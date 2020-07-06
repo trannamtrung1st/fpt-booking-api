@@ -14,6 +14,6 @@ namespace FPTBooking.Data.Models
         public string AdminMessage { get; set; }
 
         public virtual Booking Booking { get; set; }
-        public virtual BookingService BookingServiceCodeNavigation { get; set; }
+        public virtual BookingService BookingService { get; set; }
     }
 }

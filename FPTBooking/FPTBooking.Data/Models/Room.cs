@@ -27,10 +27,10 @@ namespace FPTBooking.Data.Models
         public TimeSpan HangingEndTime { get; set; }
         public int Status { get; set; }
 
-        public virtual BuildingArea BuildingAreaCodeNavigation { get; set; }
-        public virtual BuildingLevel BuildingLevelCodeNavigation { get; set; }
-        public virtual Department DepartmentCodeNavigation { get; set; }
-        public virtual RoomType RoomTypeCodeNavigation { get; set; }
+        public virtual BuildingArea BuildingArea { get; set; }
+        public virtual BuildingLevel BuildingLevel { get; set; }
+        public virtual Department Department { get; set; }
+        public virtual RoomType RoomType { get; set; }
         public virtual ICollection<Booking> Booking { get; set; }
         public virtual ICollection<RoomResource> RoomResource { get; set; }
         public virtual ICollection<RoomService> RoomService { get; set; }

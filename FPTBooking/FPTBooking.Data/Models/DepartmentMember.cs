@@ -10,7 +10,7 @@ namespace FPTBooking.Data.Models
         public string DepartmentCode { get; set; }
         public bool? IsManager { get; set; }
 
-        public virtual Department DepartmentCodeNavigation { get; set; }
+        public virtual Department Department { get; set; }
         public virtual Member Member { get; set; }
     }
 }

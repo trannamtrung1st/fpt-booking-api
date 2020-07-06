@@ -9,7 +9,7 @@ namespace FPTBooking.Data.Models
         public string AreaCode { get; set; }
         public string LevelCode { get; set; }
 
-        public virtual BuildingArea AreaCodeNavigation { get; set; }
-        public virtual BuildingLevel LevelCodeNavigation { get; set; }
+        public virtual BuildingArea Area { get; set; }
+        public virtual BuildingLevel Level { get; set; }
     }
 }

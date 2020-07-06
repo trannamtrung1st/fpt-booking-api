@@ -17,7 +17,7 @@ namespace FPTBooking.Data.Models
         public bool Archived { get; set; }
         public string BuildingBlockCode { get; set; }
 
-        public virtual BuildingBlock BuildingBlockCodeNavigation { get; set; }
+        public virtual BuildingBlock BuildingBlock { get; set; }
         public virtual ICollection<AreaLevel> AreaLevel { get; set; }
         public virtual ICollection<Room> Room { get; set; }
     }

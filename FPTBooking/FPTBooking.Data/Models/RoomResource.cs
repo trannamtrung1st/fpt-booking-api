@@ -12,6 +12,6 @@ namespace FPTBooking.Data.Models
         public string Status { get; set; }
         public string RoomCode { get; set; }
 
-        public virtual Room RoomCodeNavigation { get; set; }
+        public virtual Room Room { get; set; }
     }
 }

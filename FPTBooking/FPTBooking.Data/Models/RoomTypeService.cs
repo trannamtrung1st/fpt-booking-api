@@ -9,7 +9,7 @@ namespace FPTBooking.Data.Models
         public string BookingServiceCode { get; set; }
         public string RoomTypeCode { get; set; }
 
-        public virtual BookingService BookingServiceCodeNavigation { get; set; }
-        public virtual RoomType RoomTypeCodeNavigation { get; set; }
+        public virtual BookingService BookingService { get; set; }
+        public virtual RoomType RoomType { get; set; }
     }
 }

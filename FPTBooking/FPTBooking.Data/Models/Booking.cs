@@ -29,7 +29,7 @@ namespace FPTBooking.Data.Models
         public string UsingMemberId { get; set; }
 
         public virtual Member BookMember { get; set; }
-        public virtual Room RoomCodeNavigation { get; set; }
+        public virtual Room Room { get; set; }
         public virtual ICollection<AttachedService> AttachedService { get; set; }
         public virtual ICollection<BookingHistory> BookingHistory { get; set; }
         public virtual ICollection<UsageOfBooking> UsageOfBooking { get; set; }

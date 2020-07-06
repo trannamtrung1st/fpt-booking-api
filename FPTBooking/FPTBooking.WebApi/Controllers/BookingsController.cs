@@ -26,8 +26,13 @@ namespace FPTBooking.WebApi.Controllers
     {
         private static NLog.Logger _logger = NLog.LogManager.GetCurrentClassLogger();
 
+        [Authorize]
         [HttpGet("")]
-        public IActionResult Get()
+        public IActionResult Get([FromQuery]BookingQueryFilter filter,
+            [FromQuery]BookingQuerySort sort,
+            [FromQuery]BookingQueryProjection projection,
+            [FromQuery]BookingQueryPaging paging,
+            [FromQuery]BookingQueryOptions options)
         {
             if (Settings.Instance.Mocking.Enabled || true)
             {

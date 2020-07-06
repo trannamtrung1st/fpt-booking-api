@@ -136,11 +136,11 @@ namespace FPTBooking.Data.Models
 
                 entity.Property(e => e.LevelCode).HasMaxLength(100);
 
-                entity.HasOne(d => d.AreaCodeNavigation)
+                entity.HasOne(d => d.Area)
                     .WithMany(p => p.AreaLevel)
                     .HasForeignKey(d => d.AreaCode);
 
-                entity.HasOne(d => d.LevelCodeNavigation)
+                entity.HasOne(d => d.Level)
                     .WithMany(p => p.AreaLevel)
                     .HasForeignKey(d => d.LevelCode);
             });
@@ -161,7 +161,7 @@ namespace FPTBooking.Data.Models
                     .HasMaxLength(100)
                     .IsUnicode(false);
 
-                entity.HasOne(d => d.AreaCodeNavigation)
+                entity.HasOne(d => d.Area)
                     .WithMany(p => p.AreaManager)
                     .HasForeignKey(d => d.AreaCode);
 
@@ -190,7 +190,7 @@ namespace FPTBooking.Data.Models
                     .WithMany(p => p.AttachedService)
                     .HasForeignKey(d => d.BookingId);
 
-                entity.HasOne(d => d.BookingServiceCodeNavigation)
+                entity.HasOne(d => d.BookingService)
                     .WithMany(p => p.AttachedService)
                     .HasForeignKey(d => d.BookingServiceCode);
             });
@@ -231,7 +231,7 @@ namespace FPTBooking.Data.Models
                     .HasForeignKey(d => d.BookMemberId)
                     .OnDelete(DeleteBehavior.ClientSetNull);
 
-                entity.HasOne(d => d.RoomCodeNavigation)
+                entity.HasOne(d => d.Room)
                     .WithMany(p => p.Booking)
                     .HasForeignKey(d => d.RoomCode);
             });
@@ -338,7 +338,7 @@ namespace FPTBooking.Data.Models
                     .IsRequired()
                     .HasMaxLength(255);
 
-                entity.HasOne(d => d.BuildingBlockCodeNavigation)
+                entity.HasOne(d => d.BuildingBlock)
                     .WithMany(p => p.BuildingLevel)
                     .HasForeignKey(d => d.BuildingBlockCode);
             });
@@ -375,7 +375,7 @@ namespace FPTBooking.Data.Models
                     .HasMaxLength(100)
                     .IsUnicode(false);
 
-                entity.HasOne(d => d.DepartmentCodeNavigation)
+                entity.HasOne(d => d.Department)
                     .WithMany(p => p.DepartmentMember)
                     .HasForeignKey(d => d.DepartmentCode);
 
@@ -418,7 +418,7 @@ namespace FPTBooking.Data.Models
 
                 entity.Property(e => e.Phone).HasMaxLength(100);
 
-                entity.HasOne(d => d.MemberTypeCodeNavigation)
+                entity.HasOne(d => d.MemberType)
                     .WithMany(p => p.Member)
                     .HasForeignKey(d => d.MemberTypeCode);
 
@@ -521,19 +521,19 @@ namespace FPTBooking.Data.Models
                     .IsRequired()
                     .HasMaxLength(100);
 
-                entity.HasOne(d => d.BuildingAreaCodeNavigation)
+                entity.HasOne(d => d.BuildingArea)
                     .WithMany(p => p.Room)
                     .HasForeignKey(d => d.BuildingAreaCode);
 
-                entity.HasOne(d => d.BuildingLevelCodeNavigation)
+                entity.HasOne(d => d.BuildingLevel)
                     .WithMany(p => p.Room)
                     .HasForeignKey(d => d.BuildingLevelCode);
 
-                entity.HasOne(d => d.DepartmentCodeNavigation)
+                entity.HasOne(d => d.Department)
                     .WithMany(p => p.Room)
                     .HasForeignKey(d => d.DepartmentCode);
 
-                entity.HasOne(d => d.RoomTypeCodeNavigation)
+                entity.HasOne(d => d.RoomType)
                     .WithMany(p => p.Room)
                     .HasForeignKey(d => d.RoomTypeCode);
             });
@@ -548,7 +548,7 @@ namespace FPTBooking.Data.Models
 
                 entity.Property(e => e.RoomCode).HasMaxLength(100);
 
-                entity.HasOne(d => d.RoomCodeNavigation)
+                entity.HasOne(d => d.Room)
                     .WithMany(p => p.RoomResource)
                     .HasForeignKey(d => d.RoomCode);
             });
@@ -567,11 +567,11 @@ namespace FPTBooking.Data.Models
                     .IsRequired()
                     .HasMaxLength(100);
 
-                entity.HasOne(d => d.RoomCodeNavigation)
+                entity.HasOne(d => d.Room)
                     .WithMany(p => p.RoomService)
                     .HasForeignKey(d => d.RoomCode);
 
-                entity.HasOne(d => d.ServiceCodeNavigation)
+                entity.HasOne(d => d.BookingService)
                     .WithMany(p => p.RoomService)
                     .HasForeignKey(d => d.ServiceCode);
             });
@@ -603,11 +603,11 @@ namespace FPTBooking.Data.Models
                     .IsRequired()
                     .HasMaxLength(100);
 
-                entity.HasOne(d => d.BookingServiceCodeNavigation)
+                entity.HasOne(d => d.BookingService)
                     .WithMany(p => p.RoomTypeService)
                     .HasForeignKey(d => d.BookingServiceCode);
 
-                entity.HasOne(d => d.RoomTypeCodeNavigation)
+                entity.HasOne(d => d.RoomType)
                     .WithMany(p => p.RoomTypeService)
                     .HasForeignKey(d => d.RoomTypeCode);
             });
