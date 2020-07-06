@@ -1,0 +1,60 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 16
+VisualStudioVersion = 16.0.29920.165
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "FPTBooking", "FPTBooking\FPTBooking.csproj", "{EEAE1A0C-5714-4D8D-BE2F-9973F6B45C28}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "FPTBooking.WebApi", "FPTBooking.WebApi\FPTBooking.WebApi.csproj", "{04EFE866-7E37-4DD2-A095-7917DF031D2C}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "FPTBooking.Business", "FPTBooking.Business\FPTBooking.Business.csproj", "{E0054B5A-254E-4BF8-B773-0A2452D71C26}"
+EndProject
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "FPTBooking.Data", "FPTBooking.Data\FPTBooking.Data.csproj", "{03215C0F-CCC3-468D-9A82-3F1C635B589E}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FPTBooking.WebHelpers", "FPTBooking.WebHelpers\FPTBooking.WebHelpers.csproj", "{A3410046-4527-4554-AECF-FBE020BBD764}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+		Test|Any CPU = Test|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{EEAE1A0C-5714-4D8D-BE2F-9973F6B45C28}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{EEAE1A0C-5714-4D8D-BE2F-9973F6B45C28}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{EEAE1A0C-5714-4D8D-BE2F-9973F6B45C28}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{EEAE1A0C-5714-4D8D-BE2F-9973F6B45C28}.Release|Any CPU.Build.0 = Release|Any CPU
+		{EEAE1A0C-5714-4D8D-BE2F-9973F6B45C28}.Test|Any CPU.ActiveCfg = Test|Any CPU
+		{EEAE1A0C-5714-4D8D-BE2F-9973F6B45C28}.Test|Any CPU.Build.0 = Test|Any CPU
+		{04EFE866-7E37-4DD2-A095-7917DF031D2C}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{04EFE866-7E37-4DD2-A095-7917DF031D2C}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{04EFE866-7E37-4DD2-A095-7917DF031D2C}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{04EFE866-7E37-4DD2-A095-7917DF031D2C}.Release|Any CPU.Build.0 = Release|Any CPU
+		{04EFE866-7E37-4DD2-A095-7917DF031D2C}.Test|Any CPU.ActiveCfg = Test|Any CPU
+		{04EFE866-7E37-4DD2-A095-7917DF031D2C}.Test|Any CPU.Build.0 = Test|Any CPU
+		{E0054B5A-254E-4BF8-B773-0A2452D71C26}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{E0054B5A-254E-4BF8-B773-0A2452D71C26}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{E0054B5A-254E-4BF8-B773-0A2452D71C26}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{E0054B5A-254E-4BF8-B773-0A2452D71C26}.Release|Any CPU.Build.0 = Release|Any CPU
+		{E0054B5A-254E-4BF8-B773-0A2452D71C26}.Test|Any CPU.ActiveCfg = Debug|Any CPU
+		{E0054B5A-254E-4BF8-B773-0A2452D71C26}.Test|Any CPU.Build.0 = Debug|Any CPU
+		{03215C0F-CCC3-468D-9A82-3F1C635B589E}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{03215C0F-CCC3-468D-9A82-3F1C635B589E}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{03215C0F-CCC3-468D-9A82-3F1C635B589E}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{03215C0F-CCC3-468D-9A82-3F1C635B589E}.Release|Any CPU.Build.0 = Release|Any CPU
+		{03215C0F-CCC3-468D-9A82-3F1C635B589E}.Test|Any CPU.ActiveCfg = Debug|Any CPU
+		{03215C0F-CCC3-468D-9A82-3F1C635B589E}.Test|Any CPU.Build.0 = Debug|Any CPU
+		{A3410046-4527-4554-AECF-FBE020BBD764}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{A3410046-4527-4554-AECF-FBE020BBD764}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{A3410046-4527-4554-AECF-FBE020BBD764}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{A3410046-4527-4554-AECF-FBE020BBD764}.Release|Any CPU.Build.0 = Release|Any CPU
+		{A3410046-4527-4554-AECF-FBE020BBD764}.Test|Any CPU.ActiveCfg = Debug|Any CPU
+		{A3410046-4527-4554-AECF-FBE020BBD764}.Test|Any CPU.Build.0 = Debug|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {7E02A0B1-44FE-47FB-9C41-A76CDA6A41DF}
+	EndGlobalSection
+EndGlobal
