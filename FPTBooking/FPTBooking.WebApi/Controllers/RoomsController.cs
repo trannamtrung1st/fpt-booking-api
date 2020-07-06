@@ -124,38 +124,40 @@ namespace FPTBooking.WebApi.Controllers
                     case 4:
                         return Ok(AppResult.Success(data: new
                         {
-                            code = randomCode,
-                            name = randomCode,
-                            area_size = rd.Next(10, 30),
-                            people_capacity = rd.Next(10, 30),
-                            description = "This is the room description",
-                            room_type = new
+                            single = new
                             {
-                                code = "CR",
-                                name = "Classroom"
-                            },
-                            block = new
-                            {
-                                code = "B1",
-                                name = "Block 1"
-                            },
-                            level = new
-                            {
-                                code = "F1",
-                                name = "Floor 1"
-                            },
-                            is_available = true,
-                            area = new
-                            {
-                                code = "CR",
-                                name = "Classroom"
-                            },
-                            department = new
-                            {
-                                code = "D1",
-                                name = "Department of Education"
-                            },
-                            resources = new List<object>
+                                code = randomCode,
+                                name = randomCode,
+                                area_size = rd.Next(10, 30),
+                                people_capacity = rd.Next(10, 30),
+                                description = "This is the room description",
+                                room_type = new
+                                {
+                                    code = "CR",
+                                    name = "Classroom"
+                                },
+                                block = new
+                                {
+                                    code = "B1",
+                                    name = "Block 1"
+                                },
+                                level = new
+                                {
+                                    code = "F1",
+                                    name = "Floor 1"
+                                },
+                                is_available = true,
+                                area = new
+                                {
+                                    code = "CR",
+                                    name = "Classroom"
+                                },
+                                department = new
+                                {
+                                    code = "D1",
+                                    name = "Department of Education"
+                                },
+                                resources = new List<object>
                             {
                                 new
                                 {
@@ -170,7 +172,7 @@ namespace FPTBooking.WebApi.Controllers
                                     is_available = false,
                                 }
                             },
-                            available_services = new List<object>
+                                available_services = new List<object>
                             {
                                 new
                                 {
@@ -183,7 +185,8 @@ namespace FPTBooking.WebApi.Controllers
                                     name = "Mentor/Support"
                                 }
                             },
-                            note = "This is note from Room checker"
+                                note = "This is note from Room checker"
+                            }
                         }));
                     case 5:
                     case 6:

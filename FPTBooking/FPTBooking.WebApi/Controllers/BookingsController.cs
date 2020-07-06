@@ -15,6 +15,7 @@ using FPTBooking.Business.Models;
 using TNT.Core.Helpers.DI;
 using TNT.Core.Http.DI;
 using TNT.Core.Helpers.General;
+using FPTBooking.Business.Services;
 
 namespace FPTBooking.WebApi.Controllers
 {
@@ -26,9 +27,12 @@ namespace FPTBooking.WebApi.Controllers
     {
         private static NLog.Logger _logger = NLog.LogManager.GetCurrentClassLogger();
 
+        [Inject]
+        private readonly BookingBusinessService _service;
+
         [Authorize]
         [HttpGet("")]
-        public IActionResult Get([FromQuery]BookingQueryFilter filter,
+        public async Task<IActionResult> GetOwnerBookings([FromQuery]BookingQueryFilter filter,
             [FromQuery]BookingQuerySort sort,
             [FromQuery]BookingQueryProjection projection,
             [FromQuery]BookingQueryPaging paging,
@@ -131,7 +135,15 @@ namespace FPTBooking.WebApi.Controllers
                         throw new Exception("Test exception");
                 }
             }
-            throw new NotImplementedException();
+            var validationData = _service.ValidateGetBookings(
+                User, filter, sort, projection, paging, options);
+            if (!validationData.IsValid)
+                return BadRequest(AppResult.FailValidation(data: validationData));
+            var result = await _service.QueryBookingDynamic(
+                User, BookingPrincipalRelationship.Owner,
+                projection, validationData.TempData, filter, sort, paging, options);
+            if (options.single_only && result == null) return NotFound(AppResult.NotFound());
+            return Ok(AppResult.Success(data: result));
         }
 
 
@@ -240,20 +252,22 @@ namespace FPTBooking.WebApi.Controllers
                     case 4:
                         return Ok(AppResult.Success(data: new
                         {
-                            id = 3,
-                            code = "B2",
-                            booked_date = DateTime.Now.ToString("dd/MM/yyyy"),
-                            from_time = "13:00",
-                            to_time = "14:00",
-                            room = new
+                            single = new
                             {
-                                code = randomCode,
-                                name = randomCode
-                            },
-                            type = "Booking",
-                            status = "Approved",
-                            num_of_people = rd.Next(1, 15),
-                            attached_services = new List<object>
+                                id = 3,
+                                code = "B2",
+                                booked_date = DateTime.Now.ToString("dd/MM/yyyy"),
+                                from_time = "13:00",
+                                to_time = "14:00",
+                                room = new
+                                {
+                                    code = randomCode,
+                                    name = randomCode
+                                },
+                                type = "Booking",
+                                status = "Approved",
+                                num_of_people = rd.Next(1, 15),
+                                attached_services = new List<object>
                             {
                                 new
                                 {
@@ -261,15 +275,16 @@ namespace FPTBooking.WebApi.Controllers
                                     name = "Tea-break"
                                 }
                             },
-                            book_person = "trungtnser130@fpt.edu.vn",
-                            using_person = new List<string>()
+                                book_person = "trungtnser130@fpt.edu.vn",
+                                using_person = new List<string>()
                             {
                                 "trungtnser130@fpt.edu.vn",
                                 "abdeq@fpt.edu.vn"
                             },
-                            note = "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed nec cursus urna, quis accumsan eros. Proin et neque dignissim nulla elementum sodales nec quis magna. In eu malesuada nulla. Fusce pulvinar sem non neque imperdiet maximus. Sed eu ornare nisi, sit amet mattis leo. Etiam consequat arcu sed efficitur faucibus",
-                            feedback = "This is the latest feedback",
-                            manager_message = "This is the manager message"
+                                note = "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed nec cursus urna, quis accumsan eros. Proin et neque dignissim nulla elementum sodales nec quis magna. In eu malesuada nulla. Fusce pulvinar sem non neque imperdiet maximus. Sed eu ornare nisi, sit amet mattis leo. Etiam consequat arcu sed efficitur faucibus",
+                                feedback = "This is the latest feedback",
+                                manager_message = "This is the manager message"
+                            }
                         }));
                     case 5:
                     case 6:

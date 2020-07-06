@@ -9,6 +9,14 @@ namespace FPTBooking.Business.Helpers
 {
     public static class DateTimeHelper
     {
+        public static bool TryConvertToUTC(this string str, string dateFormat, out DateTime dateTime)
+        {
+            if (dateFormat == null) dateFormat = AppDateTimeFormat.DEFAULT_DATE_FORMAT;
+            return DateTime.TryParseExact(s: str,
+                    format: dateFormat,
+                    provider: CultureInfo.InvariantCulture, style: DateTimeStyles.AdjustToUniversal, out dateTime);
+        }
+
         public static string ToString(this DateTime dateTime, string dateFormat = null,
             string culture = null, string lang = null)
         {

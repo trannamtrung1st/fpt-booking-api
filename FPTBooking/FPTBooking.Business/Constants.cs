@@ -24,7 +24,9 @@ namespace FPTBooking.Business
         [Display(Name = "Username has already existed")]
         DuplicatedUsername = 8,
         [Display(Name = "Invalid email domain")]
-        InvalidEmailDomain = 9
+        InvalidEmailDomain = 9,
+        [Display(Name = "Access denied")]
+        AccessDenied = 10
 
     }
 
@@ -61,6 +63,11 @@ namespace FPTBooking.Business
         public const string ERROR = "error";
     }
 
+    public static class AppDateTimeFormat
+    {
+        public const string DEFAULT_DATE_FORMAT = "dd/MM/yyyy";
+    }
+
     public static class AppTimeZone
     {
         private static readonly TimeZoneInfo _default = TimeZoneInfo.FindSystemTimeZoneById("SE Asia Standard Time");
@@ -80,6 +87,17 @@ namespace FPTBooking.Business
     public static class MemberTypeValues
     {
         public const string GENERAL = "General";
+    }
+
+    public static class BookingTypeValues
+    {
+        public const string BOOKING = "Booking";
+    }
+
+    public enum BookingPrincipalRelationship
+    {
+        Manager = 1,
+        Owner = 2
     }
 
 }

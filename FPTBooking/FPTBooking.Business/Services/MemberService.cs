@@ -14,11 +14,11 @@ using Microsoft.AspNetCore.Identity;
 
 namespace FPTBooking.Business.Services
 {
-    public class MemberServices : Service
+    public class MemberService : Service
     {
         [Inject]
         private readonly UserManager<AppUser> _userManager;
-        public MemberServices(ServiceInjection inj) : base(inj)
+        public MemberService(ServiceInjection inj) : base(inj)
         {
         }
 

@@ -33,7 +33,7 @@ namespace FPTBooking.WebApi.Controllers
         [Inject]
         private readonly IdentityService _service;
         [Inject]
-        private readonly MemberServices _memberService;
+        private readonly MemberService _memberService;
 
         #region OAuth
         [HttpPost("login")]

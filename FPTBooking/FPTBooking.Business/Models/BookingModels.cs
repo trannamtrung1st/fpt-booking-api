@@ -82,9 +82,10 @@ namespace FPTBooking.Business.Models
     {
         public int? id { get; set; }
         public string name_contains { get; set; }
+        public string date_str { get; set; }
         public string from_date_str { get; set; }
         public string to_date_str { get; set; }
-        public bool managed { get; set; } = false;
+        public byte archived { get; set; } //0: false, 2: all, others: true
     }
 
     public class BookingQueryPaging
