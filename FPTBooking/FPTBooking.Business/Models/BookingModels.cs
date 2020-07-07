@@ -9,6 +9,20 @@ using System.Threading.Tasks;
 
 namespace FPTBooking.Business.Models
 {
+    public class FeedbackBookingModel : MappingModel<Booking>
+    {
+        public FeedbackBookingModel()
+        {
+        }
+
+        public FeedbackBookingModel(Booking src) : base(src)
+        {
+        }
+
+        [JsonProperty("feedback")]
+        public string Feedback { get; set; }
+    }
+
     public class CancelBookingModel : MappingModel<Booking>
     {
         public CancelBookingModel()
@@ -19,8 +33,6 @@ namespace FPTBooking.Business.Models
         {
         }
 
-        [JsonProperty("status")]
-        public string Status { get; set; }
         [JsonProperty("feedback")]
         public string Feedback { get; set; }
     }

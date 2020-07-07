@@ -101,7 +101,7 @@ namespace FPTBooking.Business
         public const string APPROVED = "Approved";
         public const string DENIED = "Denied";
         public const string ABORTED = "Aborted";
-        public const string FINISH = "Finished"; //after feedback
+        public const string FINISHED = "Finished"; //after feedback
     }
 
     public static class BookingHistoryTypes

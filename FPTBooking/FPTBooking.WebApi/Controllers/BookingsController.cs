@@ -339,6 +339,27 @@ namespace FPTBooking.WebApi.Controllers
             return NoContent();
         }
 
+        [Authorize]
+        [HttpPost("{id}/feedback")]
+        public IActionResult Feedback(int id, FeedbackBookingModel model)
+        {
+            if (Settings.Instance.Mocking.Enabled)
+                return NoContent();
+            var entity = _service.Bookings.Id(id).FirstOrDefault();
+            if (entity == null) return NotFound(AppResult.NotFound());
+            var validationData = _service.ValidateFeedbackBooking(User, entity, model);
+            if (!validationData.IsValid)
+                return BadRequest(AppResult.FailValidation(data: validationData));
+            _service.FeedbackBooking(model, entity);
+            context.SaveChanges();
+            //notify managers (if any)
+            //var managerIds = _memberService.QueryManagersOfArea(entity.Room.BuildingAreaCode)
+            //    .Select(o => o.UserId).ToList();
+            //if (managerIds.Count > 0)
+            //    await NotiHelper.Notify(managerIds, managerNoti);
+            return NoContent();
+        }
+
 #if !DEBUG
         [Authorize]
 #endif

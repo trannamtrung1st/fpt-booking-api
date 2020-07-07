@@ -74,6 +74,14 @@ namespace FPTBooking.Business.Services
         public Booking CancelBooking(CancelBookingModel model, Booking entity)
         {
             model.CopyTo(entity);
+            entity.Status = BookingStatusValues.ABORTED;
+            return entity;
+        }
+
+        public Booking FeedbackBooking(FeedbackBookingModel model, Booking entity)
+        {
+            model.CopyTo(entity);
+            entity.Status = BookingStatusValues.FINISHED;
             return entity;
         }
         #endregion
@@ -284,18 +292,40 @@ namespace FPTBooking.Business.Services
         }
 
         public ValidationData ValidateCancelBooking(ClaimsPrincipal principal,
-            Booking booking,
+            Booking entity,
             CancelBookingModel model)
         {
             var validationData = new ValidationData();
             var userId = principal.Identity.Name;
-            if (booking.BookMemberId != userId)
+            if (entity.BookMemberId != userId)
                 validationData.Fail(code: AppResultCode.AccessDenied);
             var now = DateTime.UtcNow;
-            if (booking.Status == BookingStatusValues.FINISH ||
-                booking.Status == BookingStatusValues.DENIED ||
-                booking.Status == BookingStatusValues.ABORTED ||
-                (booking.BookedDate == now.Date && booking.FromTime <= now.TimeOfDay) || booking.BookedDate > now.Date)
+            if (entity.Status == BookingStatusValues.FINISHED ||
+                entity.Status == BookingStatusValues.DENIED ||
+                entity.Status == BookingStatusValues.ABORTED ||
+                (entity.BookedDate == now.Date && entity.FromTime <= now.TimeOfDay) || entity.BookedDate > now.Date)
+                validationData.Fail(mess: "Not allowed", code: AppResultCode.FailValidation);
+            if (model.Feedback == null)
+                validationData.Fail(mess: "You must provide a reason in feedback", code: AppResultCode.FailValidation);
+            return validationData;
+        }
+
+        public ValidationData ValidateFeedbackBooking(ClaimsPrincipal principal,
+            Booking entity,
+            FeedbackBookingModel model)
+        {
+            var validationData = new ValidationData();
+            var userId = principal.Identity.Name;
+            if (entity.BookMemberId != userId)
+                validationData.Fail(code: AppResultCode.AccessDenied);
+            var now = DateTime.UtcNow;
+            var startTime = entity.BookedDate.Date
+                .AddMinutes(entity.FromTime.TotalMinutes);
+            var allowFeedbackTime = entity.BookedDate.Date
+                .AddMinutes(entity.ToTime.TotalMinutes)
+                .AddHours(4);
+            if (entity.Status != BookingStatusValues.APPROVED || allowFeedbackTime <= now
+                || startTime >= now)
                 validationData.Fail(mess: "Not allowed", code: AppResultCode.FailValidation);
             if (model.Feedback == null)
                 validationData.Fail(mess: "You must provide a reason in feedback", code: AppResultCode.FailValidation);
