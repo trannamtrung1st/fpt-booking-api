@@ -213,11 +213,32 @@ namespace FPTBooking.WebApi.Controllers
             if (hanging)
             {
                 entity = _service.Attach(entity);
-                _service.HangRoom(entity);
+                _service.ChangeRoomHangingStatus(entity, true);
                 context.SaveChanges();
             }
             var obj = _service.GetRoomDynamic(entity, projection, options);
             return Ok(AppResult.Success(data: obj));
+        }
+
+#if !DEBUG
+        [Authorize]
+#endif
+        [HttpPut("{code}/hanging/{hanging}")]
+        public IActionResult HangRoom(string code,
+            bool hanging = false)
+        {
+            if (Settings.Instance.Mocking.Enabled)
+            {
+                return NoContent();
+            }
+            var validationData = _service.ValidateHangRoom(code, hanging);
+            if (!validationData.IsValid)
+                return BadRequest(AppResult.FailValidation(data: validationData));
+            var entity = _service.Rooms.Code(code).FirstOrDefault();
+            if (entity == null) return NotFound(AppResult.NotFound());
+            if (_service.ChangeRoomHangingStatus(entity, hanging))
+                context.SaveChanges();
+            return NoContent();
         }
 
     }

@@ -37,12 +37,22 @@ namespace FPTBooking.Business.Services
             return context.Attach(entity).Entity;
         }
 
-        public Room HangRoom(Room entity)
+        public bool ChangeRoomHangingStatus(Room entity, bool hanging)
         {
-            var now = DateTime.UtcNow;
-            entity.HangingStartTime = now;
-            entity.HangingEndTime = now.AddMinutes(10);
-            return entity;
+            if (hanging)
+            {
+                var now = DateTime.UtcNow;
+                entity.HangingStartTime = now;
+                entity.HangingEndTime = now.AddMinutes(10);
+                return true;
+            }
+            else if (entity.HangingEndTime != null)
+            {
+                entity.HangingStartTime = null;
+                entity.HangingEndTime = null;
+                return true;
+            }
+            return false;
         }
 
         public IDictionary<string, object> GetRoomDynamic(
@@ -257,6 +267,13 @@ namespace FPTBooking.Business.Services
         public ValidationData ValidateGetRoomDetail(
             string code, bool hanging,
             RoomQueryOptions options)
+        {
+            var validationData = new ValidationData();
+            return validationData;
+        }
+
+        public ValidationData ValidateHangRoom(
+            string code, bool hanging)
         {
             var validationData = new ValidationData();
             return validationData;
