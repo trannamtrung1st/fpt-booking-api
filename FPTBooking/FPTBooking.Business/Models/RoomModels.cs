@@ -1,4 +1,5 @@
 ﻿using FPTBooking.Data.Models;
+using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -6,6 +7,12 @@ using System.Threading.Tasks;
 
 namespace FPTBooking.Business.Models
 {
+    public class ChangeRoomHangingStatusModel
+    {
+        [JsonProperty("hanging")]
+        public bool Hanging { get; set; }
+    }
+
     #region Query
     public class RoomQueryProjection
     {

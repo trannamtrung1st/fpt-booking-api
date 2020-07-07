@@ -223,20 +223,20 @@ namespace FPTBooking.WebApi.Controllers
 #if !DEBUG
         [Authorize]
 #endif
-        [HttpPut("{code}/hanging/{hanging}")]
+        [HttpPut("{code}/hanging")]
         public IActionResult HangRoom(string code,
-            bool hanging = false)
+            ChangeRoomHangingStatusModel model)
         {
             if (Settings.Instance.Mocking.Enabled)
             {
                 return NoContent();
             }
-            var validationData = _service.ValidateHangRoom(code, hanging);
+            var validationData = _service.ValidateHangRoom(code, model);
             if (!validationData.IsValid)
                 return BadRequest(AppResult.FailValidation(data: validationData));
             var entity = _service.Rooms.Code(code).FirstOrDefault();
             if (entity == null) return NotFound(AppResult.NotFound());
-            if (_service.ChangeRoomHangingStatus(entity, hanging))
+            if (_service.ChangeRoomHangingStatus(entity, model.Hanging))
                 context.SaveChanges();
             return NoContent();
         }

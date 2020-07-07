@@ -273,7 +273,7 @@ namespace FPTBooking.Business.Services
         }
 
         public ValidationData ValidateHangRoom(
-            string code, bool hanging)
+            string code, ChangeRoomHangingStatusModel model)
         {
             var validationData = new ValidationData();
             return validationData;
