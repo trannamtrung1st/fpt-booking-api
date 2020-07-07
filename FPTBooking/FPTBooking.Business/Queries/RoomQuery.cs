@@ -69,7 +69,7 @@ namespace FPTBooking.Business.Queries
                 query = query.Available(available == BoolOptions.T);
             var archived = model.available ?? BoolOptions.F;
             if (archived != BoolOptions.B)
-                query = query.Archived(archived == BoolOptions.F);
+                query = query.Archived(!(archived == BoolOptions.F));
             if (model.empty)
             {
                 //required fields
@@ -121,11 +121,51 @@ namespace FPTBooking.Business.Queries
 
         public static IQueryable<Room> Project(this IQueryable<Room> query, RoomQueryProjection model)
         {
-            var finalFields = model.GetFieldsArr()
-                .Where(f => RoomQueryProjection.FIELDS_MAPPING.ContainsKey(f))
-                .Select(f => RoomQueryProjection.FIELDS_MAPPING[f]);
-            foreach (var f in finalFields)
-                query = query.Include(f);
+            bool res = false, area = false, block = false, dep = false, level = false, roomType = false;
+            foreach (var f in model.GetFieldsArr())
+            {
+                switch (f)
+                {
+                    case RoomQueryProjection.RESOURCES: res = true; break;
+                    case RoomQueryProjection.AREA: area = true; break;
+                    case RoomQueryProjection.BLOCK: block = true; break;
+                    case RoomQueryProjection.DEPARTMENT: dep = true; break;
+                    case RoomQueryProjection.LEVEL: level = true; break;
+                    case RoomQueryProjection.ROOM_TYPE: roomType = true; break;
+                }
+            }
+            query = query.Select(o => new Room
+            {
+                Archived = o.Archived,
+                AreaSize = o.AreaSize,
+                //Booking = o.Booking,
+                BuildingArea = area ? o.BuildingArea : null,
+                BuildingAreaCode = o.BuildingAreaCode,
+                BuildingBlockCode = o.BuildingBlockCode,
+                BuildingLevel = level ? new BuildingLevel
+                {
+                    Code = o.BuildingLevel.Code,
+                    Name = o.BuildingLevel.Name,
+                    BuildingBlock = block ? o.BuildingLevel.BuildingBlock : null
+                } : (block ? new BuildingLevel
+                {
+                    BuildingBlock = o.BuildingLevel.BuildingBlock
+                } : null),
+                BuildingLevelCode = o.BuildingLevelCode,
+                Code = o.Code,
+                Department = dep ? o.Department : null,
+                DepartmentCode = o.DepartmentCode,
+                Description = o.Description,
+                HangingEndTime = o.HangingEndTime,
+                HangingStartTime = o.HangingStartTime,
+                IsAvailable = o.IsAvailable,
+                Name = o.Name,
+                Note = o.Note,
+                PeopleCapacity = o.PeopleCapacity,
+                RoomResource = res ? o.RoomResource.Where(r => r.IsAvailable).ToList() : null,
+                RoomType = roomType ? o.RoomType : null,
+                RoomTypeCode = o.RoomTypeCode,
+            });
             return query;
         }
         #endregion

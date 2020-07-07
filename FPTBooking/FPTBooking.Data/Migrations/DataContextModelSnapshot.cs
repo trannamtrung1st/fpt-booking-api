@@ -85,28 +85,28 @@ namespace FPTBooking.Data.Migrations
                         new
                         {
                             Id = "Administrator",
-                            ConcurrencyStamp = "a7fae252-9e78-4431-9c9c-e18ae4d38ead",
+                            ConcurrencyStamp = "1638a15f-35f0-42bb-b0e5-6e1c27d3363b",
                             Name = "Administrator",
                             NormalizedName = "ADMINISTRATOR"
                         },
                         new
                         {
                             Id = "Manager",
-                            ConcurrencyStamp = "5727951f-36df-4a98-9561-0b15e77ec6d9",
+                            ConcurrencyStamp = "79544b7c-e3d2-45a1-a491-fbb0c428afd8",
                             Name = "Manager",
                             NormalizedName = "MANAGER"
                         },
                         new
                         {
                             Id = "RoomChecker",
-                            ConcurrencyStamp = "0b2c320d-41a4-4f42-b334-1e77011a2157",
+                            ConcurrencyStamp = "62d5aecd-8fcb-44c7-8538-3171570c1033",
                             Name = "RoomChecker",
                             NormalizedName = "ROOMCHECKER"
                         },
                         new
                         {
                             Id = "User",
-                            ConcurrencyStamp = "7f0e67f1-5783-4edc-9e1a-6a93cfcf652b",
+                            ConcurrencyStamp = "c3c537b7-4daa-471d-a652-6f84e2cc328e",
                             Name = "User",
                             NormalizedName = "USER"
                         });
@@ -185,30 +185,6 @@ namespace FPTBooking.Data.Migrations
                         .HasFilter("[NormalizedUserName] IS NOT NULL");
 
                     b.ToTable("AspNetUsers");
-                });
-
-            modelBuilder.Entity("FPTBooking.Data.Models.AreaLevel", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int")
-                        .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
-
-                    b.Property<string>("AreaCode")
-                        .HasColumnType("nvarchar(100)")
-                        .HasMaxLength(100);
-
-                    b.Property<string>("LevelCode")
-                        .HasColumnType("nvarchar(100)")
-                        .HasMaxLength(100);
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("AreaCode");
-
-                    b.HasIndex("LevelCode");
-
-                    b.ToTable("AreaLevel");
                 });
 
             modelBuilder.Entity("FPTBooking.Data.Models.AreaManager", b =>
@@ -450,11 +426,6 @@ namespace FPTBooking.Data.Migrations
 
                     b.Property<bool>("Archived")
                         .HasColumnType("bit");
-
-                    b.Property<string>("BuildingBlockCode")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(100)")
-                        .HasMaxLength(100);
 
                     b.Property<string>("Description")
                         .HasColumnType("nvarchar(2000)")
@@ -763,6 +734,10 @@ namespace FPTBooking.Data.Migrations
                         .HasColumnType("nvarchar(255)")
                         .HasMaxLength(255);
 
+                    b.Property<string>("Note")
+                        .HasColumnType("nvarchar(2000)")
+                        .HasMaxLength(2000);
+
                     b.Property<int>("PeopleCapacity")
                         .HasColumnType("int");
 
@@ -770,9 +745,6 @@ namespace FPTBooking.Data.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(100)")
                         .HasMaxLength(100);
-
-                    b.Property<int>("Status")
-                        .HasColumnType("int");
 
                     b.HasKey("Code");
 
@@ -802,6 +774,9 @@ namespace FPTBooking.Data.Migrations
                     b.Property<string>("Description")
                         .HasColumnType("nvarchar(max)");
 
+                    b.Property<bool>("IsAvailable")
+                        .HasColumnType("bit");
+
                     b.Property<string>("Name")
                         .HasColumnType("nvarchar(max)");
 
@@ -809,40 +784,11 @@ namespace FPTBooking.Data.Migrations
                         .HasColumnType("nvarchar(100)")
                         .HasMaxLength(100);
 
-                    b.Property<string>("Status")
-                        .HasColumnType("nvarchar(max)");
-
                     b.HasKey("Id");
 
                     b.HasIndex("RoomCode");
 
                     b.ToTable("RoomResource");
-                });
-
-            modelBuilder.Entity("FPTBooking.Data.Models.RoomService", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int")
-                        .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
-
-                    b.Property<string>("RoomCode")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(100)")
-                        .HasMaxLength(100);
-
-                    b.Property<string>("ServiceCode")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(100)")
-                        .HasMaxLength(100);
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("RoomCode");
-
-                    b.HasIndex("ServiceCode");
-
-                    b.ToTable("RoomService");
                 });
 
             modelBuilder.Entity("FPTBooking.Data.Models.RoomType", b =>
@@ -1029,17 +975,6 @@ namespace FPTBooking.Data.Migrations
                         .IsRequired();
                 });
 
-            modelBuilder.Entity("FPTBooking.Data.Models.AreaLevel", b =>
-                {
-                    b.HasOne("FPTBooking.Data.Models.BuildingArea", "Area")
-                        .WithMany("AreaLevel")
-                        .HasForeignKey("AreaCode");
-
-                    b.HasOne("FPTBooking.Data.Models.BuildingLevel", "Level")
-                        .WithMany("AreaLevel")
-                        .HasForeignKey("LevelCode");
-                });
-
             modelBuilder.Entity("FPTBooking.Data.Models.AreaManager", b =>
                 {
                     b.HasOne("FPTBooking.Data.Models.BuildingArea", "Area")
@@ -1177,21 +1112,6 @@ namespace FPTBooking.Data.Migrations
                     b.HasOne("FPTBooking.Data.Models.Room", "Room")
                         .WithMany("RoomResource")
                         .HasForeignKey("RoomCode");
-                });
-
-            modelBuilder.Entity("FPTBooking.Data.Models.RoomService", b =>
-                {
-                    b.HasOne("FPTBooking.Data.Models.Room", "Room")
-                        .WithMany("RoomService")
-                        .HasForeignKey("RoomCode")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.HasOne("FPTBooking.Data.Models.BookingService", "BookingService")
-                        .WithMany("RoomService")
-                        .HasForeignKey("ServiceCode")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
                 });
 
             modelBuilder.Entity("FPTBooking.Data.Models.RoomTypeService", b =>

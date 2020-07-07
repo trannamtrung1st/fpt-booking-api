@@ -98,7 +98,7 @@ namespace FPTBooking.Business.Queries
         {
             var archived = model.archived ?? BoolOptions.F;
             if (archived != BoolOptions.B)
-                query = query.Archived(!(model.archived == BoolOptions.F));
+                query = query.Archived(!(archived == BoolOptions.F));
             if (model.id != null)
                 query = query.Id(model.id.Value);
             if (model.code != null)
@@ -142,11 +142,36 @@ namespace FPTBooking.Business.Queries
 
         public static IQueryable<Booking> Project(this IQueryable<Booking> query, BookingQueryProjection model)
         {
-            var finalFields = model.GetFieldsArr()
-                .Where(f => BookingQueryProjection.FIELDS_MAPPING.ContainsKey(f))
-                .Select(f => BookingQueryProjection.FIELDS_MAPPING[f]);
-            foreach (var f in finalFields)
-                query = query.Include(f);
+            bool room = false;
+            foreach (var f in model.GetFieldsArr())
+            {
+                switch (f)
+                {
+                    case BookingQueryProjection.ROOM: room = true; break;
+                }
+            }
+            query = query.Select(o => new Booking
+            {
+                Archived = o.Archived,
+                //AttachedService = o.AttachedService,
+                BookedDate = o.BookedDate,
+                //BookingHistory = o.BookingHistory,
+                //BookMember = o.BookMember,
+                BookMemberId = o.BookMemberId,
+                CanceledReason = o.CanceledReason,
+                Code = o.Code,
+                FromTime = o.FromTime,
+                Id = o.Id,
+                Note = o.Note,
+                RejectedReason = o.RejectedReason,
+                NumOfPeople = o.NumOfPeople,
+                Room = room ? o.Room : null,
+                Status = o.Status,
+                UsingMemberId = o.UsingMemberId,
+                RoomCode = o.RoomCode,
+                SentDate = o.SentDate,
+                ToTime = o.ToTime,
+            });
             return query;
         }
         #endregion

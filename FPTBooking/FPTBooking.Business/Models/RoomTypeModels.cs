@@ -41,13 +41,6 @@ namespace FPTBooking.Business.Models
         public const string SERVICES = "services";
         private const string T = nameof(RoomType);
         private const string S = nameof(RoomTypeService);
-
-        public static readonly IDictionary<string, string> FIELDS_MAPPING =
-            new Dictionary<string, string>()
-            {
-                { SERVICES, nameof(RoomType.RoomTypeService)+"."+nameof( RoomTypeService.BookingService) }
-            };
-
     }
 
     public class RoomTypeQuerySort

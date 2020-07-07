@@ -16,6 +16,7 @@ using TNT.Core.Helpers.DI;
 using TNT.Core.Http.DI;
 using TNT.Core.Helpers.General;
 using FPTBooking.Business.Services;
+using FPTBooking.Business.Queries;
 
 namespace FPTBooking.WebApi.Controllers
 {
@@ -127,7 +128,9 @@ namespace FPTBooking.WebApi.Controllers
 
 
         [HttpGet("{code}")]
-        public IActionResult GetDetail(string code)
+        public IActionResult GetDetail(string code,
+            [FromQuery]RoomQueryOptions options,
+            bool hanging = false)
         {
             if (Settings.Instance.Mocking.Enabled || true)
             {
@@ -175,33 +178,20 @@ namespace FPTBooking.WebApi.Controllers
                                     name = "Department of Education"
                                 },
                                 resources = new List<object>
-                            {
-                                new
                                 {
-                                    code = "PRJ",
-                                    name = "Projector",
-                                    is_available = true,
+                                    new
+                                    {
+                                        code = "PRJ",
+                                        name = "Projector",
+                                        is_available = true,
+                                    },
+                                    new
+                                    {
+                                        code = "SCR",
+                                        name = "Display screen",
+                                        is_available = false,
+                                    }
                                 },
-                                new
-                                {
-                                    code = "SCR",
-                                    name = "Display screen",
-                                    is_available = false,
-                                }
-                            },
-                                available_services = new List<object>
-                            {
-                                new
-                                {
-                                    code = "PRJ",
-                                    name = "Projector"
-                                },
-                                new
-                                {
-                                    code = "MS",
-                                    name = "Mentor/Support"
-                                }
-                            },
                                 note = "This is note from Room checker"
                             }
                         }));
@@ -210,7 +200,16 @@ namespace FPTBooking.WebApi.Controllers
                         throw new Exception("Test exception");
                 }
             }
-            throw new NotImplementedException();
+            var validationData = _service.ValidateGetRoomDetail(code, hanging, options);
+            if (!validationData.IsValid)
+                return BadRequest(AppResult.FailValidation(data: validationData));
+            var entity = _service.Rooms.Code(code).FirstOrDefault();
+            if (entity == null) return NotFound(AppResult.NotFound());
+            var obj = _service.GetRoomDynamic(entity, new RoomQueryProjection()
+            {
+                fields = RoomQueryProjection.DETAIL
+            }, options);
+            return Ok(AppResult.Success(data: obj));
         }
 
     }

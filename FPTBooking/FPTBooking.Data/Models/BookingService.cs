@@ -8,7 +8,6 @@ namespace FPTBooking.Data.Models
         public BookingService()
         {
             AttachedService = new HashSet<AttachedService>();
-            RoomService = new HashSet<RoomService>();
             RoomTypeService = new HashSet<RoomTypeService>();
         }
 
@@ -18,7 +17,6 @@ namespace FPTBooking.Data.Models
         public bool Archived { get; set; }
 
         public virtual ICollection<AttachedService> AttachedService { get; set; }
-        public virtual ICollection<RoomService> RoomService { get; set; }
         public virtual ICollection<RoomTypeService> RoomTypeService { get; set; }
     }
 }

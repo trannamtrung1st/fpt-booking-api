@@ -9,7 +9,6 @@ namespace FPTBooking.Data.Models
         {
             Booking = new HashSet<Booking>();
             RoomResource = new HashSet<RoomResource>();
-            RoomService = new HashSet<RoomService>();
         }
 
         public string Code { get; set; }
@@ -25,8 +24,8 @@ namespace FPTBooking.Data.Models
         public int PeopleCapacity { get; set; }
         public DateTime? HangingStartTime { get; set; }
         public DateTime? HangingEndTime { get; set; }
-        public int Status { get; set; }
         public bool IsAvailable { get; set; }
+        public string Note { get; set; }
 
         public virtual BuildingArea BuildingArea { get; set; }
         public virtual BuildingLevel BuildingLevel { get; set; }
@@ -34,6 +33,5 @@ namespace FPTBooking.Data.Models
         public virtual RoomType RoomType { get; set; }
         public virtual ICollection<Booking> Booking { get; set; }
         public virtual ICollection<RoomResource> RoomResource { get; set; }
-        public virtual ICollection<RoomService> RoomService { get; set; }
     }
 }

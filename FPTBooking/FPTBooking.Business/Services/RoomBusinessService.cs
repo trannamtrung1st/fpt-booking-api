@@ -52,7 +52,7 @@ namespace FPTBooking.Business.Services
                             obj["name"] = entity.Name;
                             obj["people_capacity"] = entity.PeopleCapacity;
                             obj["room_type_code"] = entity.RoomTypeCode;
-                            obj["status"] = entity.Status;
+                            obj["note"] = entity.Note;
                         }
                         break;
                     case RoomQueryProjection.SELECT:
@@ -65,36 +65,61 @@ namespace FPTBooking.Business.Services
                     case RoomQueryProjection.AREA:
                         {
                             var entity = row.BuildingArea;
-                            obj["code"] = entity.Code;
-                            obj["name"] = entity.Name;
+                            obj["area"] = new
+                            {
+                                code = entity.Code,
+                                name = entity.Name
+                            };
                         }
                         break;
                     case RoomQueryProjection.BLOCK:
                         {
                             var entity = row.BuildingLevel.BuildingBlock;
-                            obj["code"] = entity.Code;
-                            obj["name"] = entity.Name;
+                            obj["block"] = new
+                            {
+                                code = entity.Code,
+                                name = entity.Name
+                            };
                         }
                         break;
                     case RoomQueryProjection.DEPARTMENT:
                         {
                             var entity = row.Department;
-                            obj["code"] = entity.Code;
-                            obj["name"] = entity.Name;
+                            obj["department"] = new
+                            {
+                                code = entity.Code,
+                                name = entity.Name
+                            };
                         }
                         break;
                     case RoomQueryProjection.LEVEL:
                         {
                             var entity = row.BuildingLevel;
-                            obj["code"] = entity.Code;
-                            obj["name"] = entity.Name;
+                            obj["level"] = new
+                            {
+                                code = entity.Code,
+                                name = entity.Name
+                            };
                         }
                         break;
                     case RoomQueryProjection.ROOM_TYPE:
                         {
                             var entity = row.RoomType;
-                            obj["code"] = entity.Code;
-                            obj["name"] = entity.Name;
+                            obj["room_type"] = new
+                            {
+                                code = entity.Code,
+                                name = entity.Name
+                            };
+                        }
+                        break;
+                    case RoomQueryProjection.RESOURCES:
+                        {
+                            var entities = row.RoomResource.Select(o => new
+                            {
+                                name = o.Name,
+                                code = o.Code,
+                            }).ToList();
+                            obj["resources"] = entities;
                         }
                         break;
                 }
@@ -188,6 +213,13 @@ namespace FPTBooking.Business.Services
             return validationData;
         }
 
+        public ValidationData ValidateGetRoomDetail(
+            string code, bool hanging,
+            RoomQueryOptions options)
+        {
+            var validationData = new ValidationData();
+            return validationData;
+        }
         #endregion
     }
 }

@@ -67,11 +67,27 @@ namespace FPTBooking.Business.Queries
 
         public static IQueryable<RoomType> Project(this IQueryable<RoomType> query, RoomTypeQueryProjection model)
         {
-            var finalFields = model.GetFieldsArr()
-                .Where(f => RoomTypeQueryProjection.FIELDS_MAPPING.ContainsKey(f))
-                .Select(f => RoomTypeQueryProjection.FIELDS_MAPPING[f]);
-            foreach (var f in finalFields)
-                query = query.Include(f);
+            bool services = false;
+            foreach (var f in model.GetFieldsArr())
+            {
+                switch (f)
+                {
+                    case RoomTypeQueryProjection.SERVICES: services = true; break;
+                }
+            }
+            query = query.Select(o => new RoomType
+            {
+                Archived = o.Archived,
+                Code = o.Code,
+                Description = o.Description,
+                Name = o.Name,
+                //Room = o.Room,
+                RoomTypeService = services ? o.RoomTypeService
+                .Select(s => new RoomTypeService
+                {
+                    BookingService = s.BookingService
+                }).ToList() : null
+            });
             return query;
         }
         #endregion

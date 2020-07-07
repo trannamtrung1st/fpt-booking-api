@@ -18,7 +18,6 @@ namespace FPTBooking.Data.Models
         }
 
         public virtual DbSet<AppEvent> AppEvent { get; set; }
-        public virtual DbSet<AreaLevel> AreaLevel { get; set; }
         public virtual DbSet<AreaManager> AreaManager { get; set; }
         public virtual DbSet<AttachedService> AttachedService { get; set; }
         public virtual DbSet<Booking> Booking { get; set; }
@@ -36,7 +35,6 @@ namespace FPTBooking.Data.Models
         public virtual DbSet<ResourceCategory> ResourceCategory { get; set; }
         public virtual DbSet<Room> Room { get; set; }
         public virtual DbSet<RoomResource> RoomResource { get; set; }
-        public virtual DbSet<RoomService> RoomService { get; set; }
         public virtual DbSet<RoomType> RoomType { get; set; }
         public virtual DbSet<RoomTypeService> RoomTypeService { get; set; }
         public virtual DbSet<UsageOfBooking> UsageOfBooking { get; set; }
@@ -124,25 +122,6 @@ namespace FPTBooking.Data.Models
                 entity.HasOne(d => d.User)
                     .WithMany(p => p.AppEvent)
                     .HasForeignKey(d => d.UserId);
-            });
-
-            modelBuilder.Entity<AreaLevel>(entity =>
-            {
-                entity.HasIndex(e => e.AreaCode);
-
-                entity.HasIndex(e => e.LevelCode);
-
-                entity.Property(e => e.AreaCode).HasMaxLength(100);
-
-                entity.Property(e => e.LevelCode).HasMaxLength(100);
-
-                entity.HasOne(d => d.Area)
-                    .WithMany(p => p.AreaLevel)
-                    .HasForeignKey(d => d.AreaCode);
-
-                entity.HasOne(d => d.Level)
-                    .WithMany(p => p.AreaLevel)
-                    .HasForeignKey(d => d.LevelCode);
             });
 
             modelBuilder.Entity<AreaManager>(entity =>
@@ -295,10 +274,6 @@ namespace FPTBooking.Data.Models
                 entity.HasKey(e => e.Code);
 
                 entity.Property(e => e.Code).HasMaxLength(100);
-
-                entity.Property(e => e.BuildingBlockCode)
-                    .IsRequired()
-                    .HasMaxLength(100);
 
                 entity.Property(e => e.Description).HasMaxLength(2000);
 
@@ -512,6 +487,7 @@ namespace FPTBooking.Data.Models
                     .HasMaxLength(100);
 
                 entity.Property(e => e.Description).HasMaxLength(2000);
+                entity.Property(e => e.Note).HasMaxLength(2000);
 
                 entity.Property(e => e.Name)
                     .IsRequired()
@@ -551,29 +527,6 @@ namespace FPTBooking.Data.Models
                 entity.HasOne(d => d.Room)
                     .WithMany(p => p.RoomResource)
                     .HasForeignKey(d => d.RoomCode);
-            });
-
-            modelBuilder.Entity<RoomService>(entity =>
-            {
-                entity.HasIndex(e => e.RoomCode);
-
-                entity.HasIndex(e => e.ServiceCode);
-
-                entity.Property(e => e.RoomCode)
-                    .IsRequired()
-                    .HasMaxLength(100);
-
-                entity.Property(e => e.ServiceCode)
-                    .IsRequired()
-                    .HasMaxLength(100);
-
-                entity.HasOne(d => d.Room)
-                    .WithMany(p => p.RoomService)
-                    .HasForeignKey(d => d.RoomCode);
-
-                entity.HasOne(d => d.BookingService)
-                    .WithMany(p => p.RoomService)
-                    .HasForeignKey(d => d.ServiceCode);
             });
 
             modelBuilder.Entity<RoomType>(entity =>

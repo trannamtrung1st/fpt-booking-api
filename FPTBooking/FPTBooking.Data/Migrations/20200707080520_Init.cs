@@ -84,8 +84,7 @@ namespace FPTBooking.Data.Migrations
                     Code = table.Column<string>(maxLength: 100, nullable: false),
                     Name = table.Column<string>(maxLength: 255, nullable: false),
                     Description = table.Column<string>(maxLength: 2000, nullable: true),
-                    Archived = table.Column<bool>(nullable: false),
-                    BuildingBlockCode = table.Column<string>(maxLength: 100, nullable: false)
+                    Archived = table.Column<bool>(nullable: false)
                 },
                 constraints: table =>
                 {
@@ -369,32 +368,6 @@ namespace FPTBooking.Data.Migrations
                 });
 
             migrationBuilder.CreateTable(
-                name: "AreaLevel",
-                columns: table => new
-                {
-                    Id = table.Column<int>(nullable: false)
-                        .Annotation("SqlServer:Identity", "1, 1"),
-                    AreaCode = table.Column<string>(maxLength: 100, nullable: true),
-                    LevelCode = table.Column<string>(maxLength: 100, nullable: true)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_AreaLevel", x => x.Id);
-                    table.ForeignKey(
-                        name: "FK_AreaLevel_BuildingArea_AreaCode",
-                        column: x => x.AreaCode,
-                        principalTable: "BuildingArea",
-                        principalColumn: "Code",
-                        onDelete: ReferentialAction.Restrict);
-                    table.ForeignKey(
-                        name: "FK_AreaLevel_BuildingLevel_LevelCode",
-                        column: x => x.LevelCode,
-                        principalTable: "BuildingLevel",
-                        principalColumn: "Code",
-                        onDelete: ReferentialAction.Restrict);
-                });
-
-            migrationBuilder.CreateTable(
                 name: "Room",
                 columns: table => new
                 {
@@ -411,8 +384,8 @@ namespace FPTBooking.Data.Migrations
                     PeopleCapacity = table.Column<int>(nullable: false),
                     HangingStartTime = table.Column<DateTime>(nullable: true),
                     HangingEndTime = table.Column<DateTime>(nullable: true),
-                    Status = table.Column<int>(nullable: false),
-                    IsAvailable = table.Column<bool>(nullable: false)
+                    IsAvailable = table.Column<bool>(nullable: false),
+                    Note = table.Column<string>(maxLength: 2000, nullable: true)
                 },
                 constraints: table =>
                 {
@@ -565,7 +538,7 @@ namespace FPTBooking.Data.Migrations
                     Code = table.Column<string>(maxLength: 100, nullable: false),
                     Name = table.Column<string>(nullable: true),
                     Description = table.Column<string>(nullable: true),
-                    Status = table.Column<string>(nullable: true),
+                    IsAvailable = table.Column<bool>(nullable: false),
                     RoomCode = table.Column<string>(maxLength: 100, nullable: true)
                 },
                 constraints: table =>
@@ -577,32 +550,6 @@ namespace FPTBooking.Data.Migrations
                         principalTable: "Room",
                         principalColumn: "Code",
                         onDelete: ReferentialAction.Restrict);
-                });
-
-            migrationBuilder.CreateTable(
-                name: "RoomService",
-                columns: table => new
-                {
-                    Id = table.Column<int>(nullable: false)
-                        .Annotation("SqlServer:Identity", "1, 1"),
-                    ServiceCode = table.Column<string>(maxLength: 100, nullable: false),
-                    RoomCode = table.Column<string>(maxLength: 100, nullable: false)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_RoomService", x => x.Id);
-                    table.ForeignKey(
-                        name: "FK_RoomService_Room_RoomCode",
-                        column: x => x.RoomCode,
-                        principalTable: "Room",
-                        principalColumn: "Code",
-                        onDelete: ReferentialAction.Cascade);
-                    table.ForeignKey(
-                        name: "FK_RoomService_BookingService_ServiceCode",
-                        column: x => x.ServiceCode,
-                        principalTable: "BookingService",
-                        principalColumn: "Code",
-                        onDelete: ReferentialAction.Cascade);
                 });
 
             migrationBuilder.CreateTable(
@@ -697,10 +644,10 @@ namespace FPTBooking.Data.Migrations
                 columns: new[] { "Id", "ConcurrencyStamp", "Name", "NormalizedName" },
                 values: new object[,]
                 {
-                    { "Administrator", "a7fae252-9e78-4431-9c9c-e18ae4d38ead", "Administrator", "ADMINISTRATOR" },
-                    { "Manager", "5727951f-36df-4a98-9561-0b15e77ec6d9", "Manager", "MANAGER" },
-                    { "RoomChecker", "0b2c320d-41a4-4f42-b334-1e77011a2157", "RoomChecker", "ROOMCHECKER" },
-                    { "User", "7f0e67f1-5783-4edc-9e1a-6a93cfcf652b", "User", "USER" }
+                    { "Administrator", "1638a15f-35f0-42bb-b0e5-6e1c27d3363b", "Administrator", "ADMINISTRATOR" },
+                    { "Manager", "79544b7c-e3d2-45a1-a491-fbb0c428afd8", "Manager", "MANAGER" },
+                    { "RoomChecker", "62d5aecd-8fcb-44c7-8538-3171570c1033", "RoomChecker", "ROOMCHECKER" },
+                    { "User", "c3c537b7-4daa-471d-a652-6f84e2cc328e", "User", "USER" }
                 });
 
             migrationBuilder.InsertData(
@@ -712,16 +659,6 @@ namespace FPTBooking.Data.Migrations
                 name: "IX_AppEvent_UserId",
                 table: "AppEvent",
                 column: "UserId");
-
-            migrationBuilder.CreateIndex(
-                name: "IX_AreaLevel_AreaCode",
-                table: "AreaLevel",
-                column: "AreaCode");
-
-            migrationBuilder.CreateIndex(
-                name: "IX_AreaLevel_LevelCode",
-                table: "AreaLevel",
-                column: "LevelCode");
 
             migrationBuilder.CreateIndex(
                 name: "IX_AreaManager_MemberId",
@@ -854,16 +791,6 @@ namespace FPTBooking.Data.Migrations
                 column: "RoomCode");
 
             migrationBuilder.CreateIndex(
-                name: "IX_RoomService_RoomCode",
-                table: "RoomService",
-                column: "RoomCode");
-
-            migrationBuilder.CreateIndex(
-                name: "IX_RoomService_ServiceCode",
-                table: "RoomService",
-                column: "ServiceCode");
-
-            migrationBuilder.CreateIndex(
                 name: "IX_RoomTypeService_BookingServiceCode",
                 table: "RoomTypeService",
                 column: "BookingServiceCode");
@@ -888,9 +815,6 @@ namespace FPTBooking.Data.Migrations
         {
             migrationBuilder.DropTable(
                 name: "AppEvent");
-
-            migrationBuilder.DropTable(
-                name: "AreaLevel");
 
             migrationBuilder.DropTable(
                 name: "AreaManager");
@@ -924,9 +848,6 @@ namespace FPTBooking.Data.Migrations
 
             migrationBuilder.DropTable(
                 name: "RoomResource");
-
-            migrationBuilder.DropTable(
-                name: "RoomService");
 
             migrationBuilder.DropTable(
                 name: "RoomTypeService");

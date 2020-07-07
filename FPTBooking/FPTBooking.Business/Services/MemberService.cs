@@ -16,8 +16,6 @@ namespace FPTBooking.Business.Services
 {
     public class MemberService : Service
     {
-        [Inject]
-        private readonly UserManager<AppUser> _userManager;
         public MemberService(ServiceInjection inj) : base(inj)
         {
         }

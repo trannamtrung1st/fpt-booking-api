@@ -49,16 +49,55 @@ namespace FPTBooking.WebApi.Controllers
                     {
                         code = "CR",
                         name = "Classroom",
+                        services = new List<object>
+                        {
+                            new
+                            {
+                                code = "TB",
+                                name = "Tea-break"
+                            },
+                            new
+                            {
+                                code = "PRJ",
+                                name = "Projector"
+                            }
+                        }
                     },
                     new
                     {
                         code = "LB",
                         name = "Library",
+                        services = new List<object>
+                        {
+                            new
+                            {
+                                code = "TB",
+                                name = "Tea-break"
+                            },
+                            new
+                            {
+                                code = "PRJ",
+                                name = "Projector"
+                            }
+                        }
                     },
                     new
                     {
                         code = "ST",
                         name = "Studio",
+                        services = new List<object>
+                        {
+                            new
+                            {
+                                code = "TB",
+                                name = "Tea-break"
+                            },
+                            new
+                            {
+                                code = "PRJ",
+                                name = "Projector"
+                            }
+                        }
                     },
                 };
                 switch (new Random().Next(1, 7))

@@ -7,7 +7,6 @@ namespace FPTBooking.Data.Models
     {
         public BuildingArea()
         {
-            AreaLevel = new HashSet<AreaLevel>();
             AreaManager = new HashSet<AreaManager>();
             Room = new HashSet<Room>();
         }
@@ -16,9 +15,7 @@ namespace FPTBooking.Data.Models
         public string Name { get; set; }
         public string Description { get; set; }
         public bool Archived { get; set; }
-        public string BuildingBlockCode { get; set; }
 
-        public virtual ICollection<AreaLevel> AreaLevel { get; set; }
         public virtual ICollection<AreaManager> AreaManager { get; set; }
         public virtual ICollection<Room> Room { get; set; }
     }

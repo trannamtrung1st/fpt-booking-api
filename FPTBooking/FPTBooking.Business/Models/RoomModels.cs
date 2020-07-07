@@ -42,22 +42,14 @@ namespace FPTBooking.Business.Models
         public const string AREA = "area";
         public const string LEVEL = "level";
         public const string BLOCK = "block";
+        public const string RESOURCES = "resources";
+        public static readonly string DETAIL = $"{INFO},{ROOM_TYPE},{DEPARTMENT},{AREA},{LEVEL},{BLOCK},{RESOURCES}";
         private const string R = nameof(Room);
         private const string RT = nameof(RoomType);
         private const string D = nameof(Department);
         private const string A = nameof(BuildingArea);
         private const string L = nameof(BuildingLevel);
         private const string B = nameof(BuildingBlock);
-
-        public static readonly IDictionary<string, string> FIELDS_MAPPING =
-            new Dictionary<string, string>()
-            {
-                { ROOM_TYPE, nameof(Room.RoomType) },
-                { DEPARTMENT, nameof(Room.Department) },
-                { AREA, nameof(Room.BuildingArea) },
-                { LEVEL,nameof(Room.BuildingLevel) },
-                { BLOCK,nameof(Room.BuildingLevel) + "." + nameof(Room.BuildingLevel.BuildingBlock)},
-            };
 
     }
 
