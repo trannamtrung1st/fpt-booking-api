@@ -16,6 +16,7 @@ using TNT.Core.Helpers.DI;
 using TNT.Core.Http.DI;
 using TNT.Core.Helpers.General;
 using FPTBooking.Business.Services;
+using FPTBooking.Data;
 
 namespace FPTBooking.WebApi.Controllers
 {
@@ -146,7 +147,7 @@ namespace FPTBooking.WebApi.Controllers
             return Ok(AppResult.Success(data: result));
         }
 
-
+        //[Authorize(Roles = RoleName.MANAGER)]
         [HttpGet("managed")]
         public IActionResult GetManagedRequests()
         {
@@ -236,7 +237,9 @@ namespace FPTBooking.WebApi.Controllers
             throw new NotImplementedException();
         }
 
-
+#if !DEBUG
+        [Authorize]
+#endif
         [HttpGet("{id}")]
         public IActionResult GetDetail(int id)
         {

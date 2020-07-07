@@ -83,10 +83,11 @@ namespace FPTBooking.Business.Queries
                 Name = o.Name,
                 //Room = o.Room,
                 RoomTypeService = services ? o.RoomTypeService
-                .Select(s => new RoomTypeService
-                {
-                    BookingService = s.BookingService
-                }).ToList() : null
+                    .Select(s => new RoomTypeService
+                    {
+                        BookingService = s.BookingService
+                    }).Where(s => !s.BookingService.Archived).ToList()
+                    : null
             });
             return query;
         }

@@ -30,7 +30,9 @@ namespace FPTBooking.WebApi.Controllers
         [Inject]
         private readonly RoomTypeBusinessService _service;
 
-        //[Authorize]
+#if !DEBUG
+        [Authorize]
+#endif
         [HttpGet("")]
         public async Task<IActionResult> Get([FromQuery]RoomTypeQueryFilter filter,
             [FromQuery]RoomTypeQuerySort sort,
