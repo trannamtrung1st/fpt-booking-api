@@ -168,21 +168,21 @@ namespace FPTBooking.Business.Services
             if (filter.to_date_str != null)
             {
                 DateTime dateTime;
-                if (filter.to_date_str.TryConvertToUTC(dateFormat: options.date_format, out dateTime))
+                if (!filter.to_date_str.TryConvertToUTC(dateFormat: options.date_format, out dateTime))
                     validationData.Fail(mess: "Invalid date time format", AppResultCode.FailValidation);
                 else validationData.TempData["to_date"] = dateTime;
             }
             if (filter.from_date_str != null)
             {
                 DateTime dateTime;
-                if (filter.from_date_str.TryConvertToUTC(dateFormat: options.date_format, out dateTime))
+                if (!filter.from_date_str.TryConvertToUTC(dateFormat: options.date_format, out dateTime))
                     validationData.Fail(mess: "Invalid date time format", AppResultCode.FailValidation);
                 else validationData.TempData["from_date"] = dateTime;
             }
             if (filter.date_str != null)
             {
                 DateTime dateTime;
-                if (filter.date_str.TryConvertToUTC(dateFormat: options.date_format, out dateTime))
+                if (!filter.date_str.TryConvertToUTC(dateFormat: options.date_format, out dateTime))
                     validationData.Fail(mess: "Invalid date time format", AppResultCode.FailValidation);
                 else validationData.TempData["date"] = dateTime;
             }

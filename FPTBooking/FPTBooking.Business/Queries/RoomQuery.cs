@@ -47,7 +47,7 @@ namespace FPTBooking.Business.Queries
 
         public static IQueryable<Room> NotHanging(this IQueryable<Room> query, DateTime current)
         {
-            return query.Where(o => o.HangingEndTime <= current);
+            return query.Where(o => o.HangingEndTime == null || o.HangingEndTime <= current);
         }
 
         public static IQueryable<Room> OfRoomType(this IQueryable<Room> query, string typeCode)
@@ -76,7 +76,7 @@ namespace FPTBooking.Business.Queries
                 var date = (DateTime)tempData["date"];
                 var fromTime = (TimeSpan)tempData["from_time"];
                 var toTime = (TimeSpan)tempData["to_time"];
-                var now = DateTime.Now;
+                var now = DateTime.UtcNow;
                 //empty room
                 var notAvailableRoom = bookingQuery.ActiveStatus()
                     .Overlapped(date, fromTime, toTime)

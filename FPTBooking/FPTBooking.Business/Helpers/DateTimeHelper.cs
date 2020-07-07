@@ -17,6 +17,11 @@ namespace FPTBooking.Business.Helpers
                     provider: CultureInfo.InvariantCulture, style: DateTimeStyles.AdjustToUniversal, out dateTime);
         }
 
+        public static bool TryConvertToTimeSpan(this string str, out TimeSpan timeSpan)
+        {
+            return TimeSpan.TryParse(str, out timeSpan);
+        }
+
         public static string ToString(this DateTime dateTime, string dateFormat = null,
             string culture = null, string lang = null)
         {

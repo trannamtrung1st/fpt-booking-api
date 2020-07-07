@@ -212,6 +212,7 @@ namespace FPTBooking.WebApi.Controllers
             if (entity == null) return NotFound(AppResult.NotFound());
             if (hanging)
             {
+                entity = _service.Attach(entity);
                 _service.HangRoom(entity);
                 context.SaveChanges();
             }

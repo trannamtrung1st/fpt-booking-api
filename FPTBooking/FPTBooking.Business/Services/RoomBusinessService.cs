@@ -32,6 +32,11 @@ namespace FPTBooking.Business.Services
             return entity;
         }
 
+        public Room Attach(Room entity)
+        {
+            return context.Attach(entity).Entity;
+        }
+
         public Room HangRoom(Room entity)
         {
             var now = DateTime.UtcNow;
@@ -233,13 +238,18 @@ namespace FPTBooking.Business.Services
                     filter.to_time == null ||
                     filter.num_of_people == null || filter.room_type == null)
                     validationData.Fail(mess: "Invalid input data", AppResultCode.FailValidation);
-                if (filter.date_str != null)
-                {
-                    DateTime dateTime;
-                    if (filter.date_str.TryConvertToUTC(dateFormat: options.date_format, out dateTime))
-                        validationData.Fail(mess: "Invalid date time format", AppResultCode.FailValidation);
-                    else validationData.TempData["date"] = dateTime;
-                }
+                DateTime dateTime;
+                if (!filter.date_str.TryConvertToUTC(dateFormat: options.date_format, out dateTime))
+                    validationData.Fail(mess: "Invalid date time format", AppResultCode.FailValidation);
+                else validationData.TempData["date"] = dateTime;
+                TimeSpan fromTime;
+                if (!filter.from_time.TryConvertToTimeSpan(out fromTime))
+                    validationData.Fail(mess: "Invalid date time format", AppResultCode.FailValidation);
+                else validationData.TempData["from_time"] = fromTime;
+                TimeSpan toTime;
+                if (!filter.to_time.TryConvertToTimeSpan(out toTime))
+                    validationData.Fail(mess: "Invalid date time format", AppResultCode.FailValidation);
+                else validationData.TempData["to_time"] = toTime;
             }
             return validationData;
         }
