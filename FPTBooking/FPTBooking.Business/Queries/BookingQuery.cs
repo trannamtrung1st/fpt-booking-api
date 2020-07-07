@@ -12,9 +12,9 @@ namespace FPTBooking.Business.Queries
 {
     public static class BookingQuery
     {
-        public static IQueryable<Booking> Id(this IQueryable<Booking> query, string id)
+        public static IQueryable<Booking> Id(this IQueryable<Booking> query, int id)
         {
-            return query.Where(o => o.Id.Equals(id));
+            return query.Where(o => o.Id == id);
         }
         public static IQueryable<Booking> OfBookMember(this IQueryable<Booking> query, string userId)
         {
@@ -26,23 +26,30 @@ namespace FPTBooking.Business.Queries
             return query.Select(o => new Booking { Code = o.Code });
         }
 
-        public static bool Exists(this IQueryable<Booking> query, string id)
+        public static bool Exists(this IQueryable<Booking> query, int id)
         {
-            return query.Any(o => o.Code.Equals(id));
+            return query.Any(o => o.Id == id);
+        }
+        public static bool Exists(this IQueryable<Booking> query, string code)
+        {
+            return query.Any(o => o.Code == code);
         }
 
-        public static IQueryable<Booking> Ids(this IQueryable<Booking> query, IEnumerable<string> ids)
+        public static IQueryable<Booking> Ids(this IQueryable<Booking> query, IEnumerable<int> ids)
         {
-            return query.Where(q => ids.Contains(q.Code));
+            return query.Where(q => ids.Contains(q.Id));
         }
 
         #region Query
         public static IQueryable<Booking> Filter(this IQueryable<Booking> query, BookingQueryFilter model, IDictionary<string, object> tempData)
         {
-            if (model.archived != 2)
-                query = query.Where(o => o.Archived == (model.archived != 0));
+            var archived = model.archived ?? BoolOptions.F;
+            if (archived != BoolOptions.B)
+                query = query.Where(o => o.Archived == !(model.archived == BoolOptions.F));
             if (model.id != null)
                 query = query.Where(o => o.Id == model.id);
+            if (model.code != null)
+                query = query.Where(o => o.Code == model.code);
             if (model.name_contains != null)
                 query = query.Where(o => o.Code.Contains(model.name_contains));
             if (model.from_date_str != null)

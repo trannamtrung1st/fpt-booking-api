@@ -94,10 +94,24 @@ namespace FPTBooking.Business
         public const string BOOKING = "Booking";
     }
 
+    public static class BookingStatusValues
+    {
+        public const string PROCESSING = "Processing";
+        public const string APPROVED = "Approved";
+        public const string DENIED = "Denied";
+        public const string ABORTED = "Aborted";
+        public const string FINISH = "Finished"; //after feedback
+    }
+
     public enum BookingPrincipalRelationship
     {
         Manager = 1,
         Owner = 2
+    }
+
+    public enum BoolOptions
+    {
+        T = 1, F = 2, B = 3
     }
 
 }

@@ -1,0 +1,106 @@
+﻿using FPTBooking.Business.Models;
+using FPTBooking.Data.Models;
+using Microsoft.EntityFrameworkCore;
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Threading.Tasks;
+
+namespace FPTBooking.Business.Queries
+{
+    public static class RoomQuery
+    {
+        public static IQueryable<Room> Code(this IQueryable<Room> query, string code)
+        {
+            return query.Where(o => o.Code == code);
+        }
+
+        public static IQueryable<Room> CodeOnly(this IQueryable<Room> query)
+        {
+            return query.Select(o => new Room { Code = o.Code });
+        }
+
+        public static bool Exists(this IQueryable<Room> query, string code)
+        {
+            return query.Any(o => o.Code == code);
+        }
+
+        public static IQueryable<Room> Codes(this IQueryable<Room> query, IEnumerable<string> codes)
+        {
+            return query.Where(q => codes.Contains(q.Code));
+        }
+
+        #region Query
+        public static IQueryable<Room> Filter(this IQueryable<Room> query, RoomQueryFilter model,
+            IDictionary<string, object> tempData, IQueryable<Booking> bookingQuery)
+        {
+            var available = model.available ?? BoolOptions.B;
+            if (available != BoolOptions.B)
+                query = query.Where(o => o.IsAvailable == (available == BoolOptions.T));
+            var archived = model.available ?? BoolOptions.F;
+            if (archived != BoolOptions.B)
+                query = query.Where(o => o.Archived == !(archived == BoolOptions.F));
+            if (model.empty)
+            {
+                //required fields
+                var date = (DateTime)tempData["date"];
+                var fromTime = (TimeSpan)tempData["from_time"];
+                var toTime = (TimeSpan)tempData["to_time"];
+                var now = DateTime.Now;
+                //empty room
+                query = query.Except(bookingQuery.Where(b =>
+                    b.BookedDate.Date == date.Date
+                    && b.Status != BookingStatusValues.ABORTED && b.Status != BookingStatusValues.DENIED
+                    && ((b.FromTime < toTime && b.ToTime >= toTime)
+                        || (b.ToTime <= toTime && b.ToTime > fromTime)))
+                    .Select(b => b.Room))
+                    //not hanging by someone else
+                    .Where(o => o.HangingEndTime <= now);
+
+                //Already filter below
+                //.Where(o => o.RoomTypeCode == model.room_type)
+                //.Where(o => o.PeopleCapacity >= model.num_of_people);
+            }
+            if (model.code != null)
+                query = query.Where(o => o.Code == model.code);
+            if (model.name_contains != null)
+                query = query.Where(o => o.Name.Contains(model.name_contains));
+            if (model.room_type != null)
+                query = query.Where(o => o.RoomTypeCode == model.room_type);
+            if (model.num_of_people != null)
+                query = query.Where(o => o.PeopleCapacity >= model.num_of_people);
+            return query;
+        }
+
+        public static IQueryable<Room> Sort(this IQueryable<Room> query, RoomQuerySort model)
+        {
+            foreach (var s in model._sortsArr)
+            {
+                var asc = s[0] == 'a';
+                var fieldName = s.Remove(0, 1);
+                switch (fieldName)
+                {
+                    case RoomQuerySort.CODE:
+                        {
+                            if (asc) query = query.OrderBy(o => o.Code);
+                            else query = query.OrderByDescending(o => o.Code);
+                        }
+                        break;
+                }
+            }
+            return query;
+        }
+
+        public static IQueryable<Room> Project(this IQueryable<Room> query, RoomQueryProjection model)
+        {
+            var finalFields = model.GetFieldsArr()
+                .Where(f => RoomQueryProjection.FIELDS_MAPPING.ContainsKey(f))
+                .Select(f => RoomQueryProjection.FIELDS_MAPPING[f]);
+            foreach (var f in finalFields)
+                query = query.Include(f);
+            return query;
+        }
+        #endregion
+
+    }
+}

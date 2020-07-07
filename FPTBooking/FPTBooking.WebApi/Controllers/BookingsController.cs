@@ -136,7 +136,7 @@ namespace FPTBooking.WebApi.Controllers
                 }
             }
             var validationData = _service.ValidateGetBookings(
-                User, filter, sort, projection, paging, options);
+                User, BookingPrincipalRelationship.Owner, filter, sort, projection, paging, options);
             if (!validationData.IsValid)
                 return BadRequest(AppResult.FailValidation(data: validationData));
             var result = await _service.QueryBookingDynamic(

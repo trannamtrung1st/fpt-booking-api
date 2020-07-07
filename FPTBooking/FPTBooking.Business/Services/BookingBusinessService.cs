@@ -18,8 +18,6 @@ namespace FPTBooking.Business.Services
 {
     public class BookingBusinessService : Service
     {
-        [Inject]
-        private readonly UserManager<AppUser> _userManager;
         public BookingBusinessService(ServiceInjection inj) : base(inj)
         {
         }
@@ -159,6 +157,7 @@ namespace FPTBooking.Business.Services
         #region Validation
         public ValidationData ValidateGetBookings(
             ClaimsPrincipal principal,
+            BookingPrincipalRelationship relationship,
             BookingQueryFilter filter,
             BookingQuerySort sort,
             BookingQueryProjection projection,

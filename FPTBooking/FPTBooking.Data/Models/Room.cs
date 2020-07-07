@@ -21,11 +21,12 @@ namespace FPTBooking.Data.Models
         public string BuildingLevelCode { get; set; }
         public string BuildingBlockCode { get; set; }
         public string DepartmentCode { get; set; }
-        public double AreaSize { get; set; }
+        public double? AreaSize { get; set; }
         public int PeopleCapacity { get; set; }
-        public TimeSpan HangingStartTime { get; set; }
-        public TimeSpan HangingEndTime { get; set; }
+        public DateTime? HangingStartTime { get; set; }
+        public DateTime? HangingEndTime { get; set; }
         public int Status { get; set; }
+        public bool IsAvailable { get; set; }
 
         public virtual BuildingArea BuildingArea { get; set; }
         public virtual BuildingLevel BuildingLevel { get; set; }

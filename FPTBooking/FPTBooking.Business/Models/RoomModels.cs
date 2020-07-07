@@ -6,9 +6,8 @@ using System.Threading.Tasks;
 
 namespace FPTBooking.Business.Models
 {
-
     #region Query
-    public class BookingQueryProjection
+    public class RoomQueryProjection
     {
         private const string DEFAULT = INFO;
         private string _fields = DEFAULT;
@@ -38,21 +37,34 @@ namespace FPTBooking.Business.Models
 
         public const string INFO = "info";
         public const string SELECT = "select";
-        public const string ROOM = "room";
-        private const string B = nameof(Booking);
+        public const string ROOM_TYPE = "type";
+        public const string DEPARTMENT = "department";
+        public const string AREA = "area";
+        public const string LEVEL = "level";
+        public const string BLOCK = "block";
+        private const string R = nameof(Room);
+        private const string RT = nameof(RoomType);
+        private const string D = nameof(Department);
+        private const string A = nameof(BuildingArea);
+        private const string L = nameof(BuildingLevel);
+        private const string B = nameof(BuildingBlock);
 
         public static readonly IDictionary<string, string> FIELDS_MAPPING =
             new Dictionary<string, string>()
             {
-                { ROOM, nameof(Booking.Room) }
+                { ROOM_TYPE, nameof(Room.RoomType) },
+                { DEPARTMENT, nameof(Room.Department) },
+                { AREA, nameof(Room.BuildingArea) },
+                { LEVEL,nameof(Room.BuildingLevel) },
+                { BLOCK,nameof(Room.BuildingLevel) + "." + nameof(Room.BuildingLevel.BuildingBlock)},
             };
 
     }
 
-    public class BookingQuerySort
+    public class RoomQuerySort
     {
-        public const string DATE = "date";
-        private const string DEFAULT = "a" + DATE;
+        public const string CODE = "code";
+        private const string DEFAULT = "a" + CODE;
         private string _sorts = DEFAULT;
         public string sorts
         {
@@ -78,18 +90,21 @@ namespace FPTBooking.Business.Models
 
     }
 
-    public class BookingQueryFilter
+    public class RoomQueryFilter
     {
-        public int? id { get; set; }
         public string code { get; set; }
         public string name_contains { get; set; }
         public string date_str { get; set; }
-        public string from_date_str { get; set; }
-        public string to_date_str { get; set; }
-        public BoolOptions? archived { get; set; } //default: false
+        public string from_time { get; set; }
+        public string to_time { get; set; }
+        public int? num_of_people { get; set; }
+        public string room_type { get; set; }
+        public bool empty { get; set; } //default false
+        public BoolOptions? available { get; set; } //default both
+        public BoolOptions? archived { get; set; } //default false
     }
 
-    public class BookingQueryPaging
+    public class RoomQueryPaging
     {
         private int _page = 1;
         public int page
@@ -119,7 +134,7 @@ namespace FPTBooking.Business.Models
         }
     }
 
-    public class BookingQueryOptions
+    public class RoomQueryOptions
     {
         public bool count_total { get; set; }
         public string date_format { get; set; }

@@ -407,11 +407,12 @@ namespace FPTBooking.Data.Migrations
                     BuildingLevelCode = table.Column<string>(maxLength: 100, nullable: false),
                     BuildingBlockCode = table.Column<string>(maxLength: 100, nullable: false),
                     DepartmentCode = table.Column<string>(maxLength: 100, nullable: false),
-                    AreaSize = table.Column<double>(nullable: false),
+                    AreaSize = table.Column<double>(nullable: true),
                     PeopleCapacity = table.Column<int>(nullable: false),
-                    HangingStartTime = table.Column<TimeSpan>(nullable: false),
-                    HangingEndTime = table.Column<TimeSpan>(nullable: false),
-                    Status = table.Column<int>(nullable: false)
+                    HangingStartTime = table.Column<DateTime>(nullable: true),
+                    HangingEndTime = table.Column<DateTime>(nullable: true),
+                    Status = table.Column<int>(nullable: false),
+                    IsAvailable = table.Column<bool>(nullable: false)
                 },
                 constraints: table =>
                 {
@@ -696,10 +697,10 @@ namespace FPTBooking.Data.Migrations
                 columns: new[] { "Id", "ConcurrencyStamp", "Name", "NormalizedName" },
                 values: new object[,]
                 {
-                    { "Administrator", "69dac56a-cf6f-477a-9698-27afa8611fc4", "Administrator", "ADMINISTRATOR" },
-                    { "Manager", "6975fe1a-ddb8-4ec1-a839-a56985ca4cde", "Manager", "MANAGER" },
-                    { "RoomChecker", "fa6d1a88-ee63-4bbb-a452-93eb9b08d702", "RoomChecker", "ROOMCHECKER" },
-                    { "User", "d9ba72f2-3d16-4c6d-8152-3492df221433", "User", "USER" }
+                    { "Administrator", "a7fae252-9e78-4431-9c9c-e18ae4d38ead", "Administrator", "ADMINISTRATOR" },
+                    { "Manager", "5727951f-36df-4a98-9561-0b15e77ec6d9", "Manager", "MANAGER" },
+                    { "RoomChecker", "0b2c320d-41a4-4f42-b334-1e77011a2157", "RoomChecker", "ROOMCHECKER" },
+                    { "User", "7f0e67f1-5783-4edc-9e1a-6a93cfcf652b", "User", "USER" }
                 });
 
             migrationBuilder.InsertData(

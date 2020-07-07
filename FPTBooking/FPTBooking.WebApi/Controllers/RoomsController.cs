@@ -15,6 +15,7 @@ using FPTBooking.Business.Models;
 using TNT.Core.Helpers.DI;
 using TNT.Core.Http.DI;
 using TNT.Core.Helpers.General;
+using FPTBooking.Business.Services;
 
 namespace FPTBooking.WebApi.Controllers
 {
@@ -24,10 +25,19 @@ namespace FPTBooking.WebApi.Controllers
     [InjectionFilter]
     public class RoomsController : BaseController
     {
+
         private static NLog.Logger _logger = NLog.LogManager.GetCurrentClassLogger();
 
+        [Inject]
+        private readonly RoomBusinessService _service;
+
+        [Authorize]
         [HttpGet("")]
-        public IActionResult Get()
+        public async Task<IActionResult> Get([FromQuery]RoomQueryFilter filter,
+            [FromQuery]RoomQuerySort sort,
+            [FromQuery]RoomQueryProjection projection,
+            [FromQuery]RoomQueryPaging paging,
+            [FromQuery]RoomQueryOptions options)
         {
             if (Settings.Instance.Mocking.Enabled || true)
             {
@@ -105,7 +115,14 @@ namespace FPTBooking.WebApi.Controllers
                         throw new Exception("Test exception");
                 }
             }
-            throw new NotImplementedException();
+            var validationData = _service.ValidateGetRooms(
+                filter, sort, projection, paging, options);
+            if (!validationData.IsValid)
+                return BadRequest(AppResult.FailValidation(data: validationData));
+            var result = await _service.QueryRoomDynamic(
+                projection, validationData.TempData, filter, sort, paging, options);
+            if (options.single_only && result == null) return NotFound(AppResult.NotFound());
+            return Ok(AppResult.Success(data: result));
         }
 
 
