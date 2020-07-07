@@ -10,7 +10,7 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace FPTBooking.Data.Migrations
 {
     [DbContext(typeof(DataContext))]
-    [Migration("20200707161622_Init")]
+    [Migration("20200707170036_Init")]
     partial class Init
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -87,28 +87,28 @@ namespace FPTBooking.Data.Migrations
                         new
                         {
                             Id = "Administrator",
-                            ConcurrencyStamp = "220432b1-0776-42d5-9d46-e6a49af7bcf6",
+                            ConcurrencyStamp = "d125c40b-cb41-4cff-b595-7ebf67d9e8a3",
                             Name = "Administrator",
                             NormalizedName = "ADMINISTRATOR"
                         },
                         new
                         {
                             Id = "Manager",
-                            ConcurrencyStamp = "e8ab6858-351e-4610-8fa2-f8a0b33041c5",
+                            ConcurrencyStamp = "d2eb8d9b-e063-46b6-a320-651c0e3bc222",
                             Name = "Manager",
                             NormalizedName = "MANAGER"
                         },
                         new
                         {
                             Id = "RoomChecker",
-                            ConcurrencyStamp = "cb4eeb3f-dc23-498d-b9c6-562fcdd57fb1",
+                            ConcurrencyStamp = "c2dff61e-4652-466c-9142-5fa6d48e5994",
                             Name = "RoomChecker",
                             NormalizedName = "ROOMCHECKER"
                         },
                         new
                         {
                             Id = "User",
-                            ConcurrencyStamp = "bdf48e78-8f2d-455a-9413-b30c1fde41fe",
+                            ConcurrencyStamp = "ca61774d-de2e-417b-8e50-9e24218655eb",
                             Name = "User",
                             NormalizedName = "USER"
                         });
@@ -260,17 +260,21 @@ namespace FPTBooking.Data.Migrations
                     b.Property<DateTime>("BookedDate")
                         .HasColumnType("datetime2");
 
-                    b.Property<string>("CanceledReason")
-                        .HasColumnType("nvarchar(2000)")
-                        .HasMaxLength(2000);
-
                     b.Property<string>("Code")
                         .IsRequired()
                         .HasColumnType("nvarchar(100)")
                         .HasMaxLength(100);
 
+                    b.Property<string>("Feedback")
+                        .HasColumnType("nvarchar(2000)")
+                        .HasMaxLength(2000);
+
                     b.Property<TimeSpan>("FromTime")
                         .HasColumnType("time");
+
+                    b.Property<string>("ManagerMessage")
+                        .HasColumnType("nvarchar(2000)")
+                        .HasMaxLength(2000);
 
                     b.Property<string>("Note")
                         .HasColumnType("nvarchar(2000)")
@@ -278,10 +282,6 @@ namespace FPTBooking.Data.Migrations
 
                     b.Property<int>("NumOfPeople")
                         .HasColumnType("int");
-
-                    b.Property<string>("RejectedReason")
-                        .HasColumnType("nvarchar(2000)")
-                        .HasMaxLength(2000);
 
                     b.Property<string>("RoomCode")
                         .IsRequired()

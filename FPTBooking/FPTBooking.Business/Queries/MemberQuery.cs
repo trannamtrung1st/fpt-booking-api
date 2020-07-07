@@ -10,12 +10,8 @@ namespace FPTBooking.Business.Queries
 {
     public static class MemberQuery
     {
-        public static IQueryable<Member> IsManagerOf(this IQueryable<Member> query, Member member, ClaimsPrincipal principal)
+        public static IQueryable<Member> IsManagerOfAny(this IQueryable<Member> query, IEnumerable<string> depCodes)
         {
-            var isManager = principal.IsInRole(RoleName.MANAGER);
-            if (isManager)
-                return new List<Member>().AsQueryable();
-            var depCodes = member.DepartmentMember.Select(o => o.DepartmentCode);
             return query.Where(o => o.DepartmentMember
                 .Any(dm => dm.IsManager == true && depCodes.Contains(dm.DepartmentCode)));
         }

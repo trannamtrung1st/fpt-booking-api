@@ -133,28 +133,26 @@ namespace FPTBooking.Business.Queries
 
         public static IQueryable<Booking> Project(this IQueryable<Booking> query, BookingQueryProjection model)
         {
-            bool room = false;
+            bool room = false, member = false, services = false;
             foreach (var f in model.GetFieldsArr())
             {
                 switch (f)
                 {
                     case BookingQueryProjection.ROOM: room = true; break;
+                    case BookingQueryProjection.MEMBER: member = true; break;
+                    case BookingQueryProjection.SERVICES: services = true; break;
                 }
             }
             query = query.Select(o => new Booking
             {
                 Archived = o.Archived,
-                //AttachedService = o.AttachedService,
                 BookedDate = o.BookedDate,
                 //BookingHistory = o.BookingHistory,
-                //BookMember = o.BookMember,
                 BookMemberId = o.BookMemberId,
-                CanceledReason = o.CanceledReason,
                 Code = o.Code,
                 FromTime = o.FromTime,
                 Id = o.Id,
                 Note = o.Note,
-                RejectedReason = o.RejectedReason,
                 NumOfPeople = o.NumOfPeople,
                 Room = room ? o.Room : null,
                 Status = o.Status,
@@ -162,6 +160,18 @@ namespace FPTBooking.Business.Queries
                 RoomCode = o.RoomCode,
                 SentDate = o.SentDate,
                 ToTime = o.ToTime,
+                Feedback = o.Feedback,
+                ManagerMessage = o.ManagerMessage,
+                AttachedService = services ? o.AttachedService.AsQueryable()
+                    .Select(s => new AttachedService
+                    {
+                        BookingService = new BookingService
+                        {
+                            Code = s.BookingService.Code,
+                            Name = s.BookingService.Name
+                        }
+                    }).ToList() : null,
+                BookMember = member ? o.BookMember : null,
             });
             return query;
         }

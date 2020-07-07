@@ -22,11 +22,11 @@ namespace FPTBooking.Data.Models
         public TimeSpan ToTime { get; set; }
         public string RoomCode { get; set; }
         public string Status { get; set; }
-        public string RejectedReason { get; set; }
-        public string CanceledReason { get; set; }
         public bool Archived { get; set; }
         public string BookMemberId { get; set; }
         public string UsingMemberIds { get; set; }
+        public string ManagerMessage { get; set; }
+        public string Feedback { get; set; }
 
         public virtual Member BookMember { get; set; }
         public virtual Room Room { get; set; }

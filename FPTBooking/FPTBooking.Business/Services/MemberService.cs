@@ -28,6 +28,14 @@ namespace FPTBooking.Business.Services
                 return context.Member;
             }
         }
+
+        public IQueryable<Member> GetManagersOf(Member member)
+        {
+            var depCodes = member.DepartmentMember.AsQueryable()
+                .IsNotManager().Select(o => o.DepartmentCode).ToList();
+            return Members.IsManagerOfAny(depCodes);
+        }
+
         #endregion
 
         #region Create Member

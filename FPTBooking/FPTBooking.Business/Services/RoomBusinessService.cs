@@ -253,7 +253,7 @@ namespace FPTBooking.Business.Services
         }
 
         public ValidationData ValidateGetRoomDetail(
-            string code, bool hanging,
+            Room room, bool hanging,
             RoomQueryOptions options)
         {
             var validationData = new ValidationData();

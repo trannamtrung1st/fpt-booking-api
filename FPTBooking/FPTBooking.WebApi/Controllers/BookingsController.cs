@@ -270,7 +270,7 @@ namespace FPTBooking.WebApi.Controllers
                 Title = $"You have a new booking",
                 Body = $"{UserEmail} have just created a booking for you. Press for more detail"
             });
-            var managerIds = memberQuery.IsManagerOf(member, User).Select(o => o.UserId).ToList();
+            var managerIds = _memberService.GetManagersOf(member).Select(o => o.UserId).ToList();
             if (managerIds.Count > 0)
             {
                 await NotiHelper.Notify(managerIds, new Notification
@@ -288,7 +288,8 @@ namespace FPTBooking.WebApi.Controllers
         [Authorize]
 #endif
         [HttpGet("{id}")]
-        public IActionResult GetDetail(int id)
+        public IActionResult GetDetail(int id,
+            [FromQuery]BookingQueryOptions options)
         {
             if (Settings.Instance.Mocking.Enabled || true)
             {
@@ -318,19 +319,23 @@ namespace FPTBooking.WebApi.Controllers
                                 status = "Approved",
                                 num_of_people = rd.Next(1, 15),
                                 attached_services = new List<object>
-                            {
-                                new
                                 {
-                                    code = "TB",
-                                    name = "Tea-break"
-                                }
-                            },
-                                book_person = "trungtnser130@fpt.edu.vn",
-                                using_person = new List<string>()
-                            {
-                                "trungtnser130@fpt.edu.vn",
-                                "abdeq@fpt.edu.vn"
-                            },
+                                    new
+                                    {
+                                        code = "TB",
+                                        name = "Tea-break"
+                                    }
+                                },
+                                book_member = new
+                                {
+                                    user_id = "user1",
+                                    email = "trungtnser130@fpt.edu.vn"
+                                },
+                                using_emails = new List<string>()
+                                {
+                                    "trungtnser130@fpt.edu.vn",
+                                    "abdeq@fpt.edu.vn"
+                                },
                                 note = "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed nec cursus urna, quis accumsan eros. Proin et neque dignissim nulla elementum sodales nec quis magna. In eu malesuada nulla. Fusce pulvinar sem non neque imperdiet maximus. Sed eu ornare nisi, sit amet mattis leo. Etiam consequat arcu sed efficitur faucibus",
                                 feedback = "This is the latest feedback",
                                 manager_message = "This is the manager message"
@@ -341,7 +346,14 @@ namespace FPTBooking.WebApi.Controllers
                         throw new Exception("Test exception");
                 }
             }
-            throw new NotImplementedException();
+            var projection = new BookingQueryProjection { fields = BookingQueryProjection.DETAIL };
+            var entity = _service.GetBookingDetail(id, projection);
+            if (entity == null) return NotFound(AppResult.NotFound());
+            var validationData = _service.ValidateGetBookingDetail(entity, User, options);
+            if (!validationData.IsValid)
+                return BadRequest(AppResult.FailValidation(data: validationData));
+            var obj = _service.GetBookingDynamic(entity, projection, options);
+            return Ok(AppResult.Success(data: obj));
         }
     }
 }

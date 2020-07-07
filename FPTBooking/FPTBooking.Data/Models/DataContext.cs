@@ -179,15 +179,14 @@ namespace FPTBooking.Data.Models
                     .HasMaxLength(100)
                     .IsUnicode(false);
 
-                entity.Property(e => e.CanceledReason).HasMaxLength(2000);
-
                 entity.Property(e => e.Code)
                     .IsRequired()
                     .HasMaxLength(100);
 
                 entity.Property(e => e.Note).HasMaxLength(2000);
 
-                entity.Property(e => e.RejectedReason).HasMaxLength(2000);
+                entity.Property(e => e.ManagerMessage).HasMaxLength(2000);
+                entity.Property(e => e.Feedback).HasMaxLength(2000);
 
                 entity.Property(e => e.RoomCode)
                     .IsRequired()

@@ -506,11 +506,11 @@ namespace FPTBooking.Data.Migrations
                     ToTime = table.Column<TimeSpan>(nullable: false),
                     RoomCode = table.Column<string>(maxLength: 100, nullable: false),
                     Status = table.Column<string>(maxLength: 50, nullable: false),
-                    RejectedReason = table.Column<string>(maxLength: 2000, nullable: true),
-                    CanceledReason = table.Column<string>(maxLength: 2000, nullable: true),
                     Archived = table.Column<bool>(nullable: false),
                     BookMemberId = table.Column<string>(unicode: false, maxLength: 100, nullable: false),
-                    UsingMemberIds = table.Column<string>(nullable: false)
+                    UsingMemberIds = table.Column<string>(nullable: false),
+                    ManagerMessage = table.Column<string>(maxLength: 2000, nullable: true),
+                    Feedback = table.Column<string>(maxLength: 2000, nullable: true)
                 },
                 constraints: table =>
                 {
@@ -640,10 +640,10 @@ namespace FPTBooking.Data.Migrations
                 columns: new[] { "Id", "ConcurrencyStamp", "Name", "NormalizedName" },
                 values: new object[,]
                 {
-                    { "Administrator", "220432b1-0776-42d5-9d46-e6a49af7bcf6", "Administrator", "ADMINISTRATOR" },
-                    { "Manager", "e8ab6858-351e-4610-8fa2-f8a0b33041c5", "Manager", "MANAGER" },
-                    { "RoomChecker", "cb4eeb3f-dc23-498d-b9c6-562fcdd57fb1", "RoomChecker", "ROOMCHECKER" },
-                    { "User", "bdf48e78-8f2d-455a-9413-b30c1fde41fe", "User", "USER" }
+                    { "Administrator", "d125c40b-cb41-4cff-b595-7ebf67d9e8a3", "Administrator", "ADMINISTRATOR" },
+                    { "Manager", "d2eb8d9b-e063-46b6-a320-651c0e3bc222", "Manager", "MANAGER" },
+                    { "RoomChecker", "c2dff61e-4652-466c-9142-5fa6d48e5994", "RoomChecker", "ROOMCHECKER" },
+                    { "User", "ca61774d-de2e-417b-8e50-9e24218655eb", "User", "USER" }
                 });
 
             migrationBuilder.InsertData(

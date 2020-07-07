@@ -20,14 +20,22 @@ namespace FPTBooking.Business.Models
         }
 
         [JsonConverter(typeof(DefaultDateTimeConverter))]
+        [JsonProperty("booked_date")]
         public DateTime? BookedDate { get; set; }
+        [JsonProperty("num_of_people")]
         public int? NumOfPeople { get; set; }
+        [JsonProperty("note")]
         public string Note { get; set; }
+        [JsonProperty("from_time")]
         public TimeSpan? FromTime { get; set; }
+        [JsonProperty("to_time")]
         public TimeSpan? ToTime { get; set; }
+        [JsonProperty("room_code")]
         public string RoomCode { get; set; }
+        [JsonProperty("using_emails")]
         public List<string> UsingEmails { get; set; }
 
+        [JsonProperty("attached_services")]
         public virtual ICollection<CreateAttachedServiceModel> AttachedService { get; set; }
 
     }
@@ -79,6 +87,9 @@ namespace FPTBooking.Business.Models
         public const string INFO = "info";
         public const string SELECT = "select";
         public const string ROOM = "room";
+        public const string SERVICES = "services";
+        public const string MEMBER = "member";
+        public static readonly string DETAIL = $"{INFO},{ROOM},{SERVICES},{MEMBER}";
         private const string B = nameof(Booking);
     }
 

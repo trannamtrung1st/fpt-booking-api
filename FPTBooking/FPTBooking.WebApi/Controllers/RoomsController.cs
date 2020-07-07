@@ -205,12 +205,12 @@ namespace FPTBooking.WebApi.Controllers
                         throw new Exception("Test exception");
                 }
             }
-            var validationData = _service.ValidateGetRoomDetail(code, hanging, options);
-            if (!validationData.IsValid)
-                return BadRequest(AppResult.FailValidation(data: validationData));
             var projection = new RoomQueryProjection { fields = RoomQueryProjection.DETAIL };
             var entity = _service.GetRoomDetail(code, projection);
             if (entity == null) return NotFound(AppResult.NotFound());
+            var validationData = _service.ValidateGetRoomDetail(entity, hanging, options);
+            if (!validationData.IsValid)
+                return BadRequest(AppResult.FailValidation(data: validationData));
             if (hanging)
             {
                 entity = _service.Attach(entity);

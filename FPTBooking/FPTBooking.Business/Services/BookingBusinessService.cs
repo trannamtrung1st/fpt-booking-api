@@ -72,6 +72,13 @@ namespace FPTBooking.Business.Services
             }
         }
 
+
+        public Booking GetBookingDetail(int id, BookingQueryProjection projection)
+        {
+            var entity = Bookings.Id(id).Project(projection).FirstOrDefault();
+            return entity;
+        }
+
         public IDictionary<string, object> GetBookingDynamic(
             Booking row, BookingQueryProjection projection,
             BookingQueryOptions options)
@@ -98,6 +105,13 @@ namespace FPTBooking.Business.Services
                             obj["to_time"] = entity.ToTime;
                             obj["type"] = BookingTypeValues.BOOKING;
                             obj["status"] = entity.Status;
+                            obj["archived"] = entity.Archived;
+                            obj["book_member_id"] = entity.BookMemberId;
+                            obj["note"] = entity.Note;
+                            obj["archived"] = entity.NumOfPeople;
+                            obj["archived"] = entity.UsingMemberIds.Split('\n');
+                            obj["manager_message"] = entity.ManagerMessage;
+                            obj["feedback"] = entity.Feedback;
                         }
                         break;
                     case BookingQueryProjection.SELECT:
@@ -114,6 +128,27 @@ namespace FPTBooking.Business.Services
                             {
                                 code = entity.Code,
                                 name = entity.Name
+                            };
+                        }
+                        break;
+                    case BookingQueryProjection.SERVICES:
+                        {
+                            var entities = row.AttachedService
+                                .Select(o => o.BookingService).Select(o => new
+                                {
+                                    code = o.Code,
+                                    name = o.Name
+                                }).ToList();
+                            obj["attached_services"] = entities;
+                        }
+                        break;
+                    case BookingQueryProjection.MEMBER:
+                        {
+                            var entity = row.BookMember;
+                            obj["book_member"] = new
+                            {
+                                user_id = entity.UserId,
+                                email = entity.Email
                             };
                         }
                         break;
@@ -206,6 +241,23 @@ namespace FPTBooking.Business.Services
             BookingQueryOptions options)
         {
             var validationData = new ValidationData();
+            return validationData;
+        }
+
+        public ValidationData ValidateGetBookingDetail(
+            Booking booking,
+            ClaimsPrincipal principal,
+            BookingQueryOptions options)
+        {
+            var validationData = new ValidationData();
+            var userId = principal.Identity.Name;
+            if (booking.BookMemberId != userId)
+            {
+                var member = _memberService.Members.Id(booking.BookMemberId).FirstOrDefault();
+                var managerIds = _memberService.GetManagersOf(member).Select(o => o.UserId);
+                if (!managerIds.Contains(userId))
+                    validationData.Fail(code: AppResultCode.AccessDenied);
+            }
             return validationData;
         }
 
