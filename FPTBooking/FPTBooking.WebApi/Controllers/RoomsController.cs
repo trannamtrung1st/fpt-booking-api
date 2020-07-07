@@ -39,7 +39,7 @@ namespace FPTBooking.WebApi.Controllers
             [FromQuery]RoomQueryPaging paging,
             [FromQuery]RoomQueryOptions options)
         {
-            if (Settings.Instance.Mocking.Enabled || true)
+            if (Settings.Instance.Mocking.Enabled)
             {
                 var rd = new Random();
                 Func<string> randomCode = () =>

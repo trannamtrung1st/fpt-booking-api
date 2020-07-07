@@ -38,7 +38,7 @@ namespace FPTBooking.WebApi.Controllers
             [FromQuery]BookingQueryPaging paging,
             [FromQuery]BookingQueryOptions options)
         {
-            if (Settings.Instance.Mocking.Enabled || true)
+            if (Settings.Instance.Mocking.Enabled)
             {
                 var randomCode = new Random().RandomStringFrom(RandomExtension.Uppers_Digits, 4);
                 var list = new List<object>

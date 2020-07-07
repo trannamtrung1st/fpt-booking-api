@@ -30,16 +30,46 @@ namespace FPTBooking.Business.Queries
             return query.Where(q => codes.Contains(q.Code));
         }
 
+        public static IQueryable<Room> NameContains(this IQueryable<Room> query, string nameContains)
+        {
+            return query.Where(o => o.Name.Contains(nameContains));
+        }
+
+        public static IQueryable<Room> Available(this IQueryable<Room> query, bool val)
+        {
+            return query.Where(o => o.IsAvailable == val);
+        }
+
+        public static IQueryable<Room> Archived(this IQueryable<Room> query, bool val)
+        {
+            return query.Where(o => o.Archived == val);
+        }
+
+        public static IQueryable<Room> NotHanging(this IQueryable<Room> query, DateTime current)
+        {
+            return query.Where(o => o.HangingEndTime <= current);
+        }
+
+        public static IQueryable<Room> OfRoomType(this IQueryable<Room> query, string typeCode)
+        {
+            return query.Where(o => o.RoomTypeCode == typeCode);
+        }
+
+        public static IQueryable<Room> CanHandle(this IQueryable<Room> query, int numOfPeople)
+        {
+            return query.Where(o => o.PeopleCapacity >= numOfPeople);
+        }
+
         #region Query
         public static IQueryable<Room> Filter(this IQueryable<Room> query, RoomQueryFilter model,
             IDictionary<string, object> tempData, IQueryable<Booking> bookingQuery)
         {
             var available = model.available ?? BoolOptions.B;
             if (available != BoolOptions.B)
-                query = query.Where(o => o.IsAvailable == (available == BoolOptions.T));
+                query = query.Available(available == BoolOptions.T);
             var archived = model.available ?? BoolOptions.F;
             if (archived != BoolOptions.B)
-                query = query.Where(o => o.Archived == !(archived == BoolOptions.F));
+                query = query.Archived(archived == BoolOptions.F);
             if (model.empty)
             {
                 //required fields
@@ -48,27 +78,25 @@ namespace FPTBooking.Business.Queries
                 var toTime = (TimeSpan)tempData["to_time"];
                 var now = DateTime.Now;
                 //empty room
-                query = query.Except(bookingQuery.Where(b =>
-                    b.BookedDate.Date == date.Date
-                    && b.Status != BookingStatusValues.ABORTED && b.Status != BookingStatusValues.DENIED
-                    && ((b.FromTime < toTime && b.ToTime >= toTime)
-                        || (b.ToTime <= toTime && b.ToTime > fromTime)))
-                    .Select(b => b.Room))
+                var notAvailableRoom = bookingQuery.ActiveStatus()
+                    .Overlapped(date, fromTime, toTime)
+                    .Select(b => b.Room);
+                query = query.Except(notAvailableRoom)
                     //not hanging by someone else
-                    .Where(o => o.HangingEndTime <= now);
+                    .NotHanging(now);
 
                 //Already filter below
                 //.Where(o => o.RoomTypeCode == model.room_type)
                 //.Where(o => o.PeopleCapacity >= model.num_of_people);
             }
             if (model.code != null)
-                query = query.Where(o => o.Code == model.code);
+                query = query.Code(model.code);
             if (model.name_contains != null)
-                query = query.Where(o => o.Name.Contains(model.name_contains));
+                query = query.NameContains(model.name_contains);
             if (model.room_type != null)
-                query = query.Where(o => o.RoomTypeCode == model.room_type);
+                query = query.OfRoomType(model.room_type);
             if (model.num_of_people != null)
-                query = query.Where(o => o.PeopleCapacity >= model.num_of_people);
+                query = query.CanHandle(model.num_of_people.Value);
             return query;
         }
 

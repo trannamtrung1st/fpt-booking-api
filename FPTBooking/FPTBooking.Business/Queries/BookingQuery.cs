@@ -12,10 +12,39 @@ namespace FPTBooking.Business.Queries
 {
     public static class BookingQuery
     {
+        public static IQueryable<Booking> BookedDate(this IQueryable<Booking> query, DateTime date)
+        {
+            return query.Where(o => o.BookedDate.Date == date.Date);
+        }
+
+        public static IQueryable<Booking> ActiveStatus(this IQueryable<Booking> query)
+        {
+            return query.Where(o => o.Status != BookingStatusValues.ABORTED && o.Status != BookingStatusValues.DENIED);
+        }
+
+        public static IQueryable<Booking> OverlappedInTimeRange(this IQueryable<Booking> query,
+            TimeSpan fromTime, TimeSpan toTime)
+        {
+            return query.Where(o => ((o.FromTime < toTime && o.ToTime >= toTime)
+                        || (o.ToTime <= toTime && o.ToTime > fromTime)));
+        }
+
+        public static IQueryable<Booking> Overlapped(this IQueryable<Booking> query, DateTime date,
+            TimeSpan fromTime, TimeSpan toTime)
+        {
+            return query.BookedDate(date).OverlappedInTimeRange(fromTime, toTime);
+        }
+
         public static IQueryable<Booking> Id(this IQueryable<Booking> query, int id)
         {
             return query.Where(o => o.Id == id);
         }
+
+        public static IQueryable<Booking> Code(this IQueryable<Booking> query, string code)
+        {
+            return query.Where(o => o.Code == code);
+        }
+
         public static IQueryable<Booking> OfBookMember(this IQueryable<Booking> query, string userId)
         {
             return query.Where(o => o.BookMemberId.Equals(userId));
@@ -40,32 +69,54 @@ namespace FPTBooking.Business.Queries
             return query.Where(q => ids.Contains(q.Id));
         }
 
+        public static IQueryable<Booking> Archived(this IQueryable<Booking> query, bool val)
+        {
+            return query.Where(o => o.Archived == val);
+        }
+
+        public static IQueryable<Booking> FromDate(this IQueryable<Booking> query, DateTime date)
+        {
+            return query.Where(o => o.BookedDate.Date >= date.Date);
+        }
+        public static IQueryable<Booking> ToDate(this IQueryable<Booking> query, DateTime date)
+        {
+            return query.Where(o => o.BookedDate.Date <= date.Date);
+        }
+
+        public static IQueryable<Booking> SortLatest(this IQueryable<Booking> query)
+        {
+            return query.OrderBy(o => o.BookedDate).OrderBy(o => o.FromTime);
+        }
+
+        public static IQueryable<Booking> SortOldest(this IQueryable<Booking> query)
+        {
+            return query.OrderByDescending(o => o.BookedDate).OrderByDescending(o => o.FromTime);
+        }
+
         #region Query
         public static IQueryable<Booking> Filter(this IQueryable<Booking> query, BookingQueryFilter model, IDictionary<string, object> tempData)
         {
             var archived = model.archived ?? BoolOptions.F;
             if (archived != BoolOptions.B)
-                query = query.Where(o => o.Archived == !(model.archived == BoolOptions.F));
+                query = query.Archived(!(model.archived == BoolOptions.F));
             if (model.id != null)
-                query = query.Where(o => o.Id == model.id);
+                query = query.Id(model.id.Value);
             if (model.code != null)
-                query = query.Where(o => o.Code == model.code);
-            if (model.name_contains != null)
-                query = query.Where(o => o.Code.Contains(model.name_contains));
+                query = query.Code(model.code);
             if (model.from_date_str != null)
             {
                 var fromDate = (DateTime)tempData["from_date"];
-                query = query.Where(o => o.BookedDate.Date >= fromDate.Date);
+                query = query.FromDate(fromDate);
             }
             if (model.to_date_str != null)
             {
                 var toDate = (DateTime)tempData["to_date"];
-                query = query.Where(o => o.BookedDate.Date <= toDate.Date);
+                query = query.ToDate(toDate);
             }
             if (model.date_str != null)
             {
                 var date = (DateTime)tempData["date"];
-                query = query.Where(o => o.BookedDate.Date == date.Date);
+                query = query.BookedDate(date);
             }
             return query;
         }
@@ -80,10 +131,8 @@ namespace FPTBooking.Business.Queries
                 {
                     case BookingQuerySort.DATE:
                         {
-                            if (asc) query = query.OrderBy(o => o.BookedDate)
-                                                .OrderBy(o => o.FromTime);
-                            else query = query.OrderByDescending(o => o.BookedDate)
-                                                .OrderByDescending(o => o.FromTime);
+                            if (asc) query = query.SortLatest();
+                            else query = query.SortOldest();
                         }
                         break;
                 }

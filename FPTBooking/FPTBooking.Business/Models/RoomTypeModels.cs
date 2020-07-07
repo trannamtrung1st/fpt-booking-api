@@ -8,7 +8,7 @@ namespace FPTBooking.Business.Models
 {
 
     #region Query
-    public class BookingQueryProjection
+    public class RoomTypeQueryProjection
     {
         private const string DEFAULT = INFO;
         private string _fields = DEFAULT;
@@ -38,21 +38,22 @@ namespace FPTBooking.Business.Models
 
         public const string INFO = "info";
         public const string SELECT = "select";
-        public const string ROOM = "room";
-        private const string B = nameof(Booking);
+        public const string SERVICES = "services";
+        private const string T = nameof(RoomType);
+        private const string S = nameof(RoomTypeService);
 
         public static readonly IDictionary<string, string> FIELDS_MAPPING =
             new Dictionary<string, string>()
             {
-                { ROOM, nameof(Booking.Room) }
+                { SERVICES, nameof(RoomType.RoomTypeService)+"."+nameof( RoomTypeService.BookingService) }
             };
 
     }
 
-    public class BookingQuerySort
+    public class RoomTypeQuerySort
     {
-        public const string DATE = "date";
-        private const string DEFAULT = "a" + DATE;
+        public const string NAME = "name";
+        private const string DEFAULT = "a" + NAME;
         private string _sorts = DEFAULT;
         public string sorts
         {
@@ -78,17 +79,13 @@ namespace FPTBooking.Business.Models
 
     }
 
-    public class BookingQueryFilter
+    public class RoomTypeQueryFilter
     {
-        public int? id { get; set; }
         public string code { get; set; }
-        public string date_str { get; set; }
-        public string from_date_str { get; set; }
-        public string to_date_str { get; set; }
-        public BoolOptions? archived { get; set; } //default: false
+        public string name_contains { get; set; }
     }
 
-    public class BookingQueryPaging
+    public class RoomTypeQueryPaging
     {
         private int _page = 1;
         public int page
@@ -118,7 +115,7 @@ namespace FPTBooking.Business.Models
         }
     }
 
-    public class BookingQueryOptions
+    public class RoomTypeQueryOptions
     {
         public bool count_total { get; set; }
         public string date_format { get; set; }
