@@ -16,6 +16,7 @@ using TNT.Core.Helpers.DI;
 using TNT.Core.Http.DI;
 using TNT.Core.Helpers.General;
 using FPTBooking.Business.Services;
+using FPTBooking.Business.Helpers;
 
 namespace FPTBooking.WebApi.Controllers
 {
@@ -34,7 +35,7 @@ namespace FPTBooking.WebApi.Controllers
         [Authorize]
 #endif
         [HttpGet("")]
-        public async Task<IActionResult> Get([FromQuery]RoomTypeQueryFilter filter,
+        public async Task<IActionResult> Get([FromQuery][QueryObject]RoomTypeQueryFilter filter,
             [FromQuery]RoomTypeQuerySort sort,
             [FromQuery]RoomTypeQueryProjection projection,
             [FromQuery]RoomTypeQueryPaging paging,

@@ -1,12 +1,14 @@
-﻿using FPTBooking.Data.Models;
+﻿using FPTBooking.Business.Helpers;
+using FPTBooking.Data.Models;
+using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Threading.Tasks;
 
 namespace FPTBooking.Business.Models
 {
-
     #region Query
     public class BookingQueryProjection
     {
@@ -75,9 +77,12 @@ namespace FPTBooking.Business.Models
     {
         public int? id { get; set; }
         public string code { get; set; }
-        public string date_str { get; set; }
-        public string from_date_str { get; set; }
-        public string to_date_str { get; set; }
+        [DefaultDateTimeModelBinder]
+        public DateTime? date { get; set; }
+        [DefaultDateTimeModelBinder]
+        public DateTime? from_date { get; set; }
+        [DefaultDateTimeModelBinder]
+        public DateTime? to_date { get; set; }
         public BoolOptions? archived { get; set; } //default: false
     }
 

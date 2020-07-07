@@ -17,6 +17,7 @@ using TNT.Core.Http.DI;
 using TNT.Core.Helpers.General;
 using FPTBooking.Business.Services;
 using FPTBooking.Business.Queries;
+using FPTBooking.Business.Helpers;
 
 namespace FPTBooking.WebApi.Controllers
 {
@@ -36,7 +37,7 @@ namespace FPTBooking.WebApi.Controllers
         [Authorize]
 #endif
         [HttpGet("")]
-        public async Task<IActionResult> Get([FromQuery]RoomQueryFilter filter,
+        public async Task<IActionResult> Get([FromQuery][QueryObject]RoomQueryFilter filter,
             [FromQuery]RoomQuerySort sort,
             [FromQuery]RoomQueryProjection projection,
             [FromQuery]RoomQueryPaging paging,
@@ -238,7 +239,7 @@ namespace FPTBooking.WebApi.Controllers
             if (entity == null) return NotFound(AppResult.NotFound());
             if (_service.ChangeRoomHangingStatus(entity, model.Hanging))
                 context.SaveChanges();
-            return NoContent();
+            return Ok(model.D1 + "-" + model.D2);
         }
 
     }

@@ -243,23 +243,11 @@ namespace FPTBooking.Business.Services
             var validationData = new ValidationData();
             if (filter.empty)
             {
-                if (filter.date_str == null ||
+                if (filter.date == null ||
                     filter.from_time == null ||
                     filter.to_time == null ||
                     filter.num_of_people == null || filter.room_type == null)
                     validationData.Fail(mess: "Invalid input data", AppResultCode.FailValidation);
-                DateTime dateTime;
-                if (!filter.date_str.TryConvertToUTC(dateFormat: options.date_format, out dateTime))
-                    validationData.Fail(mess: "Invalid date time format", AppResultCode.FailValidation);
-                else validationData.TempData["date"] = dateTime;
-                TimeSpan fromTime;
-                if (!filter.from_time.TryConvertToTimeSpan(out fromTime))
-                    validationData.Fail(mess: "Invalid date time format", AppResultCode.FailValidation);
-                else validationData.TempData["from_time"] = fromTime;
-                TimeSpan toTime;
-                if (!filter.to_time.TryConvertToTimeSpan(out toTime))
-                    validationData.Fail(mess: "Invalid date time format", AppResultCode.FailValidation);
-                else validationData.TempData["to_time"] = toTime;
             }
             return validationData;
         }

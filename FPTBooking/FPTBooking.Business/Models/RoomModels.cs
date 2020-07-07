@@ -1,4 +1,5 @@
-﻿using FPTBooking.Data.Models;
+﻿using FPTBooking.Business.Helpers;
+using FPTBooking.Data.Models;
 using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
@@ -11,6 +12,10 @@ namespace FPTBooking.Business.Models
     {
         [JsonProperty("hanging")]
         public bool Hanging { get; set; }
+        [JsonConverter(typeof(DefaultDateTimeConverter))]
+        public DateTime? D1 { get; set; }
+        [JsonConverter(typeof(DefaultDateTimeConverter))]
+        public DateTime D2 { get; set; }
     }
 
     #region Query
@@ -93,9 +98,10 @@ namespace FPTBooking.Business.Models
     {
         public string code { get; set; }
         public string name_contains { get; set; }
-        public string date_str { get; set; }
-        public string from_time { get; set; }
-        public string to_time { get; set; }
+        [DefaultDateTimeModelBinder]
+        public DateTime? date { get; set; }
+        public TimeSpan? from_time { get; set; }
+        public TimeSpan? to_time { get; set; }
         public int? num_of_people { get; set; }
         public string room_type { get; set; }
         public bool empty { get; set; } //default false

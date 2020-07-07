@@ -24,6 +24,7 @@ using TNT.Core.Helpers.DI;
 using System.Security.Claims;
 using FirebaseAdmin;
 using Google.Apis.Auth.OAuth2;
+using FPTBooking.Business.Helpers;
 
 namespace FPTBooking.WebApi
 {
@@ -144,8 +145,11 @@ namespace FPTBooking.WebApi
                     };
                 });
             #endregion
-            services.AddControllers()
-                .AddNewtonsoftJson();
+            services.AddSingleton(new DefaultDateTimeModelBinder());
+            services.AddControllers(options =>
+            {
+                options.ModelBinderProviders.Insert(0, new QueryObjectModelBinderProvider());
+            }).AddNewtonsoftJson();
             services.AddSwaggerGenNewtonsoftSupport();
             // Register the Swagger generator, defining 1 or more Swagger documents
             services.AddSwaggerGen(c =>

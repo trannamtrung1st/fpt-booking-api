@@ -73,13 +73,10 @@ namespace FPTBooking.Business.Queries
             if (model.empty)
             {
                 //required fields
-                var date = (DateTime)tempData["date"];
-                var fromTime = (TimeSpan)tempData["from_time"];
-                var toTime = (TimeSpan)tempData["to_time"];
                 var now = DateTime.UtcNow;
                 //empty room
                 var notAvailableRoom = bookingQuery.ActiveStatus()
-                    .Overlapped(date, fromTime, toTime)
+                    .Overlapped(model.date.Value, model.from_time.Value, model.to_time.Value)
                     .Select(b => b.Room);
                 query = query.Except(notAvailableRoom)
                     //not hanging by someone else

@@ -103,21 +103,12 @@ namespace FPTBooking.Business.Queries
                 query = query.Id(model.id.Value);
             if (model.code != null)
                 query = query.Code(model.code);
-            if (model.from_date_str != null)
-            {
-                var fromDate = (DateTime)tempData["from_date"];
-                query = query.FromDate(fromDate);
-            }
-            if (model.to_date_str != null)
-            {
-                var toDate = (DateTime)tempData["to_date"];
-                query = query.ToDate(toDate);
-            }
-            if (model.date_str != null)
-            {
-                var date = (DateTime)tempData["date"];
-                query = query.BookedDate(date);
-            }
+            if (model.from_date != null)
+                query = query.FromDate(model.from_date.Value);
+            if (model.to_date != null)
+                query = query.ToDate(model.to_date.Value);
+            if (model.date != null)
+                query = query.BookedDate(model.date.Value);
             return query;
         }
 
