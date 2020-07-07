@@ -136,7 +136,7 @@ namespace FPTBooking.WebApi.Controllers
             [FromQuery]RoomQueryOptions options,
             bool hanging = false)
         {
-            if (Settings.Instance.Mocking.Enabled || true)
+            if (Settings.Instance.Mocking.Enabled)
             {
                 var rd = new Random();
                 var randomCode = rd.RandomStringFrom(RandomExtension.Uppers_Digits, 4);
@@ -207,12 +207,15 @@ namespace FPTBooking.WebApi.Controllers
             var validationData = _service.ValidateGetRoomDetail(code, hanging, options);
             if (!validationData.IsValid)
                 return BadRequest(AppResult.FailValidation(data: validationData));
-            var entity = _service.Rooms.Code(code).FirstOrDefault();
+            var projection = new RoomQueryProjection { fields = RoomQueryProjection.DETAIL };
+            var entity = _service.GetRoomDetail(code, projection);
             if (entity == null) return NotFound(AppResult.NotFound());
-            var obj = _service.GetRoomDynamic(entity, new RoomQueryProjection()
+            if (hanging)
             {
-                fields = RoomQueryProjection.DETAIL
-            }, options);
+                _service.HangRoom(entity);
+                context.SaveChanges();
+            }
+            var obj = _service.GetRoomDynamic(entity, projection, options);
             return Ok(AppResult.Success(data: obj));
         }
 

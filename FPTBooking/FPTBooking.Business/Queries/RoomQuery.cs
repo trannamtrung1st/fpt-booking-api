@@ -162,7 +162,8 @@ namespace FPTBooking.Business.Queries
                 Name = o.Name,
                 Note = o.Note,
                 PeopleCapacity = o.PeopleCapacity,
-                RoomResource = res ? o.RoomResource.Where(r => r.IsAvailable).ToList() : null,
+                RoomResource = res ? o.RoomResource.AsQueryable()
+                    .Where(r => r.IsAvailable).ToList() : null,
                 RoomType = roomType ? o.RoomType : null,
                 RoomTypeCode = o.RoomTypeCode,
             });

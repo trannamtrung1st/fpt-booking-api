@@ -26,6 +26,20 @@ namespace FPTBooking.Business.Services
             }
         }
 
+        public Room GetRoomDetail(string code, RoomQueryProjection projection)
+        {
+            var entity = Rooms.Code(code).Project(projection).FirstOrDefault();
+            return entity;
+        }
+
+        public Room HangRoom(Room entity)
+        {
+            var now = DateTime.UtcNow;
+            entity.HangingStartTime = now;
+            entity.HangingEndTime = now.AddMinutes(10);
+            return entity;
+        }
+
         public IDictionary<string, object> GetRoomDynamic(
             Room row, RoomQueryProjection projection,
             RoomQueryOptions options)
@@ -47,8 +61,25 @@ namespace FPTBooking.Business.Services
                             obj["code"] = entity.Code;
                             obj["department_code"] = entity.DepartmentCode;
                             obj["description"] = entity.Description;
-                            //obj[""] = entity.HangingStartTime;
-                            //obj[""] = entity.HangingEndTime;
+                            if (entity.HangingEndTime > DateTime.UtcNow)
+                            {
+                                var time = entity.HangingStartTime.Value
+                                   .ToTimeZone(options.time_zone, options.culture, Settings.Instance.SupportedLangs[0]);
+                                var timeStr = time.ToString(options.date_format, options.culture, Settings.Instance.SupportedLangs[0]);
+                                obj["hanging_start"] = new
+                                {
+                                    display = timeStr,
+                                    iso = $"{time.ToUniversalTime():s}Z"
+                                };
+                                time = entity.HangingEndTime.Value
+                                   .ToTimeZone(options.time_zone, options.culture, Settings.Instance.SupportedLangs[0]);
+                                timeStr = time.ToString(options.date_format, options.culture, Settings.Instance.SupportedLangs[0]);
+                                obj["hanging_end"] = new
+                                {
+                                    display = timeStr,
+                                    iso = $"{time.ToUniversalTime():s}Z"
+                                };
+                            }
                             obj["name"] = entity.Name;
                             obj["people_capacity"] = entity.PeopleCapacity;
                             obj["room_type_code"] = entity.RoomTypeCode;
