@@ -60,6 +60,22 @@ namespace FPTBooking.Business.Queries
             return query.Where(o => o.PeopleCapacity >= numOfPeople);
         }
 
+        public static IQueryable<Room> AvailableForBooking(this IQueryable<Room> query,
+            IQueryable<Booking> bookingQuery,
+            DateTime date, TimeSpan fromTime, TimeSpan toTime, int numOfPeople)
+        {
+            var now = DateTime.UtcNow;
+            //empty room
+            var notAvailableRoom = bookingQuery.ActiveStatus()
+                .Overlapped(date, fromTime, toTime)
+                .Select(b => b.Room);
+            return query = query.Except(notAvailableRoom)
+                .Available(true)
+                //not hanging by someone else
+                .NotHanging(now)
+                .CanHandle(numOfPeople);
+        }
+
         #region Query
         public static IQueryable<Room> Filter(this IQueryable<Room> query, RoomQueryFilter model,
             IDictionary<string, object> tempData, IQueryable<Booking> bookingQuery)

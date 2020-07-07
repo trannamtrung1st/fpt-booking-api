@@ -6,6 +6,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Net;
+using System.Security.Claims;
 using System.Threading.Tasks;
 using TNT.Core.Helpers.DI;
 
@@ -15,6 +16,14 @@ namespace FPTBooking.WebApi.Controllers
     {
         [Inject]
         protected readonly DbContext context;
+
+        public string UserEmail
+        {
+            get
+            {
+                return User.FindFirstValue(ClaimTypes.Email);
+            }
+        }
 
         public string UserId
         {

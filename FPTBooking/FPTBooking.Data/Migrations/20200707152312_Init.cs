@@ -510,7 +510,7 @@ namespace FPTBooking.Data.Migrations
                     CanceledReason = table.Column<string>(maxLength: 2000, nullable: true),
                     Archived = table.Column<bool>(nullable: false),
                     BookMemberId = table.Column<string>(unicode: false, maxLength: 100, nullable: false),
-                    UsingMemberId = table.Column<string>(nullable: false)
+                    UsingMemberIds = table.Column<string>(nullable: false)
                 },
                 constraints: table =>
                 {
@@ -559,11 +559,7 @@ namespace FPTBooking.Data.Migrations
                     Id = table.Column<int>(nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
                     BookingServiceCode = table.Column<string>(maxLength: 100, nullable: false),
-                    BookingId = table.Column<int>(nullable: false),
-                    NumOfPeople = table.Column<int>(nullable: false),
-                    Note = table.Column<string>(maxLength: 2000, nullable: true),
-                    Status = table.Column<string>(maxLength: 50, nullable: true),
-                    AdminMessage = table.Column<string>(maxLength: 2000, nullable: true)
+                    BookingId = table.Column<int>(nullable: false)
                 },
                 constraints: table =>
                 {
@@ -644,10 +640,10 @@ namespace FPTBooking.Data.Migrations
                 columns: new[] { "Id", "ConcurrencyStamp", "Name", "NormalizedName" },
                 values: new object[,]
                 {
-                    { "Administrator", "1638a15f-35f0-42bb-b0e5-6e1c27d3363b", "Administrator", "ADMINISTRATOR" },
-                    { "Manager", "79544b7c-e3d2-45a1-a491-fbb0c428afd8", "Manager", "MANAGER" },
-                    { "RoomChecker", "62d5aecd-8fcb-44c7-8538-3171570c1033", "RoomChecker", "ROOMCHECKER" },
-                    { "User", "c3c537b7-4daa-471d-a652-6f84e2cc328e", "User", "USER" }
+                    { "Administrator", "64dd8b1e-e461-4b68-98aa-719a5b6b2962", "Administrator", "ADMINISTRATOR" },
+                    { "Manager", "a87d960c-2183-492d-9a68-0300854ed9ff", "Manager", "MANAGER" },
+                    { "RoomChecker", "560c2ac7-c762-4403-a6b4-84beb30a5108", "RoomChecker", "ROOMCHECKER" },
+                    { "User", "eb3f14f9-d413-42fd-9926-e1a9e7f7b797", "User", "USER" }
                 });
 
             migrationBuilder.InsertData(

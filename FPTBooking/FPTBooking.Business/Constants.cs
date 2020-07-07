@@ -103,6 +103,11 @@ namespace FPTBooking.Business
         public const string FINISH = "Finished"; //after feedback
     }
 
+    public static class BookingHistoryTypes
+    {
+        public const string CREATE = "Create";
+    }
+
     public enum BookingPrincipalRelationship
     {
         Manager = 1,

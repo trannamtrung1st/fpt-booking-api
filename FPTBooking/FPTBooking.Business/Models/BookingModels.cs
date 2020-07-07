@@ -9,6 +9,44 @@ using System.Threading.Tasks;
 
 namespace FPTBooking.Business.Models
 {
+    public class CreateBookingModel : MappingModel<Booking>
+    {
+        public CreateBookingModel()
+        {
+        }
+
+        public CreateBookingModel(Booking src) : base(src)
+        {
+        }
+
+        [JsonConverter(typeof(DefaultDateTimeConverter))]
+        public DateTime? BookedDate { get; set; }
+        public int? NumOfPeople { get; set; }
+        public string Note { get; set; }
+        public TimeSpan? FromTime { get; set; }
+        public TimeSpan? ToTime { get; set; }
+        public string RoomCode { get; set; }
+        public List<string> UsingEmails { get; set; }
+
+        public virtual ICollection<CreateAttachedServiceModel> AttachedService { get; set; }
+
+    }
+
+    public class CreateAttachedServiceModel : MappingModel<AttachedService>
+    {
+        public CreateAttachedServiceModel()
+        {
+        }
+
+        public CreateAttachedServiceModel(AttachedService src) : base(src)
+        {
+        }
+
+        [JsonProperty("service_code")]
+        public string BookingServiceCode { get; set; }
+
+    }
+
     #region Query
     public class BookingQueryProjection
     {

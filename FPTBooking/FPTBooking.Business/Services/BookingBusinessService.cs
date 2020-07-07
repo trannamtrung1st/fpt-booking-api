@@ -18,9 +18,50 @@ namespace FPTBooking.Business.Services
 {
     public class BookingBusinessService : Service
     {
+        [Inject]
+        protected readonly MemberService _memberService;
+        [Inject]
+        protected readonly RoomBusinessService _roomService;
+
         public BookingBusinessService(ServiceInjection inj) : base(inj)
         {
         }
+
+        #region Create Booking
+        protected void PrepareCreate(Booking entity)
+        {
+            entity.Code = "B" + DateTime.UtcNow.ToString("ddMMyyyyhhmmss") + Global.Random.Next(0, 9);
+            entity.Archived = false;
+            entity.SentDate = DateTime.UtcNow;
+            entity.Status = BookingStatusValues.PROCESSING;
+        }
+
+        public Booking CreateBooking(string bookMemberId,
+            CreateBookingModel model, List<string> usingMemberIds)
+        {
+            var entity = model.ToDest();
+            entity.BookMemberId = bookMemberId;
+            entity.UsingMemberIds = string.Join("\n", usingMemberIds);
+            PrepareCreate(entity);
+            return context.Booking.Add(entity).Entity;
+        }
+
+        public BookingHistory CreateHistoryForCreateBooking(Booking booking, Member createMember)
+        {
+            var entity = new BookingHistory
+            {
+                BookingId = booking.Id,
+                DisplayContent = $"{createMember.Email} created this booking",
+                HappenedTime = DateTime.UtcNow,
+                FromStatus = null,
+                Id = Guid.NewGuid().ToString(),
+                MemberId = createMember.UserId,
+                ToStatus = BookingStatusValues.PROCESSING,
+                Type = BookingHistoryTypes.CREATE,
+            };
+            return context.BookingHistory.Add(entity).Entity;
+        }
+        #endregion
 
         #region Query Booking
         public IQueryable<Booking> Bookings
@@ -168,6 +209,41 @@ namespace FPTBooking.Business.Services
             return validationData;
         }
 
+        public ValidationData ValidateCreateBooking(ClaimsPrincipal principal,
+            CreateBookingModel model)
+        {
+            var memberQuery = _memberService.Members;
+            var validationData = new ValidationData();
+            DateTime currentTime = DateTime.UtcNow;
+            if (model.BookedDate == null)
+                validationData.Fail("Booked date must not be empty", AppResultCode.FailValidation);
+            if (model.NumOfPeople == null || model.NumOfPeople == 0)
+                validationData.Fail("Number of people is not valid", AppResultCode.FailValidation);
+            else if (currentTime >= model.BookedDate)
+                validationData.Fail(mess: "Booked date must be greater than current", AppResultCode.FailValidation);
+            if (model.FromTime == null || model.ToTime == null)
+                validationData.Fail(mess: "From time and to time must not be empty", AppResultCode.FailValidation);
+            else if (model.FromTime >= model.ToTime)
+                validationData.Fail(mess: "Time range is not valid", AppResultCode.FailValidation);
+            if (model.UsingEmails == null || model.UsingEmails.Count == 0)
+                validationData.Fail(mess: "At lease one using email is required", AppResultCode.FailValidation);
+            else
+            {
+                var ids = memberQuery.ByEmails(model.UsingEmails).Select(o => o.UserId).ToList();
+                if (ids.Count != model.UsingEmails.Count)
+                    validationData.Fail(mess: "One or more emails not found", AppResultCode.FailValidation);
+                else validationData.TempData["using_member_ids"] = ids;
+            }
+            if (validationData.IsValid)
+            {
+                var isAvailable = _roomService.Rooms.Code(model.RoomCode)
+                    .AvailableForBooking(Bookings, model.BookedDate.Value, model.FromTime.Value,
+                        model.ToTime.Value, model.NumOfPeople.Value).Any();
+                if (!isAvailable)
+                    validationData.Fail("Room is not available for this booking", AppResultCode.FailValidation);
+            }
+            return validationData;
+        }
         #endregion
     }
 }

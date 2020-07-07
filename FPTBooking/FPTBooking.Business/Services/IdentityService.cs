@@ -34,6 +34,13 @@ namespace FPTBooking.Business.Services
         }
 
         #region Query AppUser
+        public IQueryable<AppUser> Users
+        {
+            get
+            {
+                return _userManager.Users;
+            }
+        }
         #endregion
 
         #region Role

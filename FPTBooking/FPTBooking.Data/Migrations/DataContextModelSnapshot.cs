@@ -85,28 +85,28 @@ namespace FPTBooking.Data.Migrations
                         new
                         {
                             Id = "Administrator",
-                            ConcurrencyStamp = "1638a15f-35f0-42bb-b0e5-6e1c27d3363b",
+                            ConcurrencyStamp = "64dd8b1e-e461-4b68-98aa-719a5b6b2962",
                             Name = "Administrator",
                             NormalizedName = "ADMINISTRATOR"
                         },
                         new
                         {
                             Id = "Manager",
-                            ConcurrencyStamp = "79544b7c-e3d2-45a1-a491-fbb0c428afd8",
+                            ConcurrencyStamp = "a87d960c-2183-492d-9a68-0300854ed9ff",
                             Name = "Manager",
                             NormalizedName = "MANAGER"
                         },
                         new
                         {
                             Id = "RoomChecker",
-                            ConcurrencyStamp = "62d5aecd-8fcb-44c7-8538-3171570c1033",
+                            ConcurrencyStamp = "560c2ac7-c762-4403-a6b4-84beb30a5108",
                             Name = "RoomChecker",
                             NormalizedName = "ROOMCHECKER"
                         },
                         new
                         {
                             Id = "User",
-                            ConcurrencyStamp = "c3c537b7-4daa-471d-a652-6f84e2cc328e",
+                            ConcurrencyStamp = "eb3f14f9-d413-42fd-9926-e1a9e7f7b797",
                             Name = "User",
                             NormalizedName = "USER"
                         });
@@ -222,10 +222,6 @@ namespace FPTBooking.Data.Migrations
                         .HasColumnType("int")
                         .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
 
-                    b.Property<string>("AdminMessage")
-                        .HasColumnType("nvarchar(2000)")
-                        .HasMaxLength(2000);
-
                     b.Property<int>("BookingId")
                         .HasColumnType("int");
 
@@ -233,17 +229,6 @@ namespace FPTBooking.Data.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(100)")
                         .HasMaxLength(100);
-
-                    b.Property<string>("Note")
-                        .HasColumnType("nvarchar(2000)")
-                        .HasMaxLength(2000);
-
-                    b.Property<int>("NumOfPeople")
-                        .HasColumnType("int");
-
-                    b.Property<string>("Status")
-                        .HasColumnType("nvarchar(50)")
-                        .HasMaxLength(50);
 
                     b.HasKey("Id");
 
@@ -312,7 +297,7 @@ namespace FPTBooking.Data.Migrations
                     b.Property<TimeSpan>("ToTime")
                         .HasColumnType("time");
 
-                    b.Property<string>("UsingMemberId")
+                    b.Property<string>("UsingMemberIds")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 

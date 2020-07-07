@@ -9,6 +9,16 @@ namespace FPTBooking.Business.Queries
 {
     public static class AppUserQuery
     {
+        public static IQueryable<AppUser> ByEmail(this IQueryable<AppUser> query, string email)
+        {
+            return query.Where(o => o.Email == email);
+        }
+
+        public static IQueryable<AppUser> ByEmails(this IQueryable<AppUser> query, IEnumerable<string> emails)
+        {
+            return query.Where(o => emails.Contains(o.Email));
+        }
+
         public static IQueryable<AppUser> Id(this IQueryable<AppUser> query, string id)
         {
             return query.Where(o => o.Id == id);

@@ -115,13 +115,13 @@ namespace FPTBooking.Business.Models
         [JsonProperty("is_valid")]
         public bool IsValid { get; set; }
         [JsonProperty("results")]
-        public List<ValidationResult> Results { get; set; }
+        public List<AppResult> Results { get; set; }
         [JsonIgnore]
         public IDictionary<string, object> TempData { get; set; }
 
         public ValidationData()
         {
-            Results = new List<ValidationResult>();
+            Results = new List<AppResult>();
             IsValid = true;
             TempData = new Dictionary<string, object>();
         }
@@ -134,25 +134,18 @@ namespace FPTBooking.Business.Models
             return default;
         }
 
-        public ValidationData Fail(string mess = null, AppResultCode? code = null)
+        public ValidationData Fail(string mess = null, AppResultCode? code = null, object data = null)
         {
-            Results.Add(new ValidationResult
+            Results.Add(new AppResult
             {
                 Message = mess ?? code?.DisplayName(),
+                Data = data,
                 Code = code
             });
             IsValid = false;
             return this;
         }
 
-    }
-
-    public class ValidationResult
-    {
-        [JsonProperty("message")]
-        public string Message { get; set; }
-        [JsonProperty("code")]
-        public AppResultCode? Code { get; set; }
     }
 
 }

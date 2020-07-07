@@ -155,15 +155,9 @@ namespace FPTBooking.Data.Models
 
                 entity.HasIndex(e => e.BookingServiceCode);
 
-                entity.Property(e => e.AdminMessage).HasMaxLength(2000);
-
                 entity.Property(e => e.BookingServiceCode)
                     .IsRequired()
                     .HasMaxLength(100);
-
-                entity.Property(e => e.Note).HasMaxLength(2000);
-
-                entity.Property(e => e.Status).HasMaxLength(50);
 
                 entity.HasOne(d => d.Booking)
                     .WithMany(p => p.AttachedService)
@@ -203,7 +197,7 @@ namespace FPTBooking.Data.Models
                     .IsRequired()
                     .HasMaxLength(50);
 
-                entity.Property(e => e.UsingMemberId).IsRequired();
+                entity.Property(e => e.UsingMemberIds).IsRequired();
 
                 entity.HasOne(d => d.BookMember)
                     .WithMany(p => p.Booking)

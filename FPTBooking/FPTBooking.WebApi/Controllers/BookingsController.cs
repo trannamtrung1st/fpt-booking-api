@@ -18,6 +18,9 @@ using TNT.Core.Helpers.General;
 using FPTBooking.Business.Services;
 using FPTBooking.Data;
 using FPTBooking.Business.Helpers;
+using FirebaseAdmin.Messaging;
+using FPTBooking.Business.Queries;
+using FPTBooking.Data.Models;
 
 namespace FPTBooking.WebApi.Controllers
 {
@@ -31,6 +34,8 @@ namespace FPTBooking.WebApi.Controllers
 
         [Inject]
         private readonly BookingBusinessService _service;
+        [Inject]
+        private readonly MemberService _memberService;
 
         [Authorize]
         [HttpGet("")]
@@ -236,6 +241,47 @@ namespace FPTBooking.WebApi.Controllers
                 }
             }
             throw new NotImplementedException();
+        }
+
+        [Authorize]
+        [HttpPost("")]
+        public async Task<IActionResult> Create(CreateBookingModel model)
+        {
+            if (Settings.Instance.Mocking.Enabled)
+                return Ok(AppResult.Success(data: 1));
+            var validationData = _service.ValidateCreateBooking(User, model);
+            if (!validationData.IsValid)
+                return BadRequest(AppResult.FailValidation(data: validationData));
+            var usingMemberIds = validationData.GetTempData<List<string>>("using_member_ids");
+            var memberQuery = _memberService.Members;
+            var member = memberQuery.Id(UserId).FirstOrDefault();
+            Booking entity;
+            using (var trans = context.Database.BeginTransaction())
+            {
+                entity = _service.CreateBooking(UserId, model, usingMemberIds);
+                var history = _service.CreateHistoryForCreateBooking(entity, member);
+                context.SaveChanges();
+                trans.Commit();
+            }
+            //notify using members, managers (if any)
+            var notiMemberIds = usingMemberIds.Where(o => o != UserId).ToList();
+            var notiMembers = NotiHelper.Notify(notiMemberIds, new Notification
+            {
+                Title = $"You have a new booking",
+                Body = $"{UserEmail} have just created a booking for you. Press for more detail"
+            });
+            var managerIds = memberQuery.IsManagerOf(member, User).Select(o => o.UserId).ToList();
+            if (managerIds.Count > 0)
+            {
+                await NotiHelper.Notify(managerIds, new Notification
+                {
+                    Title = $"There's a new booking request",
+                    Body = $"{UserEmail} have just created a booking. Press for more detail"
+                });
+            }
+            await notiMembers;
+            return Created($"/{ApiEndpoint.BOOKING_API}/{entity.Id}",
+                AppResult.Success(data: entity.Id));
         }
 
 #if !DEBUG

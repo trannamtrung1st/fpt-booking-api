@@ -26,7 +26,7 @@ namespace FPTBooking.Data.Models
         public string CanceledReason { get; set; }
         public bool Archived { get; set; }
         public string BookMemberId { get; set; }
-        public string UsingMemberId { get; set; }
+        public string UsingMemberIds { get; set; }
 
         public virtual Member BookMember { get; set; }
         public virtual Room Room { get; set; }

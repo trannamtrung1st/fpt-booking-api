@@ -158,7 +158,7 @@ namespace FPTBooking.Business.Queries
                 NumOfPeople = o.NumOfPeople,
                 Room = room ? o.Room : null,
                 Status = o.Status,
-                UsingMemberId = o.UsingMemberId,
+                UsingMemberIds = o.UsingMemberIds,
                 RoomCode = o.RoomCode,
                 SentDate = o.SentDate,
                 ToTime = o.ToTime,
