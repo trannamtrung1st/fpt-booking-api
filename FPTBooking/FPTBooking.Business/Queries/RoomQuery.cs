@@ -60,6 +60,12 @@ namespace FPTBooking.Business.Queries
             return query.Where(o => o.PeopleCapacity >= numOfPeople);
         }
 
+        public static IQueryable<Room> Search(this IQueryable<Room> query, string search)
+        {
+            return query.Where(o => o.Name.Contains(search) || o.Code.Contains(search)
+                || o.RoomType.Name.Contains(search));
+        }
+
         public static IQueryable<Room> AvailableForBooking(this IQueryable<Room> query,
             IQueryable<Booking> bookingQuery,
             DateTime date, TimeSpan fromTime, TimeSpan toTime, int numOfPeople)
@@ -110,6 +116,8 @@ namespace FPTBooking.Business.Queries
                 query = query.OfRoomType(model.room_type);
             if (model.num_of_people != null)
                 query = query.CanHandle(model.num_of_people.Value);
+            if (model.search != null)
+                query = query.Search(model.search);
             return query;
         }
 

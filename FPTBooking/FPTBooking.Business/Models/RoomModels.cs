@@ -98,6 +98,7 @@ namespace FPTBooking.Business.Models
     {
         public string code { get; set; }
         public string name_contains { get; set; }
+        public string search { get; set; }
         [DefaultDateTimeModelBinder]
         public DateTime? date { get; set; }
         public TimeSpan? from_time { get; set; }
