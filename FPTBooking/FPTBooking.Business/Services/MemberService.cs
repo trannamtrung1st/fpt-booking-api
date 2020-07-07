@@ -29,11 +29,32 @@ namespace FPTBooking.Business.Services
             }
         }
 
-        public IQueryable<Member> GetManagersOf(Member member)
+        public IQueryable<DepartmentMember> DepartmentMembers
         {
-            var depCodes = member.DepartmentMember.AsQueryable()
+            get
+            {
+                return context.DepartmentMember;
+            }
+        }
+
+        public IQueryable<AreaManager> AreaManagers
+        {
+            get
+            {
+                return context.AreaManager;
+            }
+        }
+
+        public IQueryable<Member> QueryManagersOfMember(string memberId)
+        {
+            var depCodes = DepartmentMembers.OfMember(memberId)
                 .IsNotManager().Select(o => o.DepartmentCode).ToList();
             return Members.IsManagerOfAny(depCodes);
+        }
+
+        public IQueryable<Member> QueryManagersOfArea(string areaCode)
+        {
+            return AreaManagers.OfArea(areaCode).Select(o => o.Member);
         }
 
         #endregion
@@ -67,16 +88,6 @@ namespace FPTBooking.Business.Services
         #endregion
 
         #region Validation
-        public ValidationData ValidateGetMembers(
-            ClaimsPrincipal principal,
-            MemberQueryFilter filter,
-            MemberQuerySort sort,
-            MemberQueryProjection projection,
-            MemberQueryPaging paging,
-            MemberQueryOptions options)
-        {
-            return new ValidationData();
-        }
         #endregion
 
     }

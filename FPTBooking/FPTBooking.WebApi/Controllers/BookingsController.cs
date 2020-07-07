@@ -253,12 +253,13 @@ namespace FPTBooking.WebApi.Controllers
             if (!validationData.IsValid)
                 return BadRequest(AppResult.FailValidation(data: validationData));
             var usingMemberIds = validationData.GetTempData<List<string>>("using_member_ids");
+            var bookedRoom = validationData.GetTempData<Room>("booked_room");
             var memberQuery = _memberService.Members;
             var member = memberQuery.Id(UserId).FirstOrDefault();
             Booking entity;
             using (var trans = context.Database.BeginTransaction())
             {
-                entity = _service.CreateBooking(UserId, model, usingMemberIds);
+                entity = _service.CreateBooking(member, bookedRoom, model, usingMemberIds);
                 var history = _service.CreateHistoryForCreateBooking(entity, member);
                 context.SaveChanges();
                 trans.Commit();
@@ -268,20 +269,74 @@ namespace FPTBooking.WebApi.Controllers
             var notiMembers = NotiHelper.Notify(notiMemberIds, new Notification
             {
                 Title = $"You have a new booking",
-                Body = $"{UserEmail} have just created a booking for you. Press for more detail"
+                Body = $"{UserEmail} has just created a booking for you. Press for more detail"
             });
-            var managerIds = _memberService.GetManagersOf(member).Select(o => o.UserId).ToList();
-            if (managerIds.Count > 0)
+            var managerNoti = new Notification
             {
-                await NotiHelper.Notify(managerIds, new Notification
-                {
-                    Title = $"There's a new booking request",
-                    Body = $"{UserEmail} have just created a booking. Press for more detail"
-                });
+                Title = $"There's a new booking request",
+                Body = $"{UserEmail} has just created a booking. Press for more detail"
+            };
+            if (entity.Status == BookingStatusValues.PROCESSING)
+            {
+                var managerIds = _memberService.QueryManagersOfMember(member.UserId)
+                    .Select(o => o.UserId).ToList();
+                if (managerIds.Count > 0)
+                    await NotiHelper.Notify(managerIds, managerNoti);
+            }
+            else if (entity.Status == BookingStatusValues.VALID)
+            {
+                var managerIds = _memberService.QueryManagersOfArea(bookedRoom.BuildingAreaCode)
+                    .Select(o => o.UserId).ToList();
+                if (managerIds.Count > 0)
+                    await NotiHelper.Notify(managerIds, managerNoti);
             }
             await notiMembers;
             return Created($"/{ApiEndpoint.BOOKING_API}/{entity.Id}",
                 AppResult.Success(data: entity.Id));
+        }
+
+        [Authorize]
+        [HttpPost("{id}/cancel")]
+        public async Task<IActionResult> CancelBooking(int id, CancelBookingModel model)
+        {
+            if (Settings.Instance.Mocking.Enabled)
+                return NoContent();
+            var entity = _service.Bookings.Id(id).FirstOrDefault();
+            if (entity == null) return NotFound(AppResult.NotFound());
+            var validationData = _service.ValidateCancelBooking(User, entity, model);
+            if (!validationData.IsValid)
+                return BadRequest(AppResult.FailValidation(data: validationData));
+            _service.CancelBooking(model, entity);
+            context.SaveChanges();
+            //notify using members, managers (if any)
+            var notiMemberIds = entity.UsingMemberIds.Split('\n')
+                .Where(o => o != UserId).ToList();
+            var notiMembers = NotiHelper.Notify(notiMemberIds, new Notification
+            {
+                Title = $"Your booking {entity.Code} has been aborted",
+                Body = $"{UserEmail} has just aborted booking {entity.Code}. Press for more detail"
+            });
+            var managerNoti = new Notification
+            {
+                Title = $"A booking managed by you has been aborted",
+                Body = $"{UserEmail} has just aborted booking {entity.Code}. Press for more detail"
+            };
+            if (entity.Status == BookingStatusValues.VALID)
+            {
+                var managerIds = _memberService.QueryManagersOfMember(entity.BookMemberId)
+                    .Select(o => o.UserId).ToList();
+                if (managerIds.Count > 0)
+                    await NotiHelper.Notify(managerIds, managerNoti);
+            }
+            else if (entity.Status == BookingStatusValues.APPROVED)
+            {
+                var managerIds = _memberService.QueryManagersOfArea(entity.Room.BuildingAreaCode)
+                    .Select(o => o.UserId).ToList();
+                if (managerIds.Count > 0)
+                    await NotiHelper.Notify(managerIds, managerNoti);
+            }
+            await notiMembers;
+            return NoContent();
         }
 
 #if !DEBUG

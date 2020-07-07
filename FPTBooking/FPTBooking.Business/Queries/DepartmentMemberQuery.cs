@@ -12,5 +12,15 @@ namespace FPTBooking.Business.Queries
         {
             return query.Where(o => o.IsManager == false);
         }
+
+        public static IQueryable<DepartmentMember> IsManager(this IQueryable<DepartmentMember> query)
+        {
+            return query.Where(o => o.IsManager == true);
+        }
+
+        public static IQueryable<DepartmentMember> OfMember(this IQueryable<DepartmentMember> query, string id)
+        {
+            return query.Where(o => o.MemberId == id);
+        }
     }
 }

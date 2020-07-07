@@ -16,6 +16,12 @@ namespace FPTBooking.Business.Queries
                 .Any(dm => dm.IsManager == true && depCodes.Contains(dm.DepartmentCode)));
         }
 
+        public static bool IsManagerOfAny(this Member entity, IEnumerable<string> depCodes)
+        {
+            return entity.DepartmentMember
+                .Any(dm => dm.IsManager == true && depCodes.Contains(dm.DepartmentCode));
+        }
+
         public static IQueryable<Member> IsManagerOf(this IQueryable<Member> query, BuildingArea area)
         {
             return query.Where(o => o.AreaManager.Any(am => am.AreaCode == area.Code));

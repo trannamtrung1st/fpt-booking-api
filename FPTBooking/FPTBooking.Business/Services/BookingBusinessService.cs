@@ -28,21 +28,28 @@ namespace FPTBooking.Business.Services
         }
 
         #region Create Booking
-        protected void PrepareCreate(Booking entity)
+        protected void PrepareCreate(Booking entity, Member bookMember, Room bookedRoom)
         {
             entity.Code = "B" + DateTime.UtcNow.ToString("ddMMyyyyhhmmss") + Global.Random.Next(0, 9);
             entity.Archived = false;
             entity.SentDate = DateTime.UtcNow;
-            entity.Status = BookingStatusValues.PROCESSING;
+            var managerDeps = _memberService.DepartmentMembers.OfMember(bookMember.UserId)
+                .IsManager().Select(o => o.DepartmentCode).ToList();
+            var isDepManager = managerDeps.Contains(bookedRoom.DepartmentCode);
+            var isAreaManager = _memberService.AreaManagers.OfMember(bookMember.UserId)
+                .Select(o => o.AreaCode)
+                .Contains(bookedRoom.BuildingAreaCode);
+            entity.Status = isDepManager ? BookingStatusValues.VALID :
+                (isAreaManager ? BookingStatusValues.APPROVED : BookingStatusValues.PROCESSING);
         }
 
-        public Booking CreateBooking(string bookMemberId,
+        public Booking CreateBooking(Member bookMember, Room bookedRoom,
             CreateBookingModel model, List<string> usingMemberIds)
         {
             var entity = model.ToDest();
-            entity.BookMemberId = bookMemberId;
+            entity.BookMemberId = bookMember.UserId;
             entity.UsingMemberIds = string.Join("\n", usingMemberIds);
-            PrepareCreate(entity);
+            PrepareCreate(entity, bookMember, bookedRoom);
             return context.Booking.Add(entity).Entity;
         }
 
@@ -56,10 +63,18 @@ namespace FPTBooking.Business.Services
                 FromStatus = null,
                 Id = Guid.NewGuid().ToString(),
                 MemberId = createMember.UserId,
-                ToStatus = BookingStatusValues.PROCESSING,
+                ToStatus = booking.Status,
                 Type = BookingHistoryTypes.CREATE,
             };
             return context.BookingHistory.Add(entity).Entity;
+        }
+        #endregion
+
+        #region Update Booking
+        public Booking CancelBooking(CancelBookingModel model, Booking entity)
+        {
+            model.CopyTo(entity);
+            return entity;
         }
         #endregion
 
@@ -108,8 +123,7 @@ namespace FPTBooking.Business.Services
                             obj["archived"] = entity.Archived;
                             obj["book_member_id"] = entity.BookMemberId;
                             obj["note"] = entity.Note;
-                            obj["archived"] = entity.NumOfPeople;
-                            obj["archived"] = entity.UsingMemberIds.Split('\n');
+                            obj["num_of_people"] = entity.NumOfPeople;
                             obj["manager_message"] = entity.ManagerMessage;
                             obj["feedback"] = entity.Feedback;
                         }
@@ -150,6 +164,14 @@ namespace FPTBooking.Business.Services
                                 user_id = entity.UserId,
                                 email = entity.Email
                             };
+                        }
+                        break;
+                    case BookingQueryProjection.USING_EMAILS:
+                        {
+                            var ids = row.UsingMemberIds.Split('\n');
+                            var usingEmails = _memberService.Members.Ids(ids)
+                                .Select(o => o.Email).ToList();
+                            obj["using_emails"] = usingEmails;
                         }
                         break;
                 }
@@ -245,19 +267,38 @@ namespace FPTBooking.Business.Services
         }
 
         public ValidationData ValidateGetBookingDetail(
-            Booking booking,
+            Booking entity,
             ClaimsPrincipal principal,
             BookingQueryOptions options)
         {
             var validationData = new ValidationData();
             var userId = principal.Identity.Name;
-            if (booking.BookMemberId != userId)
+            if (entity.BookMemberId != userId)
             {
-                var member = _memberService.Members.Id(booking.BookMemberId).FirstOrDefault();
-                var managerIds = _memberService.GetManagersOf(member).Select(o => o.UserId);
+                var managerIds = _memberService.QueryManagersOfMember(entity.BookMemberId)
+                    .Select(o => o.UserId);
                 if (!managerIds.Contains(userId))
                     validationData.Fail(code: AppResultCode.AccessDenied);
             }
+            return validationData;
+        }
+
+        public ValidationData ValidateCancelBooking(ClaimsPrincipal principal,
+            Booking booking,
+            CancelBookingModel model)
+        {
+            var validationData = new ValidationData();
+            var userId = principal.Identity.Name;
+            if (booking.BookMemberId != userId)
+                validationData.Fail(code: AppResultCode.AccessDenied);
+            var now = DateTime.UtcNow;
+            if (booking.Status == BookingStatusValues.FINISH ||
+                booking.Status == BookingStatusValues.DENIED ||
+                booking.Status == BookingStatusValues.ABORTED ||
+                (booking.BookedDate == now.Date && booking.FromTime <= now.TimeOfDay) || booking.BookedDate > now.Date)
+                validationData.Fail(mess: "Not allowed", code: AppResultCode.FailValidation);
+            if (model.Feedback == null)
+                validationData.Fail(mess: "You must provide a reason in feedback", code: AppResultCode.FailValidation);
             return validationData;
         }
 
@@ -288,11 +329,12 @@ namespace FPTBooking.Business.Services
             }
             if (validationData.IsValid)
             {
-                var isAvailable = _roomService.Rooms.Code(model.RoomCode)
+                var availableRoom = _roomService.Rooms.Code(model.RoomCode)
                     .AvailableForBooking(Bookings, model.BookedDate.Value, model.FromTime.Value,
-                        model.ToTime.Value, model.NumOfPeople.Value).Any();
-                if (!isAvailable)
+                        model.ToTime.Value, model.NumOfPeople.Value).FirstOrDefault();
+                if (availableRoom == null)
                     validationData.Fail("Room is not available for this booking", AppResultCode.FailValidation);
+                else validationData.TempData["booked_room"] = availableRoom;
             }
             return validationData;
         }

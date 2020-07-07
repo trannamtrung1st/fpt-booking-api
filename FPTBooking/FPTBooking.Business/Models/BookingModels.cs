@@ -9,6 +9,22 @@ using System.Threading.Tasks;
 
 namespace FPTBooking.Business.Models
 {
+    public class CancelBookingModel : MappingModel<Booking>
+    {
+        public CancelBookingModel()
+        {
+        }
+
+        public CancelBookingModel(Booking src) : base(src)
+        {
+        }
+
+        [JsonProperty("status")]
+        public string Status { get; set; }
+        [JsonProperty("feedback")]
+        public string Feedback { get; set; }
+    }
+
     public class CreateBookingModel : MappingModel<Booking>
     {
         public CreateBookingModel()
@@ -89,7 +105,8 @@ namespace FPTBooking.Business.Models
         public const string ROOM = "room";
         public const string SERVICES = "services";
         public const string MEMBER = "member";
-        public static readonly string DETAIL = $"{INFO},{ROOM},{SERVICES},{MEMBER}";
+        public const string USING_EMAILS = "using_emails";
+        public static readonly string DETAIL = $"{INFO},{ROOM},{SERVICES},{MEMBER},{USING_EMAILS}";
         private const string B = nameof(Booking);
     }
 

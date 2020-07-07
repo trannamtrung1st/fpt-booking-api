@@ -97,6 +97,7 @@ namespace FPTBooking.Business
     public static class BookingStatusValues
     {
         public const string PROCESSING = "Processing";
+        public const string VALID = "Valid";
         public const string APPROVED = "Approved";
         public const string DENIED = "Denied";
         public const string ABORTED = "Aborted";
