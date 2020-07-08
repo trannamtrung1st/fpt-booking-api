@@ -389,36 +389,38 @@ namespace FPTBooking.WebApi.Controllers
 
         [Authorize(Roles = RoleName.MANAGER)]
         [HttpPost("{id}/approval")]
-        public async Task<IActionResult> ApproveBooking(int id, ApproveBookingModel model)
+        public async Task<IActionResult> ChangeApproveStatusOfBooking(int id, ChangeApprovalStatusOfBookingModel model)
         {
             if (Settings.Instance.Mocking.Enabled)
                 return NoContent();
             var entity = _service.Bookings.Id(id).FirstOrDefault();
             if (entity == null) return NotFound(AppResult.NotFound());
             var member = _memberService.Members.Id(UserId).FirstOrDefault();
-            var validationData = _service.ValidateApproveBooking(User, member, entity, model);
+            var validationData = _service.ValidateChangeApprovalStausOfBooking(User, member, entity, model);
             if (!validationData.IsValid)
                 return BadRequest(AppResult.FailValidation(data: validationData));
             var fromStatus = entity.Status;
             using (var trans = context.Database.BeginTransaction())
             {
-                _service.ApproveBooking(model, entity);
-                var history = _service.CreateHistoryForApproveBooking(entity, fromStatus, entity.BookMember);
+                _service.ChangeApprovalStatusOfBooking(model, entity);
+                var history = _service.CreateHistoryForChangeApprovalStatusOfBooking(
+                    entity, fromStatus, model.IsApproved, member);
                 context.SaveChanges();
                 trans.Commit();
             }
             //notify using members, managers (if any)
-            var approvePerson = entity.Status == BookingStatusValues.VALID ? "department manager" :
+            var approvePerson = fromStatus == BookingStatusValues.PROCESSING ? "department manager" :
                 "location manager";
+            var action = model.IsApproved ? "approved" : "denied";
             var usingMemberIds = entity.UsingMemberIds.Split('\n');
             var notiMemberIds = usingMemberIds.Where(o => o != UserId).ToList();
             notiMemberIds.Add(UserId);
             var notiMembers = NotiHelper.Notify(notiMemberIds, new Notification
             {
-                Title = $"Booking {entity.Code} has been approved by your {approvePerson}",
-                Body = $"{UserEmail} has just approved your booking. Press for more detail"
+                Title = $"Booking {entity.Code} has been {action} by your {approvePerson}",
+                Body = $"{UserEmail} has just {action} your booking. Press for more detail"
             });
-            if (entity.Status == BookingStatusValues.VALID)
+            if (entity.Status == BookingStatusValues.VALID && model.IsApproved)
             {
                 var managerIds = _memberService.QueryManagersOfArea(entity.Room.BuildingAreaCode)
                     .Select(o => o.UserId).ToList();
@@ -426,7 +428,7 @@ namespace FPTBooking.WebApi.Controllers
                     await NotiHelper.Notify(managerIds, new Notification
                     {
                         Title = $"There's a new booking request",
-                        Body = $"{UserEmail} has just approved a booking. Press for more detail"
+                        Body = $"{UserEmail} has just {action} a booking. Press for more detail"
                     });
             }
             await notiMembers;

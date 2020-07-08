@@ -9,16 +9,18 @@ using System.Threading.Tasks;
 
 namespace FPTBooking.Business.Models
 {
-    public class ApproveBookingModel : MappingModel<Booking>
+    public class ChangeApprovalStatusOfBookingModel : MappingModel<Booking>
     {
-        public ApproveBookingModel()
+        public ChangeApprovalStatusOfBookingModel()
         {
         }
 
-        public ApproveBookingModel(Booking src) : base(src)
+        public ChangeApprovalStatusOfBookingModel(Booking src) : base(src)
         {
         }
 
+        [JsonProperty("is_approved")]
+        public bool IsApproved { get; set; }
         [JsonProperty("manager_message")]
         public string ManagerMessage { get; set; }
     }

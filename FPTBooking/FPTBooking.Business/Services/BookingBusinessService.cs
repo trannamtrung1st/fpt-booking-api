@@ -69,15 +69,25 @@ namespace FPTBooking.Business.Services
             return entity;
         }
 
-        public Booking ApproveBooking(ApproveBookingModel model, Booking entity)
+        public Booking ChangeApprovalStatusOfBooking(ChangeApprovalStatusOfBookingModel model, Booking entity)
         {
             model.CopyTo(entity);
             if (entity.Status == BookingStatusValues.PROCESSING)
             {
-                entity.Status = BookingStatusValues.VALID;
-                entity.DepartmentAccepted = true;
+                if (model.IsApproved)
+                {
+                    entity.Status = BookingStatusValues.VALID;
+                    entity.DepartmentAccepted = true;
+                }
+                else
+                {
+                    entity.Status = BookingStatusValues.DENIED;
+                    entity.DepartmentAccepted = false;
+                }
             }
-            else entity.Status = BookingStatusValues.APPROVED;
+            else if (model.IsApproved)
+                entity.Status = BookingStatusValues.APPROVED;
+            else entity.Status = BookingStatusValues.DENIED;
             return entity;
         }
         #endregion
@@ -345,10 +355,10 @@ namespace FPTBooking.Business.Services
             return validationData;
         }
 
-        public ValidationData ValidateApproveBooking(ClaimsPrincipal principal,
+        public ValidationData ValidateChangeApprovalStausOfBooking(ClaimsPrincipal principal,
             Member manager,
             Booking entity,
-            ApproveBookingModel model)
+            ChangeApprovalStatusOfBookingModel model)
         {
             var validationData = new ValidationData();
             var userId = principal.Identity.Name;
@@ -426,20 +436,29 @@ namespace FPTBooking.Business.Services
             return context.BookingHistory.Add(entity).Entity;
         }
 
-        public BookingHistory CreateHistoryForApproveBooking(Booking booking, string fromStatus,
+        public BookingHistory CreateHistoryForChangeApprovalStatusOfBooking(Booking booking, string fromStatus,
+            bool isApproved,
             Member approveManager)
         {
             var entity = new BookingHistory
             {
                 BookingId = booking.Id,
-                DisplayContent = $"{approveManager.Email} approved this booking",
                 HappenedTime = DateTime.UtcNow,
                 FromStatus = fromStatus,
                 Id = Guid.NewGuid().ToString(),
                 MemberId = approveManager.UserId,
                 ToStatus = booking.Status,
-                Type = BookingHistoryTypes.APPROVE,
             };
+            if (isApproved)
+            {
+                entity.DisplayContent = $"{approveManager.Email} approved this booking";
+                entity.Type = BookingHistoryTypes.APPROVE;
+            }
+            else
+            {
+                entity.DisplayContent = $"{approveManager.Email} denied this booking";
+                entity.Type = BookingHistoryTypes.DENY;
+            }
             return context.BookingHistory.Add(entity).Entity;
         }
 
