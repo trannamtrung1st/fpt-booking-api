@@ -90,6 +90,23 @@ namespace FPTBooking.Business.Services
             else entity.Status = BookingStatusValues.DENIED;
             return entity;
         }
+
+        public Booking UpdateBooking(UpdateBookingModel model, Booking entity)
+        {
+            model.CopyTo(entity);
+            RemoveBookingAttachedServices(model.RemoveServiceIds);
+            return entity;
+        }
+
+        public IEnumerable<AttachedService> RemoveBookingAttachedServices(IEnumerable<int> serviceIds)
+        {
+            var entities = serviceIds.Select(o => new AttachedService
+            {
+                Id = o
+            }).ToList();
+            context.AttachedService.RemoveRange(entities);
+            return entities;
+        }
         #endregion
 
         #region Query Booking
@@ -101,6 +118,15 @@ namespace FPTBooking.Business.Services
             }
         }
 
+        public bool CheckAvailabilityOfRoomForBooking(Booking entity, Room room)
+        {
+            var isAvailable = _roomService.Rooms.AvailableForBooking(Bookings,
+                entity.BookedDate,
+                entity.FromTime,
+                entity.ToTime,
+                entity.NumOfPeople).Any(o => o.Code == room.Code);
+            return isAvailable;
+        }
 
         public Booking GetBookingDetail(int id, BookingQueryProjection projection)
         {
@@ -382,6 +408,43 @@ namespace FPTBooking.Business.Services
             return validationData;
         }
 
+        public ValidationData ValidateUpdateBooking(ClaimsPrincipal principal,
+            Member manager,
+            Booking entity,
+            UpdateBookingModel model)
+        {
+            var validationData = new ValidationData();
+            var userId = principal.Identity.Name;
+            if (entity.Status == BookingStatusValues.PROCESSING)
+            {
+                var bookMemberId = entity.BookMemberId;
+                var managerIds = _memberService.QueryManagersOfMember(bookMemberId)
+                    .Select(o => o.UserId).ToList();
+                if (!managerIds.Contains(userId))
+                    validationData.Fail(code: AppResultCode.AccessDenied);
+            }
+            else if (entity.Status == BookingStatusValues.VALID)
+            {
+                var areaCode = entity.Room.BuildingAreaCode;
+                var managerIds = _memberService.QueryManagersOfArea(areaCode)
+                    .Select(o => o.UserId).ToList();
+                if (!managerIds.Contains(userId))
+                    validationData.Fail(code: AppResultCode.AccessDenied);
+            }
+            else validationData.Fail(mess: "Invalid status", code: AppResultCode.FailValidation);
+            if (model.RoomCode != entity.RoomCode)
+            {
+                var room = _roomService.Rooms.Code(model.RoomCode).FirstOrDefault();
+                if (room == null)
+                    validationData.Fail(mess: "Room not found", AppResultCode.FailValidation);
+                else
+                if (!CheckAvailabilityOfRoomForBooking(entity, room))
+                    validationData.Fail(mess: "New room is not available", AppResultCode.FailValidation);
+                else validationData.TempData["room"] = room;
+            }
+            return validationData;
+        }
+
         public ValidationData ValidateCreateBooking(ClaimsPrincipal principal,
             CreateBookingModel model)
         {
@@ -459,6 +522,23 @@ namespace FPTBooking.Business.Services
                 entity.DisplayContent = $"{approveManager.Email} denied this booking";
                 entity.Type = BookingHistoryTypes.DENY;
             }
+            return context.BookingHistory.Add(entity).Entity;
+        }
+
+        public BookingHistory CreateHistoryForUpdateBooking(Booking booking,
+            Member approveManager)
+        {
+            var entity = new BookingHistory
+            {
+                BookingId = booking.Id,
+                HappenedTime = DateTime.UtcNow,
+                DisplayContent = $"{approveManager.Email} updated this booking",
+                FromStatus = booking.Status,
+                Id = Guid.NewGuid().ToString(),
+                MemberId = approveManager.UserId,
+                ToStatus = booking.Status,
+                Type = BookingHistoryTypes.UPDATE,
+            };
             return context.BookingHistory.Add(entity).Entity;
         }
 

@@ -435,6 +435,41 @@ namespace FPTBooking.WebApi.Controllers
             return NoContent();
         }
 
+        [Authorize(Roles = RoleName.MANAGER)]
+        [HttpPatch("{id}")]
+        public async Task<IActionResult> UpdateBooking(int id, UpdateBookingModel model)
+        {
+            if (Settings.Instance.Mocking.Enabled)
+                return NoContent();
+            var entity = _service.Bookings.Id(id).FirstOrDefault();
+            if (entity == null) return NotFound(AppResult.NotFound());
+            var member = _memberService.Members.Id(UserId).FirstOrDefault();
+            var validationData = _service.ValidateUpdateBooking(User, member, entity, model);
+            if (!validationData.IsValid)
+                return BadRequest(AppResult.FailValidation(data: validationData));
+            var fromStatus = entity.Status;
+            using (var trans = context.Database.BeginTransaction())
+            {
+                _service.UpdateBooking(model, entity);
+                var history = _service.CreateHistoryForUpdateBooking(entity, member);
+                context.SaveChanges();
+                trans.Commit();
+            }
+            //notify using members
+            var updatePerson = fromStatus == BookingStatusValues.PROCESSING ? "department manager" :
+                "location manager";
+            var usingMemberIds = entity.UsingMemberIds.Split('\n');
+            var notiMemberIds = usingMemberIds.Where(o => o != UserId).ToList();
+            notiMemberIds.Add(UserId);
+            await NotiHelper.Notify(notiMemberIds, new Notification
+            {
+                Title = $"Booking {entity.Code} has been updated by your {updatePerson}",
+                Body = $"{UserEmail} has just updated your booking. Press for more detail"
+            });
+            return NoContent();
+        }
+
+
 #if !DEBUG
         [Authorize]
 #endif

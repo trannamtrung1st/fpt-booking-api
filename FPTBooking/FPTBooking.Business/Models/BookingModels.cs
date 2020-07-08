@@ -9,6 +9,21 @@ using System.Threading.Tasks;
 
 namespace FPTBooking.Business.Models
 {
+    public class UpdateBookingModel : MappingModel<Booking>
+    {
+        public UpdateBookingModel()
+        {
+        }
+
+        public UpdateBookingModel(Booking src) : base(src)
+        {
+        }
+
+        [JsonProperty("room_code")]
+        public string RoomCode { get; set; }
+        [JsonProperty("removed_service_ids")]
+        public virtual IEnumerable<int> RemoveServiceIds { get; set; }
+    }
     public class ChangeApprovalStatusOfBookingModel : MappingModel<Booking>
     {
         public ChangeApprovalStatusOfBookingModel()

@@ -116,6 +116,7 @@ namespace FPTBooking.Business
         public const string FEEDBACK = "Feedback";
         public const string DENY = "Deny";
         public const string ABORT = "Abort";
+        public const string UPDATE = "Update";
     }
 
     public enum BookingPrincipalRelationship
