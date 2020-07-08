@@ -52,22 +52,6 @@ namespace FPTBooking.Business.Services
             PrepareCreate(entity, bookMember, bookedRoom);
             return context.Booking.Add(entity).Entity;
         }
-
-        public BookingHistory CreateHistoryForCreateBooking(Booking booking, Member createMember)
-        {
-            var entity = new BookingHistory
-            {
-                BookingId = booking.Id,
-                DisplayContent = $"{createMember.Email} created this booking",
-                HappenedTime = DateTime.UtcNow,
-                FromStatus = null,
-                Id = Guid.NewGuid().ToString(),
-                MemberId = createMember.UserId,
-                ToStatus = booking.Status,
-                Type = BookingHistoryTypes.CREATE,
-            };
-            return context.BookingHistory.Add(entity).Entity;
-        }
         #endregion
 
         #region Update Booking
@@ -425,5 +409,70 @@ namespace FPTBooking.Business.Services
             return validationData;
         }
         #endregion
+
+        public BookingHistory CreateHistoryForCreateBooking(Booking booking, Member createMember)
+        {
+            var entity = new BookingHistory
+            {
+                BookingId = booking.Id,
+                DisplayContent = $"{createMember.Email} created this booking",
+                HappenedTime = DateTime.UtcNow,
+                FromStatus = null,
+                Id = Guid.NewGuid().ToString(),
+                MemberId = createMember.UserId,
+                ToStatus = booking.Status,
+                Type = BookingHistoryTypes.CREATE,
+            };
+            return context.BookingHistory.Add(entity).Entity;
+        }
+
+        public BookingHistory CreateHistoryForApproveBooking(Booking booking, string fromStatus,
+            Member approveManager)
+        {
+            var entity = new BookingHistory
+            {
+                BookingId = booking.Id,
+                DisplayContent = $"{approveManager.Email} approved this booking",
+                HappenedTime = DateTime.UtcNow,
+                FromStatus = fromStatus,
+                Id = Guid.NewGuid().ToString(),
+                MemberId = approveManager.UserId,
+                ToStatus = booking.Status,
+                Type = BookingHistoryTypes.APPROVE,
+            };
+            return context.BookingHistory.Add(entity).Entity;
+        }
+
+        public BookingHistory CreateHistoryForFeedbackBooking(Booking booking, Member createMember)
+        {
+            var entity = new BookingHistory
+            {
+                BookingId = booking.Id,
+                DisplayContent = $"{createMember.Email} posted a feedback for this booking",
+                HappenedTime = DateTime.UtcNow,
+                FromStatus = BookingStatusValues.APPROVED,
+                Id = Guid.NewGuid().ToString(),
+                MemberId = createMember.UserId,
+                ToStatus = booking.Status,
+                Type = BookingHistoryTypes.FEEDBACK,
+            };
+            return context.BookingHistory.Add(entity).Entity;
+        }
+
+        public BookingHistory CreateHistoryForCancelBooking(Booking booking, string fromStatus, Member createMember)
+        {
+            var entity = new BookingHistory
+            {
+                BookingId = booking.Id,
+                DisplayContent = $"{createMember.Email} canceled this booking",
+                HappenedTime = DateTime.UtcNow,
+                FromStatus = fromStatus,
+                Id = Guid.NewGuid().ToString(),
+                MemberId = createMember.UserId,
+                ToStatus = booking.Status,
+                Type = BookingHistoryTypes.ABORT,
+            };
+            return context.BookingHistory.Add(entity).Entity;
+        }
     }
 }

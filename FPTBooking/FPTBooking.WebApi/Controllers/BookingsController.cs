@@ -321,8 +321,14 @@ namespace FPTBooking.WebApi.Controllers
             var validationData = _service.ValidateCancelBooking(User, entity, model);
             if (!validationData.IsValid)
                 return BadRequest(AppResult.FailValidation(data: validationData));
-            _service.CancelBooking(model, entity);
-            context.SaveChanges();
+            var fromStatus = entity.Status;
+            using (var trans = context.Database.BeginTransaction())
+            {
+                _service.CancelBooking(model, entity);
+                var history = _service.CreateHistoryForCancelBooking(entity, fromStatus, entity.BookMember);
+                context.SaveChanges();
+                trans.Commit();
+            }
             //notify using members, managers (if any)
             var notiMemberIds = entity.UsingMemberIds.Split('\n')
                 .Where(o => o != UserId).ToList();
@@ -365,8 +371,14 @@ namespace FPTBooking.WebApi.Controllers
             var validationData = _service.ValidateFeedbackBooking(User, entity, model);
             if (!validationData.IsValid)
                 return BadRequest(AppResult.FailValidation(data: validationData));
-            _service.FeedbackBooking(model, entity);
-            context.SaveChanges();
+            var fromStatus = entity.Status;
+            using (var trans = context.Database.BeginTransaction())
+            {
+                _service.FeedbackBooking(model, entity);
+                var history = _service.CreateHistoryForFeedbackBooking(entity, entity.BookMember);
+                context.SaveChanges();
+                trans.Commit();
+            }
             //notify managers (if any)
             //var managerIds = _memberService.QueryManagersOfArea(entity.Room.BuildingAreaCode)
             //    .Select(o => o.UserId).ToList();
@@ -387,8 +399,14 @@ namespace FPTBooking.WebApi.Controllers
             var validationData = _service.ValidateApproveBooking(User, member, entity, model);
             if (!validationData.IsValid)
                 return BadRequest(AppResult.FailValidation(data: validationData));
-            _service.ApproveBooking(model, entity);
-            context.SaveChanges();
+            var fromStatus = entity.Status;
+            using (var trans = context.Database.BeginTransaction())
+            {
+                _service.ApproveBooking(model, entity);
+                var history = _service.CreateHistoryForApproveBooking(entity, fromStatus, entity.BookMember);
+                context.SaveChanges();
+                trans.Commit();
+            }
             //notify using members, managers (if any)
             var approvePerson = entity.Status == BookingStatusValues.VALID ? "department manager" :
                 "location manager";
