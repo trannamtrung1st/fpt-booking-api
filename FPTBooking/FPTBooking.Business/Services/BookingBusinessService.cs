@@ -365,10 +365,11 @@ namespace FPTBooking.Business.Services
             if (entity.BookMemberId != userId)
                 validationData.Fail(code: AppResultCode.AccessDenied);
             var now = DateTime.UtcNow;
+            var startTime = entity.BookedDate.Add(entity.FromTime);
             if (entity.Status == BookingStatusValues.FINISHED ||
                 entity.Status == BookingStatusValues.DENIED ||
                 entity.Status == BookingStatusValues.ABORTED ||
-                (entity.BookedDate == now.Date && entity.FromTime <= now.TimeOfDay) || entity.BookedDate > now.Date)
+                startTime <= now)
                 validationData.Fail(mess: "Not allowed", code: AppResultCode.FailValidation);
             if (model.Feedback == null)
                 validationData.Fail(mess: "You must provide a reason in feedback", code: AppResultCode.FailValidation);
