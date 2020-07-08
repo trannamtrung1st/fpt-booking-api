@@ -510,7 +510,8 @@ namespace FPTBooking.Data.Migrations
                     BookMemberId = table.Column<string>(unicode: false, maxLength: 100, nullable: false),
                     UsingMemberIds = table.Column<string>(nullable: false),
                     ManagerMessage = table.Column<string>(maxLength: 2000, nullable: true),
-                    Feedback = table.Column<string>(maxLength: 2000, nullable: true)
+                    Feedback = table.Column<string>(maxLength: 2000, nullable: true),
+                    DepartmentAccepted = table.Column<bool>(nullable: false)
                 },
                 constraints: table =>
                 {
@@ -640,10 +641,10 @@ namespace FPTBooking.Data.Migrations
                 columns: new[] { "Id", "ConcurrencyStamp", "Name", "NormalizedName" },
                 values: new object[,]
                 {
-                    { "Administrator", "d125c40b-cb41-4cff-b595-7ebf67d9e8a3", "Administrator", "ADMINISTRATOR" },
-                    { "Manager", "d2eb8d9b-e063-46b6-a320-651c0e3bc222", "Manager", "MANAGER" },
-                    { "RoomChecker", "c2dff61e-4652-466c-9142-5fa6d48e5994", "RoomChecker", "ROOMCHECKER" },
-                    { "User", "ca61774d-de2e-417b-8e50-9e24218655eb", "User", "USER" }
+                    { "Administrator", "45879898-5f05-45db-8ca6-4fc9792b2c45", "Administrator", "ADMINISTRATOR" },
+                    { "Manager", "077a0060-86f2-4fd3-b2d4-df3fbfd41a35", "Manager", "MANAGER" },
+                    { "RoomChecker", "dc926006-24cd-473e-8a10-2c7876c76bc2", "RoomChecker", "ROOMCHECKER" },
+                    { "User", "e162aa77-8682-4730-bc4f-9dea94cfe78a", "User", "USER" }
                 });
 
             migrationBuilder.InsertData(

@@ -12,6 +12,36 @@ namespace FPTBooking.Business.Queries
 {
     public static class BookingQuery
     {
+        public static IQueryable<Booking> OfRooms(this IQueryable<Booking> query, IEnumerable<string> roomCodes)
+        {
+            return query.Where(o => roomCodes.Contains(o.RoomCode));
+        }
+
+        public static IQueryable<Booking> ManagedByDepsOrAreasExceptStatuses(this IQueryable<Booking> query,
+            IEnumerable<string> depCodes, IEnumerable<string> depStatuses,
+            IEnumerable<string> areaCodes, IEnumerable<string> areaStatuses)
+        {
+            return query.Where(o => (depCodes.Contains(o.Room.DepartmentCode) 
+                    && (depStatuses == null || !depStatuses.Contains(o.Status)))
+                || (areaCodes.Contains(o.Room.BuildingAreaCode) &&
+                    (areaStatuses == null || !areaStatuses.Contains(o.Status)) && o.DepartmentAccepted));
+        }
+
+        public static IQueryable<Booking> OfDeps(this IQueryable<Booking> query, IEnumerable<string> depCodes)
+        {
+            return query.Where(o => depCodes.Contains(o.Room.DepartmentCode));
+        }
+
+        public static IQueryable<Booking> OfAreas(this IQueryable<Booking> query, IEnumerable<string> areaCodes)
+        {
+            return query.Where(o => areaCodes.Contains(o.Room.BuildingAreaCode));
+        }
+
+        public static IQueryable<Booking> DepartmentAccepted(this IQueryable<Booking> query, bool val)
+        {
+            return query.Where(o => o.DepartmentAccepted == val);
+        }
+
         public static IQueryable<Booking> BookedDate(this IQueryable<Booking> query, DateTime date)
         {
             return query.Where(o => o.BookedDate.Date == date.Date);
@@ -19,7 +49,18 @@ namespace FPTBooking.Business.Queries
 
         public static IQueryable<Booking> ActiveStatus(this IQueryable<Booking> query)
         {
-            return query.Where(o => o.Status != BookingStatusValues.ABORTED && o.Status != BookingStatusValues.DENIED);
+            return query.NotStatus(BookingStatusValues.ABORTED)
+                .NotStatus(BookingStatusValues.DENIED);
+        }
+
+        public static IQueryable<Booking> Status(this IQueryable<Booking> query, string status)
+        {
+            return query.Where(o => o.Status == status);
+        }
+
+        public static IQueryable<Booking> NotStatus(this IQueryable<Booking> query, string status)
+        {
+            return query.Where(o => o.Status != status);
         }
 
         public static IQueryable<Booking> OverlappedInTimeRange(this IQueryable<Booking> query,
@@ -99,16 +140,14 @@ namespace FPTBooking.Business.Queries
             var archived = model.archived ?? BoolOptions.F;
             if (archived != BoolOptions.B)
                 query = query.Archived(!(archived == BoolOptions.F));
-            if (model.id != null)
-                query = query.Id(model.id.Value);
-            if (model.code != null)
-                query = query.Code(model.code);
             if (model.from_date != null)
                 query = query.FromDate(model.from_date.Value);
             if (model.to_date != null)
                 query = query.ToDate(model.to_date.Value);
             if (model.date != null)
                 query = query.BookedDate(model.date.Value);
+            if (model.status != null)
+                query = query.Status(model.status);
             return query;
         }
 

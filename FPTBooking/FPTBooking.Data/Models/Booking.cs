@@ -27,6 +27,7 @@ namespace FPTBooking.Data.Models
         public string UsingMemberIds { get; set; }
         public string ManagerMessage { get; set; }
         public string Feedback { get; set; }
+        public bool DepartmentAccepted { get; set; }
 
         public virtual Member BookMember { get; set; }
         public virtual Room Room { get; set; }

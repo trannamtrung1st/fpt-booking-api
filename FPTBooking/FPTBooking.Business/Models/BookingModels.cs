@@ -153,14 +153,13 @@ namespace FPTBooking.Business.Models
 
     public class BookingQueryFilter
     {
-        public int? id { get; set; }
-        public string code { get; set; }
         [DefaultDateTimeModelBinder]
         public DateTime? date { get; set; }
         [DefaultDateTimeModelBinder]
         public DateTime? from_date { get; set; }
         [DefaultDateTimeModelBinder]
         public DateTime? to_date { get; set; }
+        public string status { get; set; }
         public BoolOptions? archived { get; set; } //default: false
     }
 

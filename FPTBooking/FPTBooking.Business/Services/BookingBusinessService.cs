@@ -200,8 +200,19 @@ namespace FPTBooking.Business.Services
             return list;
         }
 
+        public IQueryable<Booking> QueryBookingsManagedByManager(Member member)
+        {
+            var managerDeps = member.DepartmentMember.AsQueryable()
+                .IsManager().Select(o => o.DepartmentCode).ToList();
+            var areaManagers = member.AreaManager.Select(o => o.AreaCode).ToList();
+            var query = Bookings.ManagedByDepsOrAreasExceptStatuses(managerDeps, null,
+                areaManagers, null);
+            return query;
+        }
+
         public async Task<QueryResult<IDictionary<string, object>>> QueryBookingDynamic(
             ClaimsPrincipal principal,
+            Member member,
             BookingPrincipalRelationship relationship,
             BookingQueryProjection projection,
             IDictionary<string, object> tempData = null,
@@ -219,6 +230,9 @@ namespace FPTBooking.Business.Services
                 {
                     case BookingPrincipalRelationship.Owner:
                         query = query.OfBookMember(memberId);
+                        break;
+                    case BookingPrincipalRelationship.Manager:
+                        query = QueryBookingsManagedByManager(member);
                         break;
                 }
             }

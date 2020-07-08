@@ -147,15 +147,21 @@ namespace FPTBooking.WebApi.Controllers
             if (!validationData.IsValid)
                 return BadRequest(AppResult.FailValidation(data: validationData));
             var result = await _service.QueryBookingDynamic(
-                User, BookingPrincipalRelationship.Owner,
+                User, null, BookingPrincipalRelationship.Owner,
                 projection, validationData.TempData, filter, sort, paging, options);
             if (options.single_only && result == null) return NotFound(AppResult.NotFound());
             return Ok(AppResult.Success(data: result));
         }
 
-        //[Authorize(Roles = RoleName.MANAGER)]
+#if !DEBUG
+        [Authorize(Roles = RoleName.MANAGER)]
+#endif
         [HttpGet("managed")]
-        public IActionResult GetManagedRequests()
+        public async Task<IActionResult> GetManagedRequests([FromQuery][QueryObject]BookingQueryFilter filter,
+            [FromQuery]BookingQuerySort sort,
+            [FromQuery]BookingQueryProjection projection,
+            [FromQuery]BookingQueryPaging paging,
+            [FromQuery]BookingQueryOptions options)
         {
             if (Settings.Instance.Mocking.Enabled || true)
             {
@@ -240,7 +246,16 @@ namespace FPTBooking.WebApi.Controllers
                         throw new Exception("Test exception");
                 }
             }
-            throw new NotImplementedException();
+            var validationData = _service.ValidateGetBookings(
+                User, BookingPrincipalRelationship.Manager, filter, sort, projection, paging, options);
+            if (!validationData.IsValid)
+                return BadRequest(AppResult.FailValidation(data: validationData));
+            var member = _memberService.Members.Id(UserId).FirstOrDefault();
+            var result = await _service.QueryBookingDynamic(
+                User, member, BookingPrincipalRelationship.Manager,
+                projection, validationData.TempData, filter, sort, paging, options);
+            if (options.single_only && result == null) return NotFound(AppResult.NotFound());
+            return Ok(AppResult.Success(data: result));
         }
 
         [Authorize]

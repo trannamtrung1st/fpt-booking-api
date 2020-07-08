@@ -85,28 +85,28 @@ namespace FPTBooking.Data.Migrations
                         new
                         {
                             Id = "Administrator",
-                            ConcurrencyStamp = "d125c40b-cb41-4cff-b595-7ebf67d9e8a3",
+                            ConcurrencyStamp = "45879898-5f05-45db-8ca6-4fc9792b2c45",
                             Name = "Administrator",
                             NormalizedName = "ADMINISTRATOR"
                         },
                         new
                         {
                             Id = "Manager",
-                            ConcurrencyStamp = "d2eb8d9b-e063-46b6-a320-651c0e3bc222",
+                            ConcurrencyStamp = "077a0060-86f2-4fd3-b2d4-df3fbfd41a35",
                             Name = "Manager",
                             NormalizedName = "MANAGER"
                         },
                         new
                         {
                             Id = "RoomChecker",
-                            ConcurrencyStamp = "c2dff61e-4652-466c-9142-5fa6d48e5994",
+                            ConcurrencyStamp = "dc926006-24cd-473e-8a10-2c7876c76bc2",
                             Name = "RoomChecker",
                             NormalizedName = "ROOMCHECKER"
                         },
                         new
                         {
                             Id = "User",
-                            ConcurrencyStamp = "ca61774d-de2e-417b-8e50-9e24218655eb",
+                            ConcurrencyStamp = "e162aa77-8682-4730-bc4f-9dea94cfe78a",
                             Name = "User",
                             NormalizedName = "USER"
                         });
@@ -262,6 +262,9 @@ namespace FPTBooking.Data.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(100)")
                         .HasMaxLength(100);
+
+                    b.Property<bool>("DepartmentAccepted")
+                        .HasColumnType("bit");
 
                     b.Property<string>("Feedback")
                         .HasColumnType("nvarchar(2000)")

@@ -102,6 +102,11 @@ namespace FPTBooking.Business
         public const string DENIED = "Denied";
         public const string ABORTED = "Aborted";
         public const string FINISHED = "Finished"; //after feedback
+
+        public static readonly IEnumerable<string> ALL = new List<string>
+        {
+            PROCESSING, VALID, APPROVED, DENIED, ABORTED, FINISHED
+        };
     }
 
     public static class BookingHistoryTypes
