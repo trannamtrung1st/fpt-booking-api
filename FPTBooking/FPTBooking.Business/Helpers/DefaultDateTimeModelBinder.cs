@@ -58,7 +58,7 @@ namespace FPTBooking.Business.Helpers
             DateTime dateTime;
             if (dateStr.TryConvertToDateTime(dateFormat, out dateTime))
             {
-                dateTime = dateTime.ToTimeZone(AppTimeZone.Map[AppCulture.VI]).ToUniversalTime();
+                dateTime = dateTime.ToUniversalTime();
                 return dateTime;
             }
             return null;

@@ -259,6 +259,13 @@ namespace FPTBooking.Business.Services
                     validationData.Fail(mess: "Invalid input data", AppResultCode.FailValidation);
                 if (filter.from_time >= filter.to_time)
                     validationData.Fail(mess: "Time range is not valid", AppResultCode.FailValidation);
+                if (validationData.IsValid)
+                {
+                    DateTime currentTime = DateTime.UtcNow;
+                    var bookedTime = filter.date?.AddMinutes(filter.from_time.Value.TotalMinutes);
+                    if (currentTime >= bookedTime)
+                        validationData.Fail(mess: "Booked time must be greater than current", AppResultCode.FailValidation);
+                }
             }
             return validationData;
         }
@@ -268,6 +275,9 @@ namespace FPTBooking.Business.Services
             RoomQueryOptions options)
         {
             var validationData = new ValidationData();
+            var now = DateTime.UtcNow;
+            if (entity.HangingEndTime > now && hanging)
+                validationData.Fail(mess: "Room is being booked. Please come back later", AppResultCode.AccessDenied);
             return validationData;
         }
 

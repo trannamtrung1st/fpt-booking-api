@@ -10,7 +10,7 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace FPTBooking.Data.Migrations
 {
     [DbContext(typeof(DataContext))]
-    [Migration("20200708041104_Init")]
+    [Migration("20200708083627_Init")]
     partial class Init
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -87,28 +87,28 @@ namespace FPTBooking.Data.Migrations
                         new
                         {
                             Id = "Administrator",
-                            ConcurrencyStamp = "45879898-5f05-45db-8ca6-4fc9792b2c45",
+                            ConcurrencyStamp = "04d6d856-27d7-4a4b-aeea-166df94295e3",
                             Name = "Administrator",
                             NormalizedName = "ADMINISTRATOR"
                         },
                         new
                         {
                             Id = "Manager",
-                            ConcurrencyStamp = "077a0060-86f2-4fd3-b2d4-df3fbfd41a35",
+                            ConcurrencyStamp = "652b78c2-9924-486b-b53e-1f8d186456b1",
                             Name = "Manager",
                             NormalizedName = "MANAGER"
                         },
                         new
                         {
                             Id = "RoomChecker",
-                            ConcurrencyStamp = "dc926006-24cd-473e-8a10-2c7876c76bc2",
+                            ConcurrencyStamp = "352c600a-fe58-4580-bb9f-15964271b4d5",
                             Name = "RoomChecker",
                             NormalizedName = "ROOMCHECKER"
                         },
                         new
                         {
                             Id = "User",
-                            ConcurrencyStamp = "e162aa77-8682-4730-bc4f-9dea94cfe78a",
+                            ConcurrencyStamp = "ff48617a-00d8-4bcc-9e10-8cc0c48b9cc0",
                             Name = "User",
                             NormalizedName = "USER"
                         });

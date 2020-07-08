@@ -30,6 +30,7 @@ namespace FPTBooking.WebApi
 {
     public class Startup
     {
+        //eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1bmlxdWVfbmFtZSI6Ijg1NzI0ODIyLTI2ZWQtNGIyNC05YTNmLTAxNGI4NTlkNjFiZCIsInJvbGUiOiJVc2VyIiwidXNlcm5hbWUiOiIzRVpVQ09iNUw0VXB6ckJDaFpTUGRDTVFTd0gzIiwicGhvdG9fdXJsIjoiaHR0cHM6Ly9saDYuZ29vZ2xldXNlcmNvbnRlbnQuY29tLy1MaEJfelR0WkpmNC9BQUFBQUFBQUFBSS9BQUFBQUFBQUFBQS9BTVp1dWNrY0kzWE1WbUJZenVkeVdYMFpkaWZMclBBcHR3L3M5Ni1jL3Bob3RvLmpwZyIsImVtYWlsIjoidHJ1bmd0bnNlMTMwMDk3QGZwdC5lZHUudm4iLCJqdGkiOiJlNTgwN2VlYy0xYjRmLTQ1MDUtYWQyMy02ZjU3MmM0MmJiYzciLCJzdWIiOiI4NTcyNDgyMi0yNmVkLTRiMjQtOWEzZi0wMTRiODU5ZDYxYmQiLCJuYmYiOjE1OTQyMDMzNzgsImV4cCI6MTg3NDIwMDU3OCwiaWF0IjoxNTk0MjAzMzc4LCJpc3MiOiJmcHRib29raW5nMXN0IiwiYXVkIjoiZnB0Ym9va2luZzFzdCJ9.XvPad_mQC1PPXSsYGOOTfr6T-8Gy0E-qyonLrN4zOOQ
         public Startup(IConfiguration configuration)
         {
             Configuration = configuration;
@@ -64,7 +65,8 @@ namespace FPTBooking.WebApi
             services.AddServiceInjection();
             var connStr = Configuration.GetConnectionString("DataContext");
 #if TEST
-            connStr = connStr.Replace("{envConfig}", ".Test");
+            //connStr = connStr.Replace("{envConfig}", ".Test");
+            connStr = connStr.Replace("{envConfig}", "");
 #else
             connStr = connStr.Replace("{envConfig}", "");
 #endif

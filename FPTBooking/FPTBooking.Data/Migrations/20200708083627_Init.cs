@@ -641,10 +641,10 @@ namespace FPTBooking.Data.Migrations
                 columns: new[] { "Id", "ConcurrencyStamp", "Name", "NormalizedName" },
                 values: new object[,]
                 {
-                    { "Administrator", "45879898-5f05-45db-8ca6-4fc9792b2c45", "Administrator", "ADMINISTRATOR" },
-                    { "Manager", "077a0060-86f2-4fd3-b2d4-df3fbfd41a35", "Manager", "MANAGER" },
-                    { "RoomChecker", "dc926006-24cd-473e-8a10-2c7876c76bc2", "RoomChecker", "ROOMCHECKER" },
-                    { "User", "e162aa77-8682-4730-bc4f-9dea94cfe78a", "User", "USER" }
+                    { "Administrator", "04d6d856-27d7-4a4b-aeea-166df94295e3", "Administrator", "ADMINISTRATOR" },
+                    { "Manager", "652b78c2-9924-486b-b53e-1f8d186456b1", "Manager", "MANAGER" },
+                    { "RoomChecker", "352c600a-fe58-4580-bb9f-15964271b4d5", "RoomChecker", "ROOMCHECKER" },
+                    { "User", "ff48617a-00d8-4bcc-9e10-8cc0c48b9cc0", "User", "USER" }
                 });
 
             migrationBuilder.InsertData(

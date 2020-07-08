@@ -33,6 +33,8 @@ namespace FPTBooking.Business.Services
             entity.Code = "B" + DateTime.UtcNow.ToString("ddMMyyyyhhmmss") + Global.Random.Next(0, 9);
             entity.Archived = false;
             entity.SentDate = DateTime.UtcNow;
+            foreach (var e in entity.AttachedService)
+                e.Booking = entity;
             var managerDeps = _memberService.DepartmentMembers.OfMember(bookMember.UserId)
                 .IsManager().Select(o => o.DepartmentCode).ToList();
             var isDepManager = managerDeps.Contains(bookedRoom.DepartmentCode);
@@ -156,8 +158,8 @@ namespace FPTBooking.Business.Services
                                 display = timeStr,
                                 iso = $"{bookedDate.ToUniversalTime():s}Z"
                             };
-                            obj["from_time"] = entity.FromTime;
-                            obj["to_time"] = entity.ToTime;
+                            obj["from_time"] = entity.FromTime.ToString("hh:mm");
+                            obj["to_time"] = entity.ToTime.ToString("hh:mm");
                             obj["type"] = BookingTypeValues.BOOKING;
                             obj["status"] = entity.Status;
                             obj["archived"] = entity.Archived;
@@ -455,19 +457,32 @@ namespace FPTBooking.Business.Services
                 validationData.Fail("Booked date must not be empty", AppResultCode.FailValidation);
             if (model.NumOfPeople == null || model.NumOfPeople == 0)
                 validationData.Fail("Number of people is not valid", AppResultCode.FailValidation);
-            else if (currentTime >= model.BookedDate)
-                validationData.Fail(mess: "Booked date must be greater than current", AppResultCode.FailValidation);
-            if (model.FromTime == null || model.ToTime == null)
+            else if (model.FromTime == null || model.ToTime == null)
                 validationData.Fail(mess: "From time and to time must not be empty", AppResultCode.FailValidation);
             else if (model.FromTime >= model.ToTime)
                 validationData.Fail(mess: "Time range is not valid", AppResultCode.FailValidation);
+            else
+            {
+                var bookedTime = model.BookedDate?.AddMinutes(model.FromTime.Value.TotalMinutes);
+                if (currentTime >= bookedTime)
+                    validationData.Fail(mess: "Booked time must be greater than current", AppResultCode.FailValidation);
+            }
             if (model.UsingEmails == null || model.UsingEmails.Count == 0)
                 validationData.Fail(mess: "At lease one using email is required", AppResultCode.FailValidation);
             else
             {
-                var ids = memberQuery.ByEmails(model.UsingEmails).Select(o => o.UserId).ToList();
-                if (ids.Count != model.UsingEmails.Count)
-                    validationData.Fail(mess: "One or more emails not found", AppResultCode.FailValidation);
+                var users = memberQuery.ByEmails(model.UsingEmails).Select(o => new
+                {
+                    user_id = o.UserId,
+                    email = o.Email
+                }).ToList();
+                var ids = users.Select(o => o.user_id).ToList();
+                var emails = users.Select(o => o.email).ToList();
+                var notFoundEmails = model.UsingEmails.Where(o=> !emails.Contains(o)).ToList();
+                var notFoundEmailsList = string.Join(", ", notFoundEmails);
+                if (notFoundEmails.Any())
+                    validationData.Fail(mess: $"One or more emails not found: {notFoundEmailsList}\n" +
+                        $"Maybe they need to log into the application at least once", AppResultCode.FailValidation);
                 else validationData.TempData["using_member_ids"] = ids;
             }
             if (validationData.IsValid)
@@ -487,7 +502,7 @@ namespace FPTBooking.Business.Services
         {
             var entity = new BookingHistory
             {
-                BookingId = booking.Id,
+                Booking = booking,
                 DisplayContent = $"{createMember.Email} created this booking",
                 HappenedTime = DateTime.UtcNow,
                 FromStatus = null,
@@ -505,7 +520,7 @@ namespace FPTBooking.Business.Services
         {
             var entity = new BookingHistory
             {
-                BookingId = booking.Id,
+                Booking = booking,
                 HappenedTime = DateTime.UtcNow,
                 FromStatus = fromStatus,
                 Id = Guid.NewGuid().ToString(),
@@ -530,7 +545,7 @@ namespace FPTBooking.Business.Services
         {
             var entity = new BookingHistory
             {
-                BookingId = booking.Id,
+                Booking = booking,
                 HappenedTime = DateTime.UtcNow,
                 DisplayContent = $"{approveManager.Email} updated this booking",
                 FromStatus = booking.Status,
@@ -546,7 +561,7 @@ namespace FPTBooking.Business.Services
         {
             var entity = new BookingHistory
             {
-                BookingId = booking.Id,
+                Booking = booking,
                 DisplayContent = $"{createMember.Email} posted a feedback for this booking",
                 HappenedTime = DateTime.UtcNow,
                 FromStatus = BookingStatusValues.APPROVED,
@@ -562,7 +577,7 @@ namespace FPTBooking.Business.Services
         {
             var entity = new BookingHistory
             {
-                BookingId = booking.Id,
+                Booking = booking,
                 DisplayContent = $"{createMember.Email} canceled this booking",
                 HappenedTime = DateTime.UtcNow,
                 FromStatus = fromStatus,

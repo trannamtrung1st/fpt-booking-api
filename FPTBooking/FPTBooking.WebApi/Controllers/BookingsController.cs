@@ -33,6 +33,8 @@ namespace FPTBooking.WebApi.Controllers
         private static NLog.Logger _logger = NLog.LogManager.GetCurrentClassLogger();
 
         [Inject]
+        private readonly RoomBusinessService _roomService;
+        [Inject]
         private readonly BookingBusinessService _service;
         [Inject]
         private readonly MemberService _memberService;
@@ -276,16 +278,17 @@ namespace FPTBooking.WebApi.Controllers
             {
                 entity = _service.CreateBooking(member, bookedRoom, model, usingMemberIds);
                 var history = _service.CreateHistoryForCreateBooking(entity, member);
+                _roomService.ChangeRoomHangingStatus(bookedRoom, false);
                 context.SaveChanges();
                 trans.Commit();
             }
             //notify using members, managers (if any)
             var notiMemberIds = usingMemberIds.Where(o => o != UserId).ToList();
-            var notiMembers = NotiHelper.Notify(notiMemberIds, new Notification
+            var notiMembers = notiMemberIds.Any() ? NotiHelper.Notify(notiMemberIds, new Notification
             {
                 Title = $"You have a new booking",
                 Body = $"{UserEmail} has just created a booking for you. Press for more detail"
-            });
+            }) : Task.CompletedTask;
             var managerNoti = new Notification
             {
                 Title = $"There's a new booking request",
@@ -332,11 +335,11 @@ namespace FPTBooking.WebApi.Controllers
             //notify using members, managers (if any)
             var notiMemberIds = entity.UsingMemberIds.Split('\n')
                 .Where(o => o != UserId).ToList();
-            var notiMembers = NotiHelper.Notify(notiMemberIds, new Notification
+            var notiMembers = notiMemberIds.Any() ? NotiHelper.Notify(notiMemberIds, new Notification
             {
                 Title = $"Your booking {entity.Code} has been aborted",
                 Body = $"{UserEmail} has just aborted booking {entity.Code}. Press for more detail"
-            });
+            }) : Task.CompletedTask;
             var managerNoti = new Notification
             {
                 Title = $"A booking managed by you has been aborted",

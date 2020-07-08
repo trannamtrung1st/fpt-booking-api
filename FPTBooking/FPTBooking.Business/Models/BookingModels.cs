@@ -109,7 +109,7 @@ namespace FPTBooking.Business.Models
         {
         }
 
-        [JsonProperty("service_code")]
+        [JsonProperty("code")]
         public string BookingServiceCode { get; set; }
 
     }
