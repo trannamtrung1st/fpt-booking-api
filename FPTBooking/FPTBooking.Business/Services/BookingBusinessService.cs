@@ -299,7 +299,10 @@ namespace FPTBooking.Business.Services
             {
                 var managerIds = _memberService.QueryManagersOfMember(entity.BookMemberId)
                     .Select(o => o.UserId);
-                if (!managerIds.Contains(userId))
+                var areaManagerIds = _memberService.QueryManagersOfArea(entity.Room.BuildingAreaCode)
+                    .Select(o => o.UserId);
+                var finalManagerIds = managerIds.Union(areaManagerIds).ToList();
+                if (!finalManagerIds.Contains(userId))
                     validationData.Fail(code: AppResultCode.AccessDenied);
             }
             return validationData;

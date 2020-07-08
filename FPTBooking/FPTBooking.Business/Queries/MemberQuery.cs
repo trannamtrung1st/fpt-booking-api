@@ -22,9 +22,9 @@ namespace FPTBooking.Business.Queries
                 .Any(dm => dm.IsManager == true && depCodes.Contains(dm.DepartmentCode));
         }
 
-        public static IQueryable<Member> IsManagerOf(this IQueryable<Member> query, BuildingArea area)
+        public static IQueryable<Member> IsManagerOf(this IQueryable<Member> query, string areaCode)
         {
-            return query.Where(o => o.AreaManager.Any(am => am.AreaCode == area.Code));
+            return query.Where(o => o.AreaManager.Any(am => am.AreaCode == areaCode));
         }
 
         public static IQueryable<Member> ByEmail(this IQueryable<Member> query, string email)
