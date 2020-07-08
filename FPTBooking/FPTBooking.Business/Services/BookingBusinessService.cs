@@ -158,8 +158,22 @@ namespace FPTBooking.Business.Services
                                 display = timeStr,
                                 iso = $"{bookedDate.ToUniversalTime():s}Z"
                             };
-                            obj["from_time"] = entity.FromTime.ToString("hh:mm");
-                            obj["to_time"] = entity.ToTime.ToString("hh:mm");
+                            obj["from_time"] = entity.FromTime.ToString("hh\\:mm");
+                            obj["to_time"] = entity.ToTime.ToString("hh\\:mm");
+                            var startTime = bookedDate.Add(entity.FromTime);
+                            timeStr = startTime.ToString(dateFormat: AppDateTimeFormat.DEFAULT_FORMAT_FOR_CONVERT);
+                            obj["start_time"] = new
+                            {
+                                display = timeStr,
+                                iso = $"{startTime.ToUniversalTime():s}Z"
+                            };
+                            var finishTime = bookedDate.Add(entity.ToTime);
+                            timeStr = finishTime.ToString(dateFormat: AppDateTimeFormat.DEFAULT_FORMAT_FOR_CONVERT);
+                            obj["finish_time"] = new
+                            {
+                                display = timeStr,
+                                iso = $"{finishTime.ToUniversalTime():s}Z"
+                            };
                             obj["type"] = BookingTypeValues.BOOKING;
                             obj["status"] = entity.Status;
                             obj["archived"] = entity.Archived;
@@ -478,7 +492,7 @@ namespace FPTBooking.Business.Services
                 }).ToList();
                 var ids = users.Select(o => o.user_id).ToList();
                 var emails = users.Select(o => o.email).ToList();
-                var notFoundEmails = model.UsingEmails.Where(o=> !emails.Contains(o)).ToList();
+                var notFoundEmails = model.UsingEmails.Where(o => !emails.Contains(o)).ToList();
                 var notFoundEmailsList = string.Join(", ", notFoundEmails);
                 if (notFoundEmails.Any())
                     validationData.Fail(mess: $"One or more emails not found: {notFoundEmailsList}\n" +

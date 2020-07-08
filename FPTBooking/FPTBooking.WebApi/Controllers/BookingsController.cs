@@ -480,7 +480,7 @@ namespace FPTBooking.WebApi.Controllers
         public IActionResult GetDetail(int id,
             [FromQuery]BookingQueryOptions options)
         {
-            if (Settings.Instance.Mocking.Enabled || true)
+            if (Settings.Instance.Mocking.Enabled)
             {
                 var rd = new Random();
                 var randomCode = rd.RandomStringFrom(RandomExtension.Uppers_Digits, 4);
