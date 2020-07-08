@@ -356,7 +356,7 @@ namespace FPTBooking.WebApi.Controllers
 
         [Authorize]
         [HttpPost("{id}/feedback")]
-        public IActionResult Feedback(int id, FeedbackBookingModel model)
+        public IActionResult FeedbackBooking(int id, FeedbackBookingModel model)
         {
             if (Settings.Instance.Mocking.Enabled)
                 return NoContent();
@@ -372,6 +372,46 @@ namespace FPTBooking.WebApi.Controllers
             //    .Select(o => o.UserId).ToList();
             //if (managerIds.Count > 0)
             //    await NotiHelper.Notify(managerIds, managerNoti);
+            return NoContent();
+        }
+
+        [Authorize(Roles = RoleName.MANAGER)]
+        [HttpPost("{id}/approval")]
+        public async Task<IActionResult> ApproveBooking(int id, ApproveBookingModel model)
+        {
+            if (Settings.Instance.Mocking.Enabled)
+                return NoContent();
+            var entity = _service.Bookings.Id(id).FirstOrDefault();
+            if (entity == null) return NotFound(AppResult.NotFound());
+            var member = _memberService.Members.Id(UserId).FirstOrDefault();
+            var validationData = _service.ValidateApproveBooking(User, member, entity, model);
+            if (!validationData.IsValid)
+                return BadRequest(AppResult.FailValidation(data: validationData));
+            _service.ApproveBooking(model, entity);
+            context.SaveChanges();
+            //notify using members, managers (if any)
+            var approvePerson = entity.Status == BookingStatusValues.VALID ? "department manager" :
+                "location manager";
+            var usingMemberIds = entity.UsingMemberIds.Split('\n');
+            var notiMemberIds = usingMemberIds.Where(o => o != UserId).ToList();
+            notiMemberIds.Add(UserId);
+            var notiMembers = NotiHelper.Notify(notiMemberIds, new Notification
+            {
+                Title = $"Booking {entity.Code} has been approved by your {approvePerson}",
+                Body = $"{UserEmail} has just approved your booking. Press for more detail"
+            });
+            if (entity.Status == BookingStatusValues.VALID)
+            {
+                var managerIds = _memberService.QueryManagersOfArea(entity.Room.BuildingAreaCode)
+                    .Select(o => o.UserId).ToList();
+                if (managerIds.Count > 0)
+                    await NotiHelper.Notify(managerIds, new Notification
+                    {
+                        Title = $"There's a new booking request",
+                        Body = $"{UserEmail} has just approved a booking. Press for more detail"
+                    });
+            }
+            await notiMembers;
             return NoContent();
         }
 

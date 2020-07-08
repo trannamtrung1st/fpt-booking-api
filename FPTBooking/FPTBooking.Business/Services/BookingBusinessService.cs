@@ -84,6 +84,18 @@ namespace FPTBooking.Business.Services
             entity.Status = BookingStatusValues.FINISHED;
             return entity;
         }
+
+        public Booking ApproveBooking(ApproveBookingModel model, Booking entity)
+        {
+            model.CopyTo(entity);
+            if (entity.Status == BookingStatusValues.PROCESSING)
+            {
+                entity.Status = BookingStatusValues.VALID;
+                entity.DepartmentAccepted = true;
+            }
+            else entity.Status = BookingStatusValues.APPROVED;
+            return entity;
+        }
         #endregion
 
         #region Query Booking
@@ -346,6 +358,33 @@ namespace FPTBooking.Business.Services
                 validationData.Fail(mess: "Not allowed", code: AppResultCode.FailValidation);
             if (model.Feedback == null)
                 validationData.Fail(mess: "You must provide a reason in feedback", code: AppResultCode.FailValidation);
+            return validationData;
+        }
+
+        public ValidationData ValidateApproveBooking(ClaimsPrincipal principal,
+            Member manager,
+            Booking entity,
+            ApproveBookingModel model)
+        {
+            var validationData = new ValidationData();
+            var userId = principal.Identity.Name;
+            if (entity.Status == BookingStatusValues.PROCESSING)
+            {
+                var bookMemberId = entity.BookMemberId;
+                var managerIds = _memberService.QueryManagersOfMember(bookMemberId)
+                    .Select(o => o.UserId).ToList();
+                if (!managerIds.Contains(userId))
+                    validationData.Fail(code: AppResultCode.AccessDenied);
+            }
+            else if (entity.Status == BookingStatusValues.VALID)
+            {
+                var areaCode = entity.Room.BuildingAreaCode;
+                var managerIds = _memberService.QueryManagersOfArea(areaCode)
+                    .Select(o => o.UserId).ToList();
+                if (!managerIds.Contains(userId))
+                    validationData.Fail(code: AppResultCode.AccessDenied);
+            }
+            else validationData.Fail(mess: "Invalid status", code: AppResultCode.FailValidation);
             return validationData;
         }
 
