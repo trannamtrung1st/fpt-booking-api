@@ -18,7 +18,7 @@ namespace FPTBooking.Data.Models
         }
 
         public virtual DbSet<AppEvent> AppEvent { get; set; }
-        public virtual DbSet<AreaManager> AreaManager { get; set; }
+        public virtual DbSet<AreaMember> AreaMember { get; set; }
         public virtual DbSet<AttachedService> AttachedService { get; set; }
         public virtual DbSet<Booking> Booking { get; set; }
         public virtual DbSet<BookingHistory> BookingHistory { get; set; }
@@ -124,7 +124,7 @@ namespace FPTBooking.Data.Models
                     .HasForeignKey(d => d.UserId);
             });
 
-            modelBuilder.Entity<AreaManager>(entity =>
+            modelBuilder.Entity<AreaMember>(entity =>
             {
                 entity.HasIndex(e => e.MemberId);
 
@@ -141,11 +141,11 @@ namespace FPTBooking.Data.Models
                     .IsUnicode(false);
 
                 entity.HasOne(d => d.Area)
-                    .WithMany(p => p.AreaManager)
+                    .WithMany(p => p.AreaMember)
                     .HasForeignKey(d => d.AreaCode);
 
                 entity.HasOne(d => d.Member)
-                    .WithMany(p => p.AreaManager)
+                    .WithMany(p => p.AreaMember)
                     .HasForeignKey(d => d.MemberId);
             });
 
@@ -462,6 +462,10 @@ namespace FPTBooking.Data.Models
                 entity.HasIndex(e => e.RoomTypeCode);
 
                 entity.Property(e => e.Code).HasMaxLength(100);
+
+                entity.Property(e => e.HangingUserId)
+                    .HasMaxLength(100)
+                    .IsUnicode(false);
 
                 entity.Property(e => e.BuildingAreaCode)
                     .IsRequired()

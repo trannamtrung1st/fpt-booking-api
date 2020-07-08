@@ -447,6 +447,9 @@ namespace FPTBooking.Business.Services
 
         public bool ValidateEmailDomain(string email)
         {
+#if !RELEASE
+            return true;
+#endif
             string[] emails = email.Trim().Split("@");
             if (emails.Length == 2)
                 return emails[1] == AllowedEmailDomains.FPT_DOMAIN;

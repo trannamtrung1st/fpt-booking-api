@@ -37,11 +37,11 @@ namespace FPTBooking.Business.Services
             }
         }
 
-        public IQueryable<AreaManager> AreaManagers
+        public IQueryable<AreaMember> AreaMembers
         {
             get
             {
-                return context.AreaManager;
+                return context.AreaMember;
             }
         }
 
@@ -52,9 +52,16 @@ namespace FPTBooking.Business.Services
             return Members.IsManagerOfAny(depCodes);
         }
 
+        public IQueryable<Member> QueryManagersOfDepartment(string depCode)
+        {
+            return DepartmentMembers.OfDep(depCode)
+                .IsManager().Select(o => o.Member);
+        }
+
         public IQueryable<Member> QueryManagersOfArea(string areaCode)
         {
-            return AreaManagers.OfArea(areaCode).Select(o => o.Member);
+            return AreaMembers.OfArea(areaCode)
+                .IsManager().Select(o => o.Member);
         }
 
         #endregion

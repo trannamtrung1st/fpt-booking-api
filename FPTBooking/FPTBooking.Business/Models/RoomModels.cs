@@ -22,8 +22,8 @@ namespace FPTBooking.Business.Models
         public string Note { get; set; }
         [JsonProperty("is_available")]
         public bool IsAvailable { get; set; }
-        [JsonProperty("resources")]
-        public IEnumerable<CheckRoomResourceStatusModel> RoomResource { get; set; }
+        [JsonProperty("check_resources")]
+        public IEnumerable<CheckRoomResourceStatusModel> CheckResources { get; set; }
     }
 
     public class CheckRoomResourceStatusModel : MappingModel<RoomResource>
@@ -76,6 +76,7 @@ namespace FPTBooking.Business.Models
         }
 
         //---------------------------------------
+        public const string CHECKER_VALID = "checker_valid";
 
         public const string INFO = "info";
         public const string SELECT = "select";
@@ -136,7 +137,7 @@ namespace FPTBooking.Business.Models
         public int? num_of_people { get; set; }
         public string room_type { get; set; }
         public bool empty { get; set; } //default false
-        public BoolOptions? available { get; set; } //default both
+        public BoolOptions? is_available { get; set; } //default both
         public BoolOptions? archived { get; set; } //default false
     }
 

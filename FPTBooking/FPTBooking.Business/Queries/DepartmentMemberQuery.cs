@@ -22,5 +22,10 @@ namespace FPTBooking.Business.Queries
         {
             return query.Where(o => o.MemberId == id);
         }
+
+        public static IQueryable<DepartmentMember> OfDep(this IQueryable<DepartmentMember> query, string depCode)
+        {
+            return query.Where(o => o.DepartmentCode == depCode);
+        }
     }
 }

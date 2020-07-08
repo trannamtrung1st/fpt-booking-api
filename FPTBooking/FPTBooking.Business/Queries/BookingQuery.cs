@@ -21,7 +21,7 @@ namespace FPTBooking.Business.Queries
             IEnumerable<string> depCodes, IEnumerable<string> depStatuses,
             IEnumerable<string> areaCodes, IEnumerable<string> areaStatuses)
         {
-            return query.Where(o => (depCodes.Contains(o.Room.DepartmentCode) 
+            return query.Where(o => (depCodes.Contains(o.Room.DepartmentCode)
                     && (depStatuses == null || !depStatuses.Contains(o.Status)))
                 || (areaCodes.Contains(o.Room.BuildingAreaCode) &&
                     (areaStatuses == null || !areaStatuses.Contains(o.Status)) && o.DepartmentAccepted));
@@ -86,6 +86,11 @@ namespace FPTBooking.Business.Queries
             return query.Where(o => o.Code == code);
         }
 
+        public static IQueryable<Booking> UsedByMember(this IQueryable<Booking> query, string userId)
+        {
+            return query.Where(o => o.UsingMemberIds.Contains(userId));
+        }
+
         public static IQueryable<Booking> OfBookMember(this IQueryable<Booking> query, string userId)
         {
             return query.Where(o => o.BookMemberId.Equals(userId));
@@ -115,21 +120,29 @@ namespace FPTBooking.Business.Queries
             return query.Where(o => o.Archived == val);
         }
 
-        public static IQueryable<Booking> FromDate(this IQueryable<Booking> query, DateTime date)
+        public static IQueryable<Booking> BookedDateFromDate(this IQueryable<Booking> query, DateTime date)
         {
             return query.Where(o => o.BookedDate.Date >= date.Date);
         }
-        public static IQueryable<Booking> ToDate(this IQueryable<Booking> query, DateTime date)
+        public static IQueryable<Booking> BookedDateToDate(this IQueryable<Booking> query, DateTime date)
         {
             return query.Where(o => o.BookedDate.Date <= date.Date);
         }
+        public static IQueryable<Booking> SentDateFromDate(this IQueryable<Booking> query, DateTime date)
+        {
+            return query.Where(o => o.SentDate.Date >= date.Date);
+        }
+        public static IQueryable<Booking> SentDateToDate(this IQueryable<Booking> query, DateTime date)
+        {
+            return query.Where(o => o.SentDate.Date <= date.Date);
+        }
 
-        public static IQueryable<Booking> SortLatest(this IQueryable<Booking> query)
+        public static IQueryable<Booking> SortLatestBookedDate(this IQueryable<Booking> query)
         {
             return query.OrderBy(o => o.BookedDate).OrderBy(o => o.FromTime);
         }
 
-        public static IQueryable<Booking> SortOldest(this IQueryable<Booking> query)
+        public static IQueryable<Booking> SortOldestBookedDate(this IQueryable<Booking> query)
         {
             return query.OrderByDescending(o => o.BookedDate).OrderByDescending(o => o.FromTime);
         }
@@ -140,10 +153,10 @@ namespace FPTBooking.Business.Queries
             var archived = model.archived ?? BoolOptions.F;
             if (archived != BoolOptions.B)
                 query = query.Archived(!(archived == BoolOptions.F));
-            if (model.from_date != null)
-                query = query.FromDate(model.from_date.Value);
-            if (model.to_date != null)
-                query = query.ToDate(model.to_date.Value);
+            if (model.from_date != null) //sent date
+                query = query.SentDateFromDate(model.from_date.Value);
+            if (model.to_date != null) //sent date
+                query = query.SentDateToDate(model.to_date.Value);
             if (model.date != null)
                 query = query.BookedDate(model.date.Value);
             if (model.status != null)
@@ -159,10 +172,16 @@ namespace FPTBooking.Business.Queries
                 var fieldName = s.Remove(0, 1);
                 switch (fieldName)
                 {
-                    case BookingQuerySort.DATE:
+                    case BookingQuerySort.BOOKED_DATE:
                         {
-                            if (asc) query = query.SortLatest();
-                            else query = query.SortOldest();
+                            if (asc) query = query.SortLatestBookedDate();
+                            else query = query.SortOldestBookedDate();
+                        }
+                        break;
+                    case BookingQuerySort.SENT_DATE:
+                        {
+                            if (asc) query = query.OrderBy(o => o.SentDate);
+                            else query = query.OrderByDescending(o => o.SentDate);
                         }
                         break;
                 }
@@ -204,6 +223,7 @@ namespace FPTBooking.Business.Queries
                 AttachedService = services ? o.AttachedService.AsQueryable()
                     .Select(s => new AttachedService
                     {
+                        Id = s.Id,
                         BookingService = new BookingService
                         {
                             Code = s.BookingService.Code,

@@ -19,6 +19,7 @@ using FPTBooking.Business.Services;
 using FPTBooking.Business.Queries;
 using FPTBooking.Business.Helpers;
 using FPTBooking.Data;
+using FirebaseAdmin.Messaging;
 
 namespace FPTBooking.WebApi.Controllers
 {
@@ -33,6 +34,8 @@ namespace FPTBooking.WebApi.Controllers
 
         [Inject]
         private readonly RoomBusinessService _service;
+        [Inject]
+        private readonly MemberService _memberService;
 
 #if !DEBUG
         [Authorize]
@@ -124,7 +127,7 @@ namespace FPTBooking.WebApi.Controllers
                 filter, sort, projection, paging, options);
             if (!validationData.IsValid)
                 return BadRequest(AppResult.FailValidation(data: validationData));
-            var result = await _service.QueryRoomDynamic(
+            var result = await _service.QueryRoomDynamic(UserId,
                 projection, validationData.TempData, filter, sort, paging, options);
             if (options.single_only && result == null) return NotFound(AppResult.NotFound());
             return Ok(AppResult.Success(data: result));
@@ -135,6 +138,7 @@ namespace FPTBooking.WebApi.Controllers
 #endif
         [HttpGet("{code}")]
         public IActionResult GetDetail(string code,
+            [FromQuery]RoomQueryProjection projection,
             [FromQuery]RoomQueryOptions options,
             bool hanging = false)
         {
@@ -208,7 +212,8 @@ namespace FPTBooking.WebApi.Controllers
                         throw new Exception("Test exception");
                 }
             }
-            var projection = new RoomQueryProjection { fields = RoomQueryProjection.DETAIL };
+            var checkerValid = projection.GetFieldsArr().Contains(RoomQueryProjection.CHECKER_VALID);
+            projection = new RoomQueryProjection { fields = RoomQueryProjection.DETAIL };
             var entity = _service.GetRoomDetail(code, projection);
             if (entity == null) return NotFound(AppResult.NotFound());
             var validationData = _service.ValidateGetRoomDetail(entity, hanging, options);
@@ -217,10 +222,17 @@ namespace FPTBooking.WebApi.Controllers
             if (hanging)
             {
                 entity = _service.Attach(entity);
-                _service.ChangeRoomHangingStatus(entity, true);
+                _service.ChangeRoomHangingStatus(entity, true, UserId);
                 context.SaveChanges();
             }
             var obj = _service.GetRoomDynamic(entity, projection, options);
+            if (checkerValid)
+            {
+                var isRoomChecker = User.IsInRole(RoleName.ROOM_CHECKER);
+                var valid = _memberService.AreaMembers.OfArea(entity.BuildingAreaCode).Select(o => o.MemberId)
+                    .Contains(UserId) && isRoomChecker;
+                obj["checker_valid"] = valid;
+            }
             return Ok(AppResult.Success(data: obj));
         }
 
@@ -228,7 +240,7 @@ namespace FPTBooking.WebApi.Controllers
         [Authorize(Roles = RoleName.ROOM_CHECKER)]
 #endif
         [HttpPatch("{code}/status")]
-        public IActionResult CheckRoomStatus(string code,
+        public async Task<IActionResult> CheckRoomStatus(string code,
             CheckRoomStatusModel model)
         {
             if (Settings.Instance.Mocking.Enabled)
@@ -240,6 +252,16 @@ namespace FPTBooking.WebApi.Controllers
                 return BadRequest(AppResult.FailValidation(data: validationData));
             _service.CheckRoomStatus(model, entity);
             context.SaveChanges();
+            //notify managers
+            var managerIds = _memberService.QueryManagersOfDepartment(entity.DepartmentCode)
+                .Union(_memberService.QueryManagersOfArea(entity.BuildingAreaCode))
+                .Select(o => o.UserId).ToList();
+            if (managerIds.Count > 0)
+                await NotiHelper.Notify(managerIds, new Notification
+                {
+                    Title = $"Status of room {entity.Code} has been changed",
+                    Body = $"{UserEmail} has changed the status of room {entity.Code}. Pressed for more detail"
+                });
             return NoContent();
         }
 
@@ -247,7 +269,7 @@ namespace FPTBooking.WebApi.Controllers
         [Authorize]
 #endif
         [HttpPut("{code}/hanging")]
-        public IActionResult HangRoom(string code,
+        public IActionResult ChangeRoomHangingStatus(string code,
             ChangeRoomHangingStatusModel model)
         {
             if (Settings.Instance.Mocking.Enabled)
@@ -257,7 +279,7 @@ namespace FPTBooking.WebApi.Controllers
             var validationData = _service.ValidateHangRoom(entity, model);
             if (!validationData.IsValid)
                 return BadRequest(AppResult.FailValidation(data: validationData));
-            if (_service.ChangeRoomHangingStatus(entity, model.Hanging))
+            if (_service.ChangeRoomHangingStatus(entity, model.Hanging, UserId))
                 context.SaveChanges();
             return NoContent();
         }

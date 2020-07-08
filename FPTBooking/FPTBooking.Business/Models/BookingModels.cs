@@ -22,7 +22,7 @@ namespace FPTBooking.Business.Models
         [JsonProperty("room_code")]
         public string RoomCode { get; set; }
         [JsonProperty("removed_service_ids")]
-        public virtual IEnumerable<int> RemoveServiceIds { get; set; }
+        public IEnumerable<int> RemoveServiceIds { get; set; }
     }
     public class ChangeApprovalStatusOfBookingModel : MappingModel<Booking>
     {
@@ -142,6 +142,7 @@ namespace FPTBooking.Business.Models
         }
 
         //---------------------------------------
+        public const string MANAGER_TYPE = "manager_type";
 
         public const string INFO = "info";
         public const string SELECT = "select";
@@ -155,8 +156,9 @@ namespace FPTBooking.Business.Models
 
     public class BookingQuerySort
     {
-        public const string DATE = "date";
-        private const string DEFAULT = "a" + DATE;
+        public const string BOOKED_DATE = "booked_date";
+        public const string SENT_DATE = "sent_date";
+        private const string DEFAULT = "d" + SENT_DATE;
         private string _sorts = DEFAULT;
         public string sorts
         {

@@ -24,7 +24,7 @@ namespace FPTBooking.Business.Queries
 
         public static IQueryable<Member> IsManagerOf(this IQueryable<Member> query, string areaCode)
         {
-            return query.Where(o => o.AreaManager.Any(am => am.AreaCode == areaCode));
+            return query.Where(o => o.AreaMember.Any(am => am.AreaCode == areaCode));
         }
 
         public static IQueryable<Member> ByEmail(this IQueryable<Member> query, string email)

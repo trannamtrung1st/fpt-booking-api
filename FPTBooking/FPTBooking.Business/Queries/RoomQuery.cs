@@ -45,9 +45,10 @@ namespace FPTBooking.Business.Queries
             return query.Where(o => o.Archived == val);
         }
 
-        public static IQueryable<Room> NotHanging(this IQueryable<Room> query, DateTime current)
+        public static IQueryable<Room> NotHangingExcept(this IQueryable<Room> query, DateTime current, string hangingUserId)
         {
-            return query.Where(o => o.HangingEndTime == null || o.HangingEndTime <= current);
+            return query.Where(o => o.HangingUserId == hangingUserId
+                || o.HangingEndTime == null || o.HangingEndTime <= current);
         }
 
         public static IQueryable<Room> OfRoomType(this IQueryable<Room> query, string typeCode)
@@ -67,6 +68,7 @@ namespace FPTBooking.Business.Queries
         }
 
         public static IQueryable<Room> AvailableForBooking(this IQueryable<Room> query,
+            string userId,
             IQueryable<Booking> bookingQuery,
             DateTime date, TimeSpan fromTime, TimeSpan toTime, int numOfPeople)
         {
@@ -78,18 +80,19 @@ namespace FPTBooking.Business.Queries
             return query = query.Except(notAvailableRoom)
                 .Available(true)
                 //not hanging by someone else
-                .NotHanging(now)
+                .NotHangingExcept(now, userId)
                 .CanHandle(numOfPeople);
         }
 
         #region Query
         public static IQueryable<Room> Filter(this IQueryable<Room> query, RoomQueryFilter model,
+            string userId,
             IDictionary<string, object> tempData, IQueryable<Booking> bookingQuery)
         {
-            var available = model.available ?? BoolOptions.B;
+            var available = model.is_available ?? BoolOptions.B;
             if (available != BoolOptions.B)
                 query = query.Available(available == BoolOptions.T);
-            var archived = model.available ?? BoolOptions.F;
+            var archived = model.archived ?? BoolOptions.F;
             if (archived != BoolOptions.B)
                 query = query.Archived(!(archived == BoolOptions.F));
             if (model.empty)
@@ -102,7 +105,7 @@ namespace FPTBooking.Business.Queries
                     .Select(b => b.Room);
                 query = query.Except(notAvailableRoom)
                     //not hanging by someone else
-                    .NotHanging(now);
+                    .NotHangingExcept(now, userId);
 
                 //Already filter below
                 //.Where(o => o.RoomTypeCode == model.room_type)
@@ -183,8 +186,7 @@ namespace FPTBooking.Business.Queries
                 Name = o.Name,
                 Note = o.Note,
                 PeopleCapacity = o.PeopleCapacity,
-                RoomResource = res ? o.RoomResource.AsQueryable()
-                    .Where(r => r.IsAvailable).ToList() : null,
+                RoomResource = res ? o.RoomResource : null,
                 RoomType = roomType ? o.RoomType : null,
                 RoomTypeCode = o.RoomTypeCode,
             });

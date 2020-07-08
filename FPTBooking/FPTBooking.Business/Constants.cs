@@ -66,7 +66,7 @@ namespace FPTBooking.Business
     public static class AppDateTimeFormat
     {
         public const string DEFAULT_DATE_FORMAT = "dd/MM/yyyy";
-        public const string DEFAULT_FORMAT_FOR_CONVERT = "dd/MM/yyyy HH:mm:ss";
+        public const string DEFAULT_FORMAT_FOR_CONVERT = "dd/MM/yyyy HH:mm";
     }
 
     public static class AppTimeZone

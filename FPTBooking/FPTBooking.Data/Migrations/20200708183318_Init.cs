@@ -384,6 +384,7 @@ namespace FPTBooking.Data.Migrations
                     PeopleCapacity = table.Column<int>(nullable: false),
                     HangingStartTime = table.Column<DateTime>(nullable: true),
                     HangingEndTime = table.Column<DateTime>(nullable: true),
+                    HangingUserId = table.Column<string>(unicode: false, maxLength: 100, nullable: true),
                     IsAvailable = table.Column<bool>(nullable: false),
                     Note = table.Column<string>(maxLength: 2000, nullable: true)
                 },
@@ -439,25 +440,26 @@ namespace FPTBooking.Data.Migrations
                 });
 
             migrationBuilder.CreateTable(
-                name: "AreaManager",
+                name: "AreaMember",
                 columns: table => new
                 {
                     Id = table.Column<int>(nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
                     AreaCode = table.Column<string>(maxLength: 100, nullable: false),
-                    MemberId = table.Column<string>(unicode: false, maxLength: 100, nullable: false)
+                    MemberId = table.Column<string>(unicode: false, maxLength: 100, nullable: false),
+                    IsManager = table.Column<bool>(nullable: false)
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_AreaManager", x => x.Id);
+                    table.PrimaryKey("PK_AreaMember", x => x.Id);
                     table.ForeignKey(
-                        name: "FK_AreaManager_BuildingArea_AreaCode",
+                        name: "FK_AreaMember_BuildingArea_AreaCode",
                         column: x => x.AreaCode,
                         principalTable: "BuildingArea",
                         principalColumn: "Code",
                         onDelete: ReferentialAction.Cascade);
                     table.ForeignKey(
-                        name: "FK_AreaManager_Member_MemberId",
+                        name: "FK_AreaMember_Member_MemberId",
                         column: x => x.MemberId,
                         principalTable: "Member",
                         principalColumn: "UserId",
@@ -641,10 +643,10 @@ namespace FPTBooking.Data.Migrations
                 columns: new[] { "Id", "ConcurrencyStamp", "Name", "NormalizedName" },
                 values: new object[,]
                 {
-                    { "Administrator", "04d6d856-27d7-4a4b-aeea-166df94295e3", "Administrator", "ADMINISTRATOR" },
-                    { "Manager", "652b78c2-9924-486b-b53e-1f8d186456b1", "Manager", "MANAGER" },
-                    { "RoomChecker", "352c600a-fe58-4580-bb9f-15964271b4d5", "RoomChecker", "ROOMCHECKER" },
-                    { "User", "ff48617a-00d8-4bcc-9e10-8cc0c48b9cc0", "User", "USER" }
+                    { "Administrator", "e313d30b-1fa4-4ecb-9a70-abf56033bbf0", "Administrator", "ADMINISTRATOR" },
+                    { "Manager", "40a97dba-d2af-40df-97c0-1569f9f26e39", "Manager", "MANAGER" },
+                    { "RoomChecker", "10ff3668-7a75-4d29-9b2d-6a687afb7945", "RoomChecker", "ROOMCHECKER" },
+                    { "User", "234c06a2-9526-4f8f-817d-9a416f237a5b", "User", "USER" }
                 });
 
             migrationBuilder.InsertData(
@@ -658,13 +660,13 @@ namespace FPTBooking.Data.Migrations
                 column: "UserId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_AreaManager_MemberId",
-                table: "AreaManager",
+                name: "IX_AreaMember_MemberId",
+                table: "AreaMember",
                 column: "MemberId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_AreaManager_AreaCode_MemberId",
-                table: "AreaManager",
+                name: "IX_AreaMember_AreaCode_MemberId",
+                table: "AreaMember",
                 columns: new[] { "AreaCode", "MemberId" },
                 unique: true);
 
@@ -814,7 +816,7 @@ namespace FPTBooking.Data.Migrations
                 name: "AppEvent");
 
             migrationBuilder.DropTable(
-                name: "AreaManager");
+                name: "AreaMember");
 
             migrationBuilder.DropTable(
                 name: "AspNetRoleClaims");

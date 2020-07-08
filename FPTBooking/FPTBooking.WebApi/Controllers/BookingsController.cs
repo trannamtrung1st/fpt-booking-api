@@ -165,7 +165,7 @@ namespace FPTBooking.WebApi.Controllers
             [FromQuery]BookingQueryPaging paging,
             [FromQuery]BookingQueryOptions options)
         {
-            if (Settings.Instance.Mocking.Enabled || true)
+            if (Settings.Instance.Mocking.Enabled)
             {
                 var randomCode = new Random().RandomStringFrom(RandomExtension.Uppers_Digits, 4);
                 var list = new List<object>
@@ -278,7 +278,7 @@ namespace FPTBooking.WebApi.Controllers
             {
                 entity = _service.CreateBooking(member, bookedRoom, model, usingMemberIds);
                 var history = _service.CreateHistoryForCreateBooking(entity, member);
-                _roomService.ChangeRoomHangingStatus(bookedRoom, false);
+                _roomService.ChangeRoomHangingStatus(bookedRoom, false, UserId);
                 context.SaveChanges();
                 trans.Commit();
             }
@@ -417,7 +417,6 @@ namespace FPTBooking.WebApi.Controllers
             var action = model.IsApproved ? "approved" : "denied";
             var usingMemberIds = entity.UsingMemberIds.Split('\n');
             var notiMemberIds = usingMemberIds.Where(o => o != UserId).ToList();
-            notiMemberIds.Add(UserId);
             var notiMembers = NotiHelper.Notify(notiMemberIds, new Notification
             {
                 Title = $"Booking {entity.Code} has been {action} by your {approvePerson}",
@@ -463,7 +462,6 @@ namespace FPTBooking.WebApi.Controllers
                 "location manager";
             var usingMemberIds = entity.UsingMemberIds.Split('\n');
             var notiMemberIds = usingMemberIds.Where(o => o != UserId).ToList();
-            notiMemberIds.Add(UserId);
             await NotiHelper.Notify(notiMemberIds, new Notification
             {
                 Title = $"Booking {entity.Code} has been updated by your {updatePerson}",
@@ -478,6 +476,7 @@ namespace FPTBooking.WebApi.Controllers
 #endif
         [HttpGet("{id}")]
         public IActionResult GetDetail(int id,
+            [FromQuery]BookingQueryProjection projection,
             [FromQuery]BookingQueryOptions options)
         {
             if (Settings.Instance.Mocking.Enabled)
@@ -535,13 +534,16 @@ namespace FPTBooking.WebApi.Controllers
                         throw new Exception("Test exception");
                 }
             }
-            var projection = new BookingQueryProjection { fields = BookingQueryProjection.DETAIL };
+            var getManagerType = projection.GetFieldsArr().Contains(BookingQueryProjection.MANAGER_TYPE);
+            projection = new BookingQueryProjection { fields = BookingQueryProjection.DETAIL };
             var entity = _service.GetBookingDetail(id, projection);
             if (entity == null) return NotFound(AppResult.NotFound());
             var validationData = _service.ValidateGetBookingDetail(entity, User, options);
             if (!validationData.IsValid)
                 return BadRequest(AppResult.FailValidation(data: validationData));
             var obj = _service.GetBookingDynamic(entity, projection, options);
+            if (getManagerType)
+                obj["manager_type"] = validationData.TempData["manager_type"];
             return Ok(AppResult.Success(data: obj));
         }
     }

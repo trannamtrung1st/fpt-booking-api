@@ -10,7 +10,7 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace FPTBooking.Data.Migrations
 {
     [DbContext(typeof(DataContext))]
-    [Migration("20200708083627_Init")]
+    [Migration("20200708183318_Init")]
     partial class Init
     {
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -87,28 +87,28 @@ namespace FPTBooking.Data.Migrations
                         new
                         {
                             Id = "Administrator",
-                            ConcurrencyStamp = "04d6d856-27d7-4a4b-aeea-166df94295e3",
+                            ConcurrencyStamp = "e313d30b-1fa4-4ecb-9a70-abf56033bbf0",
                             Name = "Administrator",
                             NormalizedName = "ADMINISTRATOR"
                         },
                         new
                         {
                             Id = "Manager",
-                            ConcurrencyStamp = "652b78c2-9924-486b-b53e-1f8d186456b1",
+                            ConcurrencyStamp = "40a97dba-d2af-40df-97c0-1569f9f26e39",
                             Name = "Manager",
                             NormalizedName = "MANAGER"
                         },
                         new
                         {
                             Id = "RoomChecker",
-                            ConcurrencyStamp = "352c600a-fe58-4580-bb9f-15964271b4d5",
+                            ConcurrencyStamp = "10ff3668-7a75-4d29-9b2d-6a687afb7945",
                             Name = "RoomChecker",
                             NormalizedName = "ROOMCHECKER"
                         },
                         new
                         {
                             Id = "User",
-                            ConcurrencyStamp = "ff48617a-00d8-4bcc-9e10-8cc0c48b9cc0",
+                            ConcurrencyStamp = "234c06a2-9526-4f8f-817d-9a416f237a5b",
                             Name = "User",
                             NormalizedName = "USER"
                         });
@@ -189,7 +189,7 @@ namespace FPTBooking.Data.Migrations
                     b.ToTable("AspNetUsers");
                 });
 
-            modelBuilder.Entity("FPTBooking.Data.Models.AreaManager", b =>
+            modelBuilder.Entity("FPTBooking.Data.Models.AreaMember", b =>
                 {
                     b.Property<int>("Id")
                         .ValueGeneratedOnAdd()
@@ -200,6 +200,9 @@ namespace FPTBooking.Data.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(100)")
                         .HasMaxLength(100);
+
+                    b.Property<bool>("IsManager")
+                        .HasColumnType("bit");
 
                     b.Property<string>("MemberId")
                         .IsRequired()
@@ -214,7 +217,7 @@ namespace FPTBooking.Data.Migrations
                     b.HasIndex("AreaCode", "MemberId")
                         .IsUnique();
 
-                    b.ToTable("AreaManager");
+                    b.ToTable("AreaMember");
                 });
 
             modelBuilder.Entity("FPTBooking.Data.Models.AttachedService", b =>
@@ -716,6 +719,11 @@ namespace FPTBooking.Data.Migrations
                     b.Property<DateTime?>("HangingStartTime")
                         .HasColumnType("datetime2");
 
+                    b.Property<string>("HangingUserId")
+                        .HasColumnType("varchar(100)")
+                        .HasMaxLength(100)
+                        .IsUnicode(false);
+
                     b.Property<bool>("IsAvailable")
                         .HasColumnType("bit");
 
@@ -965,16 +973,16 @@ namespace FPTBooking.Data.Migrations
                         .IsRequired();
                 });
 
-            modelBuilder.Entity("FPTBooking.Data.Models.AreaManager", b =>
+            modelBuilder.Entity("FPTBooking.Data.Models.AreaMember", b =>
                 {
                     b.HasOne("FPTBooking.Data.Models.BuildingArea", "Area")
-                        .WithMany("AreaManager")
+                        .WithMany("AreaMember")
                         .HasForeignKey("AreaCode")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
                     b.HasOne("FPTBooking.Data.Models.Member", "Member")
-                        .WithMany("AreaManager")
+                        .WithMany("AreaMember")
                         .HasForeignKey("MemberId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();

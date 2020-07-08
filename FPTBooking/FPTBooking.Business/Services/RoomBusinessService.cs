@@ -18,6 +18,9 @@ namespace FPTBooking.Business.Services
         {
         }
 
+        [Inject]
+        protected readonly MemberService _memberService;
+
         #region Query Room
         public IQueryable<Room> Rooms
         {
@@ -38,19 +41,21 @@ namespace FPTBooking.Business.Services
             return context.Attach(entity).Entity;
         }
 
-        public bool ChangeRoomHangingStatus(Room entity, bool hanging)
+        public bool ChangeRoomHangingStatus(Room entity, bool hanging, string hangUserId)
         {
             if (hanging)
             {
                 var now = DateTime.UtcNow;
                 entity.HangingStartTime = now;
                 entity.HangingEndTime = now.AddMinutes(10);
+                entity.HangingUserId = hangUserId;
                 return true;
             }
             else if (entity.HangingEndTime != null)
             {
                 entity.HangingStartTime = null;
                 entity.HangingEndTime = null;
+                entity.HangingUserId = null;
                 return true;
             }
             return false;
@@ -59,6 +64,9 @@ namespace FPTBooking.Business.Services
         public Room CheckRoomStatus(CheckRoomStatusModel model, Room entity)
         {
             model.CopyTo(entity);
+            var map = entity.RoomResource.ToDictionary(o => o.Id);
+            foreach (var o in model.CheckResources)
+                map[o.Id].IsAvailable = o.IsAvailable;
             return entity;
         }
 
@@ -196,6 +204,7 @@ namespace FPTBooking.Business.Services
         }
 
         public async Task<QueryResult<IDictionary<string, object>>> QueryRoomDynamic(
+            string userId,
             RoomQueryProjection projection,
             IDictionary<string, object> tempData = null,
             RoomQueryFilter filter = null,
@@ -205,7 +214,7 @@ namespace FPTBooking.Business.Services
         {
             var query = Rooms;
             if (filter != null)
-                query = query.Filter(filter, tempData, context.Booking);
+                query = query.Filter(filter, userId, tempData, context.Booking);
             int? totalCount = null; Task<int> countTask = null;
             query = query.Project(projection);
             if (options != null && !options.single_only)
@@ -296,6 +305,11 @@ namespace FPTBooking.Business.Services
             Room entity, CheckRoomStatusModel model)
         {
             var validationData = new ValidationData();
+            var userId = principal.Identity.Name;
+            var roomValidCheckers = _memberService.AreaMembers.OfArea(entity.BuildingAreaCode)
+                .Select(o => o.MemberId).ToList();
+            if (!roomValidCheckers.Contains(userId))
+                validationData.Fail(code: AppResultCode.AccessDenied);
             return validationData;
         }
         #endregion

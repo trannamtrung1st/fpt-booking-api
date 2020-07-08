@@ -8,7 +8,7 @@ namespace FPTBooking.Data.Models
         public Member()
         {
             AppEvent = new HashSet<AppEvent>();
-            AreaManager = new HashSet<AreaManager>();
+            AreaMember = new HashSet<AreaMember>();
             Booking = new HashSet<Booking>();
             BookingHistory = new HashSet<BookingHistory>();
             DepartmentMember = new HashSet<DepartmentMember>();
@@ -26,7 +26,7 @@ namespace FPTBooking.Data.Models
         public virtual MemberType MemberType { get; set; }
         public virtual AppUser User { get; set; }
         public virtual ICollection<AppEvent> AppEvent { get; set; }
-        public virtual ICollection<AreaManager> AreaManager { get; set; }
+        public virtual ICollection<AreaMember> AreaMember { get; set; }
         public virtual ICollection<Booking> Booking { get; set; }
         public virtual ICollection<BookingHistory> BookingHistory { get; set; }
         public virtual ICollection<DepartmentMember> DepartmentMember { get; set; }

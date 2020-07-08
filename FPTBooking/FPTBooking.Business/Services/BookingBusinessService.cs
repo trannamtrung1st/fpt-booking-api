@@ -38,11 +38,20 @@ namespace FPTBooking.Business.Services
             var managerDeps = _memberService.DepartmentMembers.OfMember(bookMember.UserId)
                 .IsManager().Select(o => o.DepartmentCode).ToList();
             var isDepManager = managerDeps.Contains(bookedRoom.DepartmentCode);
-            var isAreaManager = _memberService.AreaManagers.OfMember(bookMember.UserId)
-                .Select(o => o.AreaCode)
+            var isAreaManager = _memberService.AreaMembers.OfMember(bookMember.UserId)
+                .IsManager().Select(o => o.AreaCode)
                 .Contains(bookedRoom.BuildingAreaCode);
-            entity.Status = isDepManager ? BookingStatusValues.VALID :
-                (isAreaManager ? BookingStatusValues.APPROVED : BookingStatusValues.PROCESSING);
+            if (isDepManager)
+            {
+                entity.Status = BookingStatusValues.VALID;
+                entity.DepartmentAccepted = true;
+            }
+            else if (isAreaManager)
+            {
+                entity.Status = BookingStatusValues.APPROVED;
+                entity.DepartmentAccepted = true;
+            }
+            else entity.Status = BookingStatusValues.PROCESSING;
         }
 
         public Booking CreateBooking(Member bookMember, Room bookedRoom,
@@ -96,7 +105,8 @@ namespace FPTBooking.Business.Services
         public Booking UpdateBooking(UpdateBookingModel model, Booking entity)
         {
             model.CopyTo(entity);
-            RemoveBookingAttachedServices(model.RemoveServiceIds);
+            if (model.RemoveServiceIds != null)
+                RemoveBookingAttachedServices(model.RemoveServiceIds);
             return entity;
         }
 
@@ -120,9 +130,11 @@ namespace FPTBooking.Business.Services
             }
         }
 
-        public bool CheckAvailabilityOfRoomForBooking(Booking entity, Room room)
+        public bool CheckAvailabilityOfRoomForBooking(string userId, Booking entity, Room room)
         {
-            var isAvailable = _roomService.Rooms.AvailableForBooking(Bookings,
+            var isAvailable = _roomService.Rooms.AvailableForBooking(
+                userId,
+                Bookings,
                 entity.BookedDate,
                 entity.FromTime,
                 entity.ToTime,
@@ -150,9 +162,17 @@ namespace FPTBooking.Business.Services
                             var entity = row;
                             obj["id"] = entity.Id;
                             obj["code"] = entity.Code;
+                            var sentDate = entity.SentDate
+                                .ToTimeZone(options.time_zone, options.culture, Settings.Instance.SupportedLangs[0]);
+                            var timeStr = sentDate.ToString(dateFormat: AppDateTimeFormat.DEFAULT_FORMAT_FOR_CONVERT);
+                            obj["sent_date"] = new
+                            {
+                                display = timeStr,
+                                iso = $"{sentDate.ToUniversalTime():s}Z"
+                            };
                             var bookedDate = entity.BookedDate
                                .ToTimeZone(options.time_zone, options.culture, Settings.Instance.SupportedLangs[0]);
-                            var timeStr = bookedDate.ToString(options.date_format, options.culture, Settings.Instance.SupportedLangs[0]);
+                            timeStr = bookedDate.ToString(options.date_format, options.culture, Settings.Instance.SupportedLangs[0]);
                             obj["booked_date"] = new
                             {
                                 display = timeStr,
@@ -204,10 +224,11 @@ namespace FPTBooking.Business.Services
                     case BookingQueryProjection.SERVICES:
                         {
                             var entities = row.AttachedService
-                                .Select(o => o.BookingService).Select(o => new
+                                .Select(o => new
                                 {
-                                    code = o.Code,
-                                    name = o.Name
+                                    id = o.Id,
+                                    code = o.BookingService.Code,
+                                    name = o.BookingService.Name
                                 }).ToList();
                             obj["attached_services"] = entities;
                         }
@@ -252,9 +273,10 @@ namespace FPTBooking.Business.Services
         {
             var managerDeps = member.DepartmentMember.AsQueryable()
                 .IsManager().Select(o => o.DepartmentCode).ToList();
-            var areaManagers = member.AreaManager.Select(o => o.AreaCode).ToList();
+            var managerAreas = member.AreaMember.AsQueryable()
+                .IsManager().Select(o => o.AreaCode).ToList();
             var query = Bookings.ManagedByDepsOrAreasExceptStatuses(managerDeps, null,
-                areaManagers, null);
+                managerAreas, null);
             return query;
         }
 
@@ -277,7 +299,8 @@ namespace FPTBooking.Business.Services
                 switch (relationship)
                 {
                     case BookingPrincipalRelationship.Owner:
-                        query = query.OfBookMember(memberId);
+                        query = query.OfBookMember(memberId)
+                            .Union(query.UsedByMember(memberId));
                         break;
                     case BookingPrincipalRelationship.Manager:
                         query = QueryBookingsManagedByManager(member);
@@ -343,16 +366,22 @@ namespace FPTBooking.Business.Services
         {
             var validationData = new ValidationData();
             var userId = principal.Identity.Name;
-            if (entity.BookMemberId != userId)
+            if (entity.BookMemberId != userId &&
+                !entity.UsingMemberIds.Contains(userId))
             {
                 var managerIds = _memberService.QueryManagersOfMember(entity.BookMemberId)
-                    .Select(o => o.UserId);
+                    .Select(o => o.UserId).ToList();
                 var areaManagerIds = _memberService.QueryManagersOfArea(entity.Room.BuildingAreaCode)
-                    .Select(o => o.UserId);
-                var finalManagerIds = managerIds.Union(areaManagerIds).ToList();
-                if (!finalManagerIds.Contains(userId))
-                    validationData.Fail(code: AppResultCode.AccessDenied);
+                    .Select(o => o.UserId).ToList();
+                var depManagerIds = _memberService.QueryManagersOfDepartment(entity.Room.DepartmentCode)
+                    .Select(o => o.UserId).ToList();
+                if (managerIds.Contains(userId) || depManagerIds.Contains(userId))
+                    validationData.TempData["manager_type"] = "Department";
+                else if (areaManagerIds.Contains(userId))
+                    validationData.TempData["manager_type"] = "Area";
+                else validationData.Fail(code: AppResultCode.AccessDenied);
             }
+            else validationData.TempData["manager_type"] = "Owner";
             return validationData;
         }
 
@@ -455,7 +484,7 @@ namespace FPTBooking.Business.Services
                 if (room == null)
                     validationData.Fail(mess: "Room not found", AppResultCode.FailValidation);
                 else
-                if (!CheckAvailabilityOfRoomForBooking(entity, room))
+                if (!CheckAvailabilityOfRoomForBooking(userId, entity, room))
                     validationData.Fail(mess: "New room is not available", AppResultCode.FailValidation);
                 else validationData.TempData["room"] = room;
             }
@@ -466,6 +495,7 @@ namespace FPTBooking.Business.Services
             CreateBookingModel model)
         {
             var memberQuery = _memberService.Members;
+            var userId = principal.Identity.Name;
             var validationData = new ValidationData();
             DateTime currentTime = DateTime.UtcNow;
             if (model.BookedDate == null)
@@ -503,7 +533,7 @@ namespace FPTBooking.Business.Services
             if (validationData.IsValid)
             {
                 var availableRoom = _roomService.Rooms.Code(model.RoomCode)
-                    .AvailableForBooking(Bookings, model.BookedDate.Value, model.FromTime.Value,
+                    .AvailableForBooking(userId, Bookings, model.BookedDate.Value, model.FromTime.Value,
                         model.ToTime.Value, model.NumOfPeople.Value).FirstOrDefault();
                 if (availableRoom == null)
                     validationData.Fail("Room is not available for this booking", AppResultCode.FailValidation);

@@ -24,6 +24,7 @@ namespace FPTBooking.Data.Models
         public int PeopleCapacity { get; set; }
         public DateTime? HangingStartTime { get; set; }
         public DateTime? HangingEndTime { get; set; }
+        public string HangingUserId { get; set; }
         public bool IsAvailable { get; set; }
         public string Note { get; set; }
 
