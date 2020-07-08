@@ -6,6 +6,7 @@ using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Security.Claims;
 using System.Threading.Tasks;
 using TNT.Core.Helpers.DI;
 
@@ -53,6 +54,12 @@ namespace FPTBooking.Business.Services
                 return true;
             }
             return false;
+        }
+
+        public Room CheckRoomStatus(CheckRoomStatusModel model, Room entity)
+        {
+            model.CopyTo(entity);
+            return entity;
         }
 
         public IDictionary<string, object> GetRoomDynamic(
@@ -162,8 +169,10 @@ namespace FPTBooking.Business.Services
                         {
                             var entities = row.RoomResource.Select(o => new
                             {
+                                id = o.Id,
                                 name = o.Name,
                                 code = o.Code,
+                                is_available = o.IsAvailable,
                             }).ToList();
                             obj["resources"] = entities;
                         }
@@ -248,12 +257,14 @@ namespace FPTBooking.Business.Services
                     filter.to_time == null ||
                     filter.num_of_people == null || filter.room_type == null)
                     validationData.Fail(mess: "Invalid input data", AppResultCode.FailValidation);
+                if (filter.from_time >= filter.to_time)
+                    validationData.Fail(mess: "Time range is not valid", AppResultCode.FailValidation);
             }
             return validationData;
         }
 
         public ValidationData ValidateGetRoomDetail(
-            Room room, bool hanging,
+            Room entity, bool hanging,
             RoomQueryOptions options)
         {
             var validationData = new ValidationData();
@@ -261,7 +272,18 @@ namespace FPTBooking.Business.Services
         }
 
         public ValidationData ValidateHangRoom(
-            string code, ChangeRoomHangingStatusModel model)
+            Room entity, ChangeRoomHangingStatusModel model)
+        {
+            var validationData = new ValidationData();
+            var now = DateTime.UtcNow;
+            if (entity.HangingEndTime > now && model.Hanging)
+                validationData.Fail(mess: "Room is already hanged", AppResultCode.FailValidation);
+            return validationData;
+        }
+
+        public ValidationData ValidateCheckRoomStatus(
+            ClaimsPrincipal principal,
+            Room entity, CheckRoomStatusModel model)
         {
             var validationData = new ValidationData();
             return validationData;

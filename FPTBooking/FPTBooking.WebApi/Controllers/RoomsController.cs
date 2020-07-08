@@ -18,6 +18,7 @@ using TNT.Core.Helpers.General;
 using FPTBooking.Business.Services;
 using FPTBooking.Business.Queries;
 using FPTBooking.Business.Helpers;
+using FPTBooking.Data;
 
 namespace FPTBooking.WebApi.Controllers
 {
@@ -186,12 +187,14 @@ namespace FPTBooking.WebApi.Controllers
                                 {
                                     new
                                     {
+                                        id = 1,
                                         code = "PRJ",
                                         name = "Projector",
                                         is_available = true,
                                     },
                                     new
                                     {
+                                        id = 2,
                                         code = "SCR",
                                         name = "Display screen",
                                         is_available = false,
@@ -222,6 +225,25 @@ namespace FPTBooking.WebApi.Controllers
         }
 
 #if !DEBUG
+        [Authorize(Roles = RoleName.ROOM_CHECKER)]
+#endif
+        [HttpPatch("{code}/status")]
+        public IActionResult CheckRoomStatus(string code,
+            CheckRoomStatusModel model)
+        {
+            if (Settings.Instance.Mocking.Enabled)
+                return NoContent();
+            var entity = _service.Rooms.Code(code).FirstOrDefault();
+            if (entity == null) return NotFound(AppResult.NotFound());
+            var validationData = _service.ValidateCheckRoomStatus(User, entity, model);
+            if (!validationData.IsValid)
+                return BadRequest(AppResult.FailValidation(data: validationData));
+            _service.CheckRoomStatus(model, entity);
+            context.SaveChanges();
+            return NoContent();
+        }
+
+#if !DEBUG
         [Authorize]
 #endif
         [HttpPut("{code}/hanging")]
@@ -229,17 +251,15 @@ namespace FPTBooking.WebApi.Controllers
             ChangeRoomHangingStatusModel model)
         {
             if (Settings.Instance.Mocking.Enabled)
-            {
                 return NoContent();
-            }
-            var validationData = _service.ValidateHangRoom(code, model);
-            if (!validationData.IsValid)
-                return BadRequest(AppResult.FailValidation(data: validationData));
             var entity = _service.Rooms.Code(code).FirstOrDefault();
             if (entity == null) return NotFound(AppResult.NotFound());
+            var validationData = _service.ValidateHangRoom(entity, model);
+            if (!validationData.IsValid)
+                return BadRequest(AppResult.FailValidation(data: validationData));
             if (_service.ChangeRoomHangingStatus(entity, model.Hanging))
                 context.SaveChanges();
-            return Ok(model.D1 + "-" + model.D2);
+            return NoContent();
         }
 
     }

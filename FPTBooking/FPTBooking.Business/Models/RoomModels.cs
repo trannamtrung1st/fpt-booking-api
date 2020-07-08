@@ -8,14 +8,44 @@ using System.Threading.Tasks;
 
 namespace FPTBooking.Business.Models
 {
+    public class CheckRoomStatusModel : MappingModel<Room>
+    {
+        public CheckRoomStatusModel()
+        {
+        }
+
+        public CheckRoomStatusModel(Room src) : base(src)
+        {
+        }
+
+        [JsonProperty("note")]
+        public string Note { get; set; }
+        [JsonProperty("is_available")]
+        public bool IsAvailable { get; set; }
+        [JsonProperty("resources")]
+        public IEnumerable<CheckRoomResourceStatusModel> RoomResource { get; set; }
+    }
+
+    public class CheckRoomResourceStatusModel : MappingModel<RoomResource>
+    {
+        public CheckRoomResourceStatusModel()
+        {
+        }
+
+        public CheckRoomResourceStatusModel(RoomResource src) : base(src)
+        {
+        }
+
+        [JsonProperty("id")]
+        public int Id { get; set; }
+        [JsonProperty("is_available")]
+        public bool IsAvailable { get; set; }
+    }
+
     public class ChangeRoomHangingStatusModel
     {
         [JsonProperty("hanging")]
         public bool Hanging { get; set; }
-        [JsonConverter(typeof(DefaultDateTimeConverter))]
-        public DateTime? D1 { get; set; }
-        [JsonConverter(typeof(DefaultDateTimeConverter))]
-        public DateTime D2 { get; set; }
     }
 
     #region Query
