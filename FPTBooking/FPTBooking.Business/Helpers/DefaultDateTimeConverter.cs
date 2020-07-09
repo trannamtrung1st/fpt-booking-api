@@ -25,7 +25,7 @@ namespace FPTBooking.Business.Helpers
             {
                 var dateTime = base.ReadJson(reader, objectType, existingValue, serializer) as DateTime?;
                 if (dateTime != null)
-                    dateTime = dateTime?.ToUniversalTime();
+                    dateTime = dateTime?.ToUtc();
                 return dateTime;
             }
             catch (Exception)

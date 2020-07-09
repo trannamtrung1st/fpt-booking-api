@@ -46,6 +46,10 @@ namespace FPTBooking.Business.Models
     {
         [JsonProperty("hanging")]
         public bool Hanging { get; set; }
+        [JsonProperty("code")]
+        public string Code { get; set; }
+        [JsonProperty("release_hanging_user_id")]
+        public string ReleaseHangingUserId { get; set; }
     }
 
     #region Query

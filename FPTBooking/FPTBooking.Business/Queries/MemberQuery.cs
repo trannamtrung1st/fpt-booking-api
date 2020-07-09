@@ -10,6 +10,11 @@ namespace FPTBooking.Business.Queries
 {
     public static class MemberQuery
     {
+        public static IQueryable<Member> IsViewOnlyUser(this IQueryable<Member> query)
+        {
+            return query.Where(o => !o.DepartmentMember.Any() && !o.AreaMember.Any());
+        }
+
         public static IQueryable<Member> IsManagerOfAny(this IQueryable<Member> query, IEnumerable<string> depCodes)
         {
             return query.Where(o => o.DepartmentMember

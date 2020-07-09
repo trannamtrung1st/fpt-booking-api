@@ -20,6 +20,7 @@ using FPTBooking.Business.Queries;
 using FPTBooking.Business.Helpers;
 using FPTBooking.Data;
 using FirebaseAdmin.Messaging;
+using FPTBooking.Data.Models;
 
 namespace FPTBooking.WebApi.Controllers
 {
@@ -222,6 +223,7 @@ namespace FPTBooking.WebApi.Controllers
             if (hanging)
             {
                 entity = _service.Attach(entity);
+                _service.ReleaseHangingRoomByHangingUserId(UserId);
                 _service.ChangeRoomHangingStatus(entity, true, UserId);
                 context.SaveChanges();
             }
@@ -268,19 +270,28 @@ namespace FPTBooking.WebApi.Controllers
 #if !DEBUG
         [Authorize]
 #endif
-        [HttpPut("{code}/hanging")]
-        public IActionResult ChangeRoomHangingStatus(string code,
+        [HttpPut("hanging")]
+        public IActionResult ChangeRoomHangingStatus(
             ChangeRoomHangingStatusModel model)
         {
             if (Settings.Instance.Mocking.Enabled)
                 return NoContent();
-            var entity = _service.Rooms.Code(code).FirstOrDefault();
-            if (entity == null) return NotFound(AppResult.NotFound());
-            var validationData = _service.ValidateHangRoom(entity, model);
+            Room entity = null;
+            if (model.Code != null)
+            {
+                entity = _service.Rooms.Code(model.Code).FirstOrDefault();
+                if (entity == null) return NotFound(AppResult.NotFound());
+            }
+            var validationData = _service.ValidateChargeRoomHangingStatus(User, entity, model);
             if (!validationData.IsValid)
                 return BadRequest(AppResult.FailValidation(data: validationData));
-            if (_service.ChangeRoomHangingStatus(entity, model.Hanging, UserId))
+            if (entity != null && _service.ChangeRoomHangingStatus(entity, model.Hanging, UserId))
                 context.SaveChanges();
+            else
+            {
+                _service.ReleaseHangingRoomByHangingUserId(model.ReleaseHangingUserId);
+                context.SaveChanges();
+            }
             return NoContent();
         }
 

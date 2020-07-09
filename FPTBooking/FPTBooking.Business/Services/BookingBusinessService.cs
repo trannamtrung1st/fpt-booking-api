@@ -28,9 +28,15 @@ namespace FPTBooking.Business.Services
         }
 
         #region Create Booking
+        protected string GetBookingCode(Booking entity)
+        {
+            return "B-" + entity.RoomCode + "-" +
+                entity.BookedDate.Date.ToTimeZone(AppTimeZone.Map.First().Value).ToString("ddMMyyyy") + "-" +
+                entity.FromTime.ToString("hh\\:mm") + entity.ToTime.ToString("hh\\:mm");
+        }
         protected void PrepareCreate(Booking entity, Member bookMember, Room bookedRoom)
         {
-            entity.Code = "B" + DateTime.UtcNow.ToString("ddMMyyyyhhmmss") + Global.Random.Next(0, 9);
+            entity.Code = GetBookingCode(entity);
             entity.Archived = false;
             entity.SentDate = DateTime.UtcNow;
             foreach (var e in entity.AttachedService)
@@ -168,7 +174,7 @@ namespace FPTBooking.Business.Services
                             obj["sent_date"] = new
                             {
                                 display = timeStr,
-                                iso = $"{sentDate.ToUniversalTime():s}Z"
+                                iso = $"{sentDate.ToUtc():s}Z"
                             };
                             var bookedDate = entity.BookedDate
                                .ToTimeZone(options.time_zone, options.culture, Settings.Instance.SupportedLangs[0]);
@@ -176,7 +182,7 @@ namespace FPTBooking.Business.Services
                             obj["booked_date"] = new
                             {
                                 display = timeStr,
-                                iso = $"{bookedDate.ToUniversalTime():s}Z"
+                                iso = $"{bookedDate.ToUtc():s}Z"
                             };
                             obj["from_time"] = entity.FromTime.ToString("hh\\:mm");
                             obj["to_time"] = entity.ToTime.ToString("hh\\:mm");
@@ -185,14 +191,14 @@ namespace FPTBooking.Business.Services
                             obj["start_time"] = new
                             {
                                 display = timeStr,
-                                iso = $"{startTime.ToUniversalTime():s}Z"
+                                iso = $"{startTime.ToUtc():s}Z"
                             };
                             var finishTime = bookedDate.Add(entity.ToTime);
                             timeStr = finishTime.ToString(dateFormat: AppDateTimeFormat.DEFAULT_FORMAT_FOR_CONVERT);
                             obj["finish_time"] = new
                             {
                                 display = timeStr,
-                                iso = $"{finishTime.ToUniversalTime():s}Z"
+                                iso = $"{finishTime.ToUtc():s}Z"
                             };
                             obj["type"] = BookingTypeValues.BOOKING;
                             obj["status"] = entity.Status;
@@ -492,12 +498,18 @@ namespace FPTBooking.Business.Services
         }
 
         public ValidationData ValidateCreateBooking(ClaimsPrincipal principal,
+            Member member,
             CreateBookingModel model)
         {
             var memberQuery = _memberService.Members;
             var userId = principal.Identity.Name;
             var validationData = new ValidationData();
             DateTime currentTime = DateTime.UtcNow;
+            if (!member.DepartmentMember.Any() && !member.AreaMember.Any())
+            {
+                validationData.Fail(code: AppResultCode.AccessDenied);
+                return validationData;
+            }
             if (model.BookedDate == null)
                 validationData.Fail("Booked date must not be empty", AppResultCode.FailValidation);
             if (model.NumOfPeople == null || model.NumOfPeople == 0)

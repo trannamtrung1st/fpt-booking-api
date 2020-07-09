@@ -28,6 +28,8 @@ namespace FPTBooking.Business.Services
         private readonly SignInManager<AppUser> _signInManager;
         [Inject]
         private readonly RoleManager<AppRole> _roleManager;
+        [Inject]
+        private readonly MemberService _memberService;
 
         public IdentityService(ServiceInjection inj) : base(inj)
         {
@@ -284,6 +286,7 @@ namespace FPTBooking.Business.Services
             #endregion
             var resp = new TokenResponseModel();
             resp.user_id = identity.Name;
+            resp.is_view_only_user = _memberService.Members.IsViewOnlyUser().Id(identity.Name).Any();
             resp.email = identity.FindFirst(ClaimTypes.Email)?.Value;
             resp.photo_url = identity.FindFirst(AppClaimType.PhotoUrl)?.Value;
             resp.access_token = tokenString;

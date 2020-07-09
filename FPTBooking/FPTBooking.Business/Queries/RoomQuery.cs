@@ -56,6 +56,11 @@ namespace FPTBooking.Business.Queries
             return query.Where(o => o.RoomTypeCode == typeCode);
         }
 
+        public static IQueryable<Room> OfHangingUserId(this IQueryable<Room> query, string hangingUserId)
+        {
+            return query.Where(o => o.HangingUserId == hangingUserId);
+        }
+
         public static IQueryable<Room> CanHandle(this IQueryable<Room> query, int numOfPeople)
         {
             return query.Where(o => o.PeopleCapacity >= numOfPeople);

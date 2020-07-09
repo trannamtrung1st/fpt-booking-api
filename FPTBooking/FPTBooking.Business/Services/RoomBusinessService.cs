@@ -61,6 +61,16 @@ namespace FPTBooking.Business.Services
             return false;
         }
 
+
+        public IEnumerable<Room> ReleaseHangingRoomByHangingUserId(string hangingUserId)
+        {
+            var entities = Rooms.OfHangingUserId(hangingUserId).ToList();
+            foreach (var e in entities)
+                ChangeRoomHangingStatus(e, false, null);
+            return entities;
+        }
+
+
         public Room CheckRoomStatus(CheckRoomStatusModel model, Room entity)
         {
             model.CopyTo(entity);
@@ -99,7 +109,7 @@ namespace FPTBooking.Business.Services
                                 obj["hanging_start"] = new
                                 {
                                     display = timeStr,
-                                    iso = $"{time.ToUniversalTime():s}Z"
+                                    iso = $"{time.ToUtc():s}Z"
                                 };
                                 time = entity.HangingEndTime.Value
                                    .ToTimeZone(options.time_zone, options.culture, Settings.Instance.SupportedLangs[0]);
@@ -107,7 +117,7 @@ namespace FPTBooking.Business.Services
                                 obj["hanging_end"] = new
                                 {
                                     display = timeStr,
-                                    iso = $"{time.ToUniversalTime():s}Z"
+                                    iso = $"{time.ToUtc():s}Z"
                                 };
                             }
                             obj["name"] = entity.Name;
@@ -290,13 +300,18 @@ namespace FPTBooking.Business.Services
             return validationData;
         }
 
-        public ValidationData ValidateHangRoom(
+        public ValidationData ValidateChargeRoomHangingStatus(
+            ClaimsPrincipal principal,
             Room entity, ChangeRoomHangingStatusModel model)
         {
             var validationData = new ValidationData();
+            var userId = principal.Identity.Name;
             var now = DateTime.UtcNow;
-            if (entity.HangingEndTime > now && model.Hanging)
-                validationData.Fail(mess: "Room is already hanged", AppResultCode.FailValidation);
+            if (entity != null)
+            {
+                if (entity.HangingEndTime > now && model.Hanging)
+                    validationData.Fail(mess: "Room is already hanged", AppResultCode.FailValidation);
+            }
             return validationData;
         }
 

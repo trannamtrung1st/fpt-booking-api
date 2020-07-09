@@ -266,13 +266,13 @@ namespace FPTBooking.WebApi.Controllers
         {
             if (Settings.Instance.Mocking.Enabled)
                 return Ok(AppResult.Success(data: 1));
-            var validationData = _service.ValidateCreateBooking(User, model);
+            var memberQuery = _memberService.Members;
+            var member = _memberService.Members.Id(UserId).FirstOrDefault();
+            var validationData = _service.ValidateCreateBooking(User, member, model);
             if (!validationData.IsValid)
                 return BadRequest(AppResult.FailValidation(data: validationData));
             var usingMemberIds = validationData.GetTempData<List<string>>("using_member_ids");
             var bookedRoom = validationData.GetTempData<Room>("booked_room");
-            var memberQuery = _memberService.Members;
-            var member = memberQuery.Id(UserId).FirstOrDefault();
             Booking entity;
             using (var trans = context.Database.BeginTransaction())
             {
@@ -287,12 +287,12 @@ namespace FPTBooking.WebApi.Controllers
             var notiMembers = notiMemberIds.Any() ? NotiHelper.Notify(notiMemberIds, new Notification
             {
                 Title = $"You have a new booking",
-                Body = $"{UserEmail} has just created a booking for you. Press for more detail"
+                Body = $"{UserEmail} has just created a booking of room {entity.RoomCode} for you. Press for more detail"
             }) : Task.CompletedTask;
             var managerNoti = new Notification
             {
                 Title = $"There's a new booking request",
-                Body = $"{UserEmail} has just created a booking. Press for more detail"
+                Body = $"{UserEmail} has just created a booking of room {entity.RoomCode}. Press for more detail"
             };
             if (entity.Status == BookingStatusValues.PROCESSING)
             {
@@ -430,7 +430,7 @@ namespace FPTBooking.WebApi.Controllers
                     await NotiHelper.Notify(managerIds, new Notification
                     {
                         Title = $"There's a new booking request",
-                        Body = $"{UserEmail} has just {action} a booking. Press for more detail"
+                        Body = $"{UserEmail} has just {action} a booking of room {entity.RoomCode}. Press for more detail"
                     });
             }
             await notiMembers;
@@ -465,7 +465,7 @@ namespace FPTBooking.WebApi.Controllers
             await NotiHelper.Notify(notiMemberIds, new Notification
             {
                 Title = $"Booking {entity.Code} has been updated by your {updatePerson}",
-                Body = $"{UserEmail} has just updated your booking. Press for more detail"
+                Body = $"{UserEmail} has just updated your booking of room {entity.RoomCode}. Press for more detail"
             });
             return NoContent();
         }
