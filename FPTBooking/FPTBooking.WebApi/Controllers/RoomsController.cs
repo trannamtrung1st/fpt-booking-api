@@ -37,6 +37,8 @@ namespace FPTBooking.WebApi.Controllers
         private readonly RoomBusinessService _service;
         [Inject]
         private readonly MemberService _memberService;
+        [Inject]
+        private readonly SystemService _sysService;
 
 #if !DEBUG
         [Authorize]
@@ -252,8 +254,26 @@ namespace FPTBooking.WebApi.Controllers
             var validationData = _service.ValidateCheckRoomStatus(User, entity, model);
             if (!validationData.IsValid)
                 return BadRequest(AppResult.FailValidation(data: validationData));
-            _service.CheckRoomStatus(model, entity);
-            context.SaveChanges();
+            using (var trans = context.Database.BeginTransaction())
+            {
+                var oldNote = entity.Note;
+                var oldStatus = entity.IsAvailable;
+                _service.CheckRoomStatus(model, entity);
+                //log event
+                var ev = _sysService.GetEventForRoomProcessing(
+                    $"{UserEmail} has changed the status of room {entity.Code}",
+                    "CheckRoomStatus", UserId, new
+                    {
+                        old_note = oldNote,
+                        old_status = oldStatus,
+                        new_note = entity.Note,
+                        new_status = entity.IsAvailable
+                    });
+                _sysService.CreateAppEvent(ev);
+                //end log event
+                trans.Commit();
+                context.SaveChanges();
+            }
             //notify managers
             var managerIds = _memberService.QueryManagersOfDepartment(entity.DepartmentCode)
                 .Union(_memberService.QueryManagersOfArea(entity.BuildingAreaCode))

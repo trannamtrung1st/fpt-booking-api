@@ -34,6 +34,8 @@ namespace FPTBooking.WebApi.Controllers
         private readonly IdentityService _service;
         [Inject]
         private readonly MemberService _memberService;
+        [Inject]
+        private readonly SystemService _sysService;
 
         #region OAuth
         [HttpPost("login")]
@@ -132,6 +134,11 @@ namespace FPTBooking.WebApi.Controllers
                                 _logger.CustomProperties(entity).Info("Register new user");
                                 var memberEntity = _memberService.ConvertToMember(entity);
                                 memberEntity = _memberService.CreateMember(memberEntity);
+                                //log event
+                                var ev = _sysService.GetEventForNewUser(
+                                    $"{memberEntity.Email} has logged into system for the first time", UserId);
+                                _sysService.CreateAppEvent(ev);
+                                //end log event
                                 context.SaveChanges();
                                 transaction.Commit();
                             }

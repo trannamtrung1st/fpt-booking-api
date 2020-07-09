@@ -37,6 +37,8 @@ namespace FPTBooking.WebApi.Controllers
         [Inject]
         private readonly BookingBusinessService _service;
         [Inject]
+        private readonly SystemService _sysService;
+        [Inject]
         private readonly MemberService _memberService;
 
         [Authorize]
@@ -279,6 +281,10 @@ namespace FPTBooking.WebApi.Controllers
                 entity = _service.CreateBooking(member, bookedRoom, model, usingMemberIds);
                 var history = _service.CreateHistoryForCreateBooking(entity, member);
                 _roomService.ChangeRoomHangingStatus(bookedRoom, false, UserId);
+                //log event
+                var ev = _sysService.GetEventForBookingProcessing(history);
+                _sysService.CreateAppEvent(ev);
+                //end log event
                 context.SaveChanges();
                 trans.Commit();
             }
@@ -329,6 +335,10 @@ namespace FPTBooking.WebApi.Controllers
             {
                 _service.CancelBooking(model, entity);
                 var history = _service.CreateHistoryForCancelBooking(entity, fromStatus, entity.BookMember);
+                //log event
+                var ev = _sysService.GetEventForBookingProcessing(history);
+                _sysService.CreateAppEvent(ev);
+                //end log event
                 context.SaveChanges();
                 trans.Commit();
             }
@@ -379,6 +389,10 @@ namespace FPTBooking.WebApi.Controllers
             {
                 _service.FeedbackBooking(model, entity);
                 var history = _service.CreateHistoryForFeedbackBooking(entity, entity.BookMember);
+                //log event
+                var ev = _sysService.GetEventForBookingProcessing(history);
+                _sysService.CreateAppEvent(ev);
+                //end log event
                 context.SaveChanges();
                 trans.Commit();
             }
@@ -408,6 +422,10 @@ namespace FPTBooking.WebApi.Controllers
                 _service.ChangeApprovalStatusOfBooking(model, entity);
                 var history = _service.CreateHistoryForChangeApprovalStatusOfBooking(
                     entity, fromStatus, model.IsApproved, member);
+                //log event
+                var ev = _sysService.GetEventForBookingProcessing(history);
+                _sysService.CreateAppEvent(ev);
+                //end log event
                 context.SaveChanges();
                 trans.Commit();
             }
@@ -454,6 +472,10 @@ namespace FPTBooking.WebApi.Controllers
             {
                 _service.UpdateBooking(model, entity);
                 var history = _service.CreateHistoryForUpdateBooking(entity, member);
+                //log event
+                var ev = _sysService.GetEventForBookingProcessing(history);
+                _sysService.CreateAppEvent(ev);
+                //end log event
                 context.SaveChanges();
                 trans.Commit();
             }
@@ -469,7 +491,6 @@ namespace FPTBooking.WebApi.Controllers
             });
             return NoContent();
         }
-
 
 #if !DEBUG
         [Authorize]
