@@ -190,7 +190,7 @@ namespace FPTBooking.Business.Models
         public DateTime? date { get; set; }
         [DefaultDateTimeModelBinder]
         public DateTime? from_date { get; set; }
-        [DefaultDateTimeModelBinder]
+        [DefaultDateTimeModelBinder(ToUtc = false)]
         public DateTime? to_date { get; set; }
         public string status { get; set; }
         public BoolOptions? archived { get; set; } //default: false

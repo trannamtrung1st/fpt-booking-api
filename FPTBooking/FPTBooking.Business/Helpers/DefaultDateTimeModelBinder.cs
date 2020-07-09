@@ -52,19 +52,21 @@ namespace FPTBooking.Business.Helpers
 
         private DateTime? ParseDate(ModelBindingContext bindingContext, string dateStr)
         {
-            var attribute = GetDateTimeModelBinderAttribute(bindingContext);
+            var attribute = GetBinderAttribute(bindingContext);
             var dateFormat = attribute?.DateFormat ?? AppDateTimeFormat.DEFAULT_DATE_FORMAT;
+            var toUtc = attribute?.ToUtc;
 
             DateTime dateTime;
             if (dateStr.TryConvertToDateTime(dateFormat, out dateTime))
             {
-                dateTime = dateTime.ToUtc();
+                if (toUtc == true)
+                    dateTime = dateTime.ToUtc();
                 return dateTime;
             }
             return null;
         }
 
-        private DefaultDateTimeModelBinderAttribute GetDateTimeModelBinderAttribute(ModelBindingContext bindingContext)
+        private DefaultDateTimeModelBinderAttribute GetBinderAttribute(ModelBindingContext bindingContext)
         {
             var modelName = GetModelName(bindingContext);
 
@@ -81,7 +83,12 @@ namespace FPTBooking.Business.Helpers
             var ctrlParamDescriptor = paramDescriptor as ControllerParameterDescriptor;
             if (ctrlParamDescriptor == null)
             {
-                return null;
+                var propAttr = bindingContext.ModelMetadata
+                    .ContainerType.GetProperty(modelName)
+                    .GetCustomAttributes(typeof(DefaultDateTimeModelBinderAttribute), false)
+                    .FirstOrDefault();
+                return propAttr != null ?
+                    (DefaultDateTimeModelBinderAttribute)propAttr : null;
             }
 
             var attribute = ctrlParamDescriptor.ParameterInfo
@@ -110,6 +117,7 @@ namespace FPTBooking.Business.Helpers
     public class DefaultDateTimeModelBinderAttribute : ModelBinderAttribute
     {
         public string DateFormat { get; set; }
+        public bool ToUtc { get; set; } = true;
 
         public DefaultDateTimeModelBinderAttribute()
             : base(typeof(DefaultDateTimeModelBinder))

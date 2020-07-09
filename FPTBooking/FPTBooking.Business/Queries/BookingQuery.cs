@@ -1,4 +1,5 @@
-﻿using FPTBooking.Business.Models;
+﻿using FPTBooking.Business.Helpers;
+using FPTBooking.Business.Models;
 using FPTBooking.Data.Models;
 using Microsoft.EntityFrameworkCore;
 using System;
@@ -7,6 +8,7 @@ using System.Globalization;
 using System.Linq;
 using System.Security.Claims;
 using System.Threading.Tasks;
+using TNT.Core.Helpers.General;
 
 namespace FPTBooking.Business.Queries
 {
@@ -120,21 +122,22 @@ namespace FPTBooking.Business.Queries
             return query.Where(o => o.Archived == val);
         }
 
-        public static IQueryable<Booking> BookedDateFromDate(this IQueryable<Booking> query, DateTime date)
+        public static IQueryable<Booking> BookedDateFromDate(this IQueryable<Booking> query, DateTime utcDate)
         {
-            return query.Where(o => o.BookedDate.Date >= date.Date);
+            return query.Where(o => o.BookedDate.Date >= utcDate.Date);
         }
-        public static IQueryable<Booking> BookedDateToDate(this IQueryable<Booking> query, DateTime date)
+        public static IQueryable<Booking> BookedDateToDate(this IQueryable<Booking> query, DateTime utcDate)
         {
-            return query.Where(o => o.BookedDate.Date <= date.Date);
+            return query.Where(o => o.BookedDate.Date <= utcDate.Date);
         }
-        public static IQueryable<Booking> SentDateFromDate(this IQueryable<Booking> query, DateTime date)
+        public static IQueryable<Booking> SentDateFromDate(this IQueryable<Booking> query, DateTime utcDate)
         {
-            return query.Where(o => o.SentDate.Date >= date.Date);
+            return query.Where(o => o.SentDate.Date >= utcDate.Date);
         }
-        public static IQueryable<Booking> SentDateToDate(this IQueryable<Booking> query, DateTime date)
+        public static IQueryable<Booking> SentDateToDate(this IQueryable<Booking> query, DateTime utcDate)
         {
-            return query.Where(o => o.SentDate.Date <= date.Date);
+            var nextDate = utcDate.AddDays(1);
+            return query.Where(o => o.SentDate.Date < nextDate.Date);
         }
 
         public static IQueryable<Booking> SortLatestBookedDate(this IQueryable<Booking> query)
@@ -153,10 +156,13 @@ namespace FPTBooking.Business.Queries
             var archived = model.archived ?? BoolOptions.F;
             if (archived != BoolOptions.B)
                 query = query.Archived(!(archived == BoolOptions.F));
-            if (model.from_date != null) //sent date
+            if (model.from_date != null)
                 query = query.SentDateFromDate(model.from_date.Value);
-            if (model.to_date != null) //sent date
-                query = query.SentDateToDate(model.to_date.Value);
+            if (model.to_date != null)
+            {
+                var toDateUtc = model.to_date.Value.ToEndOfDay().ToUtc();
+                query = query.SentDateToDate(toDateUtc);
+            }
             if (model.date != null)
                 query = query.BookedDate(model.date.Value);
             if (model.status != null)

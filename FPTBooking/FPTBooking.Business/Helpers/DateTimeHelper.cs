@@ -62,5 +62,10 @@ namespace FPTBooking.Business.Helpers
             return TimeZoneInfo.ConvertTimeToUtc(localDate, srcTimeZoneInfo);
         }
 
+        public static DateTime ToDefaultTimeZone(this DateTime dateTime)
+        {
+            return dateTime.ToTimeZone(AppTimeZone.Map.First().Value);
+        }
+
     }
 }
