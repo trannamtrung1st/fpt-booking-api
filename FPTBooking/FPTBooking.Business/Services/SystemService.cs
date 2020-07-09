@@ -23,6 +23,7 @@ namespace FPTBooking.Business.Services
         {
             return new AppEvent
             {
+                Id = Guid.NewGuid().ToString(),
                 DisplayContent = history.DisplayContent,
                 Data = history.Data,
                 HappenedTime = history.HappenedTime,
@@ -36,6 +37,7 @@ namespace FPTBooking.Business.Services
         {
             return new AppEvent
             {
+                Id = Guid.NewGuid().ToString(),
                 DisplayContent = displayContent,
                 Data = JsonConvert.SerializeObject(data),
                 HappenedTime = DateTime.UtcNow,
@@ -50,6 +52,7 @@ namespace FPTBooking.Business.Services
         {
             return new AppEvent
             {
+                Id = Guid.NewGuid().ToString(),
                 DisplayContent = displayContent,
                 Data = JsonConvert.SerializeObject(data),
                 HappenedTime = DateTime.UtcNow,
