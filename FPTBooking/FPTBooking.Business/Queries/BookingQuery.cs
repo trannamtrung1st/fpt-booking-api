@@ -55,6 +55,11 @@ namespace FPTBooking.Business.Queries
                 .NotStatus(BookingStatusValues.DENIED);
         }
 
+        public static IQueryable<Booking> Search(this IQueryable<Booking> query, string search)
+        {
+            return query.Where(o => o.Code.Contains(search));
+        }
+
         public static IQueryable<Booking> Status(this IQueryable<Booking> query, string status)
         {
             return query.Where(o => o.Status == status);
@@ -167,6 +172,8 @@ namespace FPTBooking.Business.Queries
                 query = query.BookedDate(model.date.Value);
             if (model.status != null)
                 query = query.Status(model.status);
+            if (model.search != null)
+                query = query.Search(model.search);
             return query;
         }
 

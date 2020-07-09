@@ -193,6 +193,7 @@ namespace FPTBooking.Business.Models
         [DefaultDateTimeModelBinder(ToUtc = false)]
         public DateTime? to_date { get; set; }
         public string status { get; set; }
+        public string search { get; set; }
         public BoolOptions? archived { get; set; } //default: false
     }
 
@@ -230,12 +231,14 @@ namespace FPTBooking.Business.Models
     {
         public bool count_total { get; set; }
         public string date_format { get; set; }
+        public string group_by { get; set; }
         public string time_zone { get; set; }
         public string culture { get; set; }
         public bool single_only { get; set; }
         public bool load_all { get; set; }
 
         public const bool IsLoadAllAllowed = true;
+        public const string GROUP_BY_DATE = "date";
     }
 
     #endregion

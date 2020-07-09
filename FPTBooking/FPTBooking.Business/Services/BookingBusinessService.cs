@@ -32,7 +32,7 @@ namespace FPTBooking.Business.Services
         {
             return "B-" + entity.RoomCode + "-" +
                 entity.BookedDate.Date.ToTimeZone(AppTimeZone.Map.First().Value).ToString("ddMMyyyy") + "-" +
-                entity.FromTime.ToString("hh\\:mm") + entity.ToTime.ToString("hh\\:mm");
+                entity.FromTime.ToString("hhmm") + entity.ToTime.ToString("hhmm");
         }
         protected void PrepareCreate(Booking entity, Member bookMember, Room bookedRoom)
         {
@@ -171,6 +171,7 @@ namespace FPTBooking.Business.Services
                             var sentDate = entity.SentDate
                                 .ToTimeZone(options.time_zone, options.culture, Settings.Instance.SupportedLangs[0]);
                             var timeStr = sentDate.ToString(dateFormat: AppDateTimeFormat.DEFAULT_FORMAT_FOR_CONVERT);
+                            obj["group_by_date_key"] = sentDate.ToString(dateFormat: AppDateTimeFormat.DEFAULT_DATE_FORMAT);
                             obj["sent_date"] = new
                             {
                                 display = timeStr,
@@ -262,7 +263,7 @@ namespace FPTBooking.Business.Services
             return obj;
         }
 
-        public List<IDictionary<string, object>> GetBookingDynamic(
+        public IEnumerable<object> GetBookingDynamic(
             IEnumerable<Booking> rows, BookingQueryProjection projection,
             BookingQueryOptions options)
         {
@@ -271,6 +272,10 @@ namespace FPTBooking.Business.Services
             {
                 var obj = GetBookingDynamic(o, projection, options);
                 list.Add(obj);
+            }
+            if (options.group_by == BookingQueryOptions.GROUP_BY_DATE)
+            {
+                return list.GroupBy(o => o["group_by_date_key"]).ToList();
             }
             return list;
         }
@@ -286,7 +291,7 @@ namespace FPTBooking.Business.Services
             return query;
         }
 
-        public async Task<QueryResult<IDictionary<string, object>>> QueryBookingDynamic(
+        public async Task<QueryResult<object>> QueryBookingDynamic(
             ClaimsPrincipal principal,
             Member member,
             BookingPrincipalRelationship relationship,
@@ -336,14 +341,14 @@ namespace FPTBooking.Business.Services
                 var single = queryResult.FirstOrDefault();
                 if (single == null) return null;
                 var singleResult = GetBookingDynamic(single, projection, options);
-                return new QueryResult<IDictionary<string, object>>()
+                return new QueryResult<object>()
                 {
                     SingleResult = singleResult
                 };
             }
             if (options != null && options.count_total) totalCount = await countTask;
             var results = GetBookingDynamic(queryResult, projection, options);
-            return new QueryResult<IDictionary<string, object>>()
+            return new QueryResult<object>()
             {
                 Results = results,
                 TotalCount = totalCount
