@@ -8,6 +8,10 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Web;
 using System.Xml.Linq;
+using FPTBooking.Data.Models;
+using System.Security.Claims;
+using FPTBooking.Data;
+using System.Linq;
 
 namespace FPTBooking.Business.Clients
 {
@@ -92,6 +96,30 @@ namespace FPTBooking.Business.Clients
             XDocument doc = XDocument.Parse(respStr);
             return JsonConvert.DeserializeObject<IEnumerable<FAPActivity>>(doc.Element(
                 XName.Get("string", "http://tempuri.org/")).Value);
+        }
+
+        public async Task<List<Booking>> GetFAPOwnerBookingAsync(ClaimsPrincipal principal,
+            Member member,
+            DateTime date)
+        {
+            var list = new List<Booking>();
+            if (member.MemberType.Name == MemberTypeName.STUDENT)
+            {
+                var resp = await Global.FapClient.GetActivityStudent(date, member.Code);
+                list = resp.Select(o => o.ToBooking()).ToList();
+            }
+            else if (member.MemberType.Name == MemberTypeName.TEACHER)
+            {
+                var resp = await Global.FapClient.GetActivityTeacher(date, member.Code);
+                list = resp.Select(o => o.ToBooking()).ToList();
+            }
+            return list;
+        }
+
+        public async Task<List<Booking>> GetFAPScheduleInDateRangeAsync(DateTime fromDate, DateTime toDate)
+        {
+            var list = await GetScheduleInDateRangeAsync(fromDate, toDate, null);
+            return list.Select(o => o.ToBooking(SlotMap)).ToList();
         }
 
         #region IDisposable Support

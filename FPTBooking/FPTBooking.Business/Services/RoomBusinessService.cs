@@ -224,7 +224,7 @@ namespace FPTBooking.Business.Services
         {
             var query = Rooms;
             if (filter != null)
-                query = query.Filter(filter, userId, tempData, context.Booking);
+                query = await query.FilterAsync(filter, userId, tempData, context.Booking);
             int? totalCount = null; Task<int> countTask = null;
             query = query.Project(projection);
             if (options != null && !options.single_only)

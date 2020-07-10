@@ -1,4 +1,5 @@
-﻿using FPTBooking.Business.Models;
+﻿using FPTBooking.Business.Helpers;
+using FPTBooking.Business.Models;
 using FPTBooking.Data.Models;
 using Microsoft.EntityFrameworkCore;
 using System;
@@ -23,6 +24,11 @@ namespace FPTBooking.Business.Queries
         public static bool Exists(this IQueryable<Room> query, string code)
         {
             return query.Any(o => o.Code == code);
+        }
+
+        public static IQueryable<Room> ExceptCodes(this IQueryable<Room> query, IEnumerable<string> codes)
+        {
+            return query.Where(q => !codes.Contains(q.Code));
         }
 
         public static IQueryable<Room> Codes(this IQueryable<Room> query, IEnumerable<string> codes)
@@ -90,7 +96,7 @@ namespace FPTBooking.Business.Queries
         }
 
         #region Query
-        public static IQueryable<Room> Filter(this IQueryable<Room> query, RoomQueryFilter model,
+        public static async Task<IQueryable<Room>> FilterAsync(this IQueryable<Room> query, RoomQueryFilter model,
             string userId,
             IDictionary<string, object> tempData, IQueryable<Booking> bookingQuery)
         {
@@ -100,22 +106,6 @@ namespace FPTBooking.Business.Queries
             var archived = model.archived ?? BoolOptions.F;
             if (archived != BoolOptions.B)
                 query = query.Archived(!(archived == BoolOptions.F));
-            if (model.empty)
-            {
-                //required fields
-                var now = DateTime.UtcNow;
-                //empty room
-                var notAvailableRoom = bookingQuery.ActiveStatus()
-                    .Overlapped(model.date.Value, model.from_time.Value, model.to_time.Value)
-                    .Select(b => b.Room);
-                query = query.Except(notAvailableRoom)
-                    //not hanging by someone else
-                    .NotHangingExcept(now, userId);
-
-                //Already filter below
-                //.Where(o => o.RoomTypeCode == model.room_type)
-                //.Where(o => o.PeopleCapacity >= model.num_of_people);
-            }
             if (model.code != null)
                 query = query.Code(model.code);
             if (model.name_contains != null)
@@ -126,6 +116,29 @@ namespace FPTBooking.Business.Queries
                 query = query.CanHandle(model.num_of_people.Value);
             if (model.search != null)
                 query = query.Search(model.search);
+            if (model.empty)
+            {
+                //required fields
+                var now = DateTime.UtcNow;
+                var notAvailableRoomCode = bookingQuery.ActiveStatus()
+                    .Overlapped(model.date.Value, model.from_time.Value, model.to_time.Value)
+                    .Select(b => b.RoomCode).ToList();
+                var dateLocal = model.date.Value.ToDefaultTimeZone();
+                var fapBookedRoomInDate = await Global.FapClient.GetFAPScheduleInDateRangeAsync(
+                    dateLocal, dateLocal);
+                var fapNotAvailableRoom = fapBookedRoomInDate.AsQueryable()
+                    .ActiveStatus()
+                    .Overlapped(model.date.Value, model.from_time.Value, model.to_time.Value)
+                    .Select(b => b.RoomCode).ToList();
+                notAvailableRoomCode = notAvailableRoomCode.Union(fapNotAvailableRoom).ToList();
+                query = query.ExceptCodes(notAvailableRoomCode)
+                    //not hanging by someone else
+                    .NotHangingExcept(now, userId);
+
+                //Already filter below
+                //.Where(o => o.RoomTypeCode == model.room_type)
+                //.Where(o => o.PeopleCapacity >= model.num_of_people);
+            }
             return query;
         }
 

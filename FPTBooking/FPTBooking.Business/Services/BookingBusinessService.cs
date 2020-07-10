@@ -310,7 +310,8 @@ namespace FPTBooking.Business.Services
                 .OfBookMember(member.UserId)
                 .Project(projection).ToList();
             int? totalCount = null;
-            var fapBookings = await GetFAPOwnerBooking(principal, member, date.ToDefaultTimeZone());
+            var fapBookings = await Global.FapClient
+                .GetFAPOwnerBookingAsync(principal, member, date.ToDefaultTimeZone());
             query.AddRange(fapBookings);
             query = query.AsQueryable().SortOldestBookedDateFirst().ToList();
             if (options != null)
@@ -391,25 +392,6 @@ namespace FPTBooking.Business.Services
                 TotalCount = totalCount
             };
         }
-
-        public async Task<List<Booking>> GetFAPOwnerBooking(ClaimsPrincipal principal,
-            Member member,
-            DateTime date)
-        {
-            var list = new List<Booking>();
-            if (member.MemberType.Name == MemberTypeName.STUDENT)
-            {
-                var resp = await Global.FapClient.GetActivityStudent(date, member.Code);
-                list = resp.Select(o => o.ToBooking()).ToList();
-            }
-            else if (member.MemberType.Name == MemberTypeName.TEACHER)
-            {
-                var resp = await Global.FapClient.GetActivityTeacher(date, member.Code);
-                list = resp.Select(o => o.ToBooking()).ToList();
-            }
-            return list;
-        }
-
         #endregion
 
         #region Validation

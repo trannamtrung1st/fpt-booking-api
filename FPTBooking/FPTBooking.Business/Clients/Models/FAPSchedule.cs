@@ -22,10 +22,8 @@ namespace FPTBooking.Business.Clients.Models
         public string ClassName { get; set; }
         public string SubjectCode { get; set; }
 
-        public Booking ToBooking()
+        public Booking ToBooking(IDictionary<string, ValueTuple<TimeSpan, TimeSpan>> slotMap)
         {
-            var slots = Slot.Substring(1, Slot.Length - 1).Split('-')
-                .Select(o => TimeSpan.ParseExact(o, "h:m", CultureInfo.InvariantCulture)).ToList();
             return new Booking
             {
                 Archived = false,
@@ -40,8 +38,8 @@ namespace FPTBooking.Business.Clients.Models
                 BookedDate = Date,
                 BookMemberId = Booker,
                 DepartmentAccepted = true,
-                FromTime = slots[0],
-                ToTime = slots[1],
+                FromTime = slotMap[Slot].Item1,
+                ToTime = slotMap[Slot].Item2,
                 Note = Note,
                 RoomCode = RoomNo,
             };
