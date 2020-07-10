@@ -105,7 +105,8 @@ namespace FPTBooking.WebApi.Controllers
                                 memberEntity = _memberService.CreateMember(memberEntity);
                                 //log event
                                 var ev = _sysService.GetEventForNewUser(
-                                    $"{memberEntity.Email} has logged into system for the first time", UserId);
+                                    $"{memberEntity.Email} has logged into system for the first time",
+                                    memberEntity.UserId);
                                 _sysService.CreateAppEvent(ev);
                                 //end log event
                                 context.SaveChanges();
