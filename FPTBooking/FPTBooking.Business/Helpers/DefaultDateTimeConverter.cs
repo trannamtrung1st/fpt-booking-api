@@ -12,9 +12,13 @@ namespace FPTBooking.Business.Helpers
 {
     public class DefaultDateTimeConverter : IsoDateTimeConverter
     {
-        public DefaultDateTimeConverter()
+        protected string[] dateFormats;
+        public DefaultDateTimeConverter(string dateFormatsStr)
         {
-            this.DateTimeFormat = AppDateTimeFormat.DEFAULT_DATE_FORMAT;
+            var split = dateFormatsStr?.Split('\t');
+            if (split?.Length == 0)
+                this.DateTimeFormat = AppDateTimeFormat.DEFAULT_DATE_FORMAT;
+            else this.dateFormats = split;
             this.Culture = CultureInfo.InvariantCulture;
             this.DateTimeStyles = DateTimeStyles.None;
         }
@@ -23,10 +27,19 @@ namespace FPTBooking.Business.Helpers
         {
             try
             {
-                var dateTime = base.ReadJson(reader, objectType, existingValue, serializer) as DateTime?;
+                DateTime? dateTime = null;
+                if (this.dateFormats?.Length == 0)
+                    dateTime = base.ReadJson(reader, objectType, existingValue, serializer) as DateTime?;
+                else
+                {
+                    var dateStr = reader.Value as string;
+                    DateTime dt;
+                    if (dateStr.TryConvertToDateTime(dateFormats: this.dateFormats, out dt))
+                        dateTime = dt;
+                }
                 if (dateTime != null)
                     dateTime = dateTime?.ToUtc();
-                return dateTime;
+                return dateTime ?? default;
             }
             catch (Exception)
             {

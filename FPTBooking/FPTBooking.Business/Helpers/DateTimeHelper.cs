@@ -17,6 +17,13 @@ namespace FPTBooking.Business.Helpers
                     provider: CultureInfo.InvariantCulture, style: DateTimeStyles.None, out dateTime);
         }
 
+        public static bool TryConvertToDateTime(this string str, string[] dateFormats, out DateTime dateTime)
+        {
+            return DateTime.TryParseExact(s: str,
+                    formats: dateFormats,
+                    provider: CultureInfo.InvariantCulture, style: DateTimeStyles.None, out dateTime);
+        }
+
         public static bool TryConvertToTimeSpan(this string str, out TimeSpan timeSpan)
         {
             return TimeSpan.TryParse(str, out timeSpan);
