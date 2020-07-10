@@ -11,6 +11,7 @@ namespace FPTBooking.Data.Models
         public const string TBL_NAME = "AspNetUsers";
         public string FullName { get; set; }
         public string PhotoUrl { get; set; }
+        public string MemberCode { get; set; }
 
         public virtual Member Member { get; set; }
     }

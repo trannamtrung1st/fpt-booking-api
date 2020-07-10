@@ -15,6 +15,7 @@ namespace FPTBooking.Data.Models
         }
 
         public string UserId { get; set; }
+        public string Code { get; set; }
         public string Email { get; set; }
         public string Phone { get; set; }
         public string FirstName { get; set; }

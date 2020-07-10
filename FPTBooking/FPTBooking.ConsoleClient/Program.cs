@@ -1,4 +1,4 @@
-﻿using FPTBooking.FAPClient;
+﻿using FPTBooking.Business.Clients;
 using System;
 
 namespace FPTBooking.ConsoleClient

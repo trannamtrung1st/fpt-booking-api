@@ -10,6 +10,7 @@ using FPTBooking.Business.Models;
 using FPTBooking.Business.Services;
 using FPTBooking.Data.Models;
 using TNT.Core.Helpers.DI;
+using FPTBooking.Business.Clients;
 
 namespace FPTBooking.Business
 {
@@ -17,6 +18,7 @@ namespace FPTBooking.Business
     {
         public static Random Random { get; private set; }
         public static IMapper Mapper { get; private set; }
+        public static FptFapClient Client { get; private set; }
 
         private static void InitAutoMapper()
         {
@@ -58,6 +60,8 @@ namespace FPTBooking.Business
         public static void Init(IServiceCollection services)
         {
             Random = new Random();
+            Client = new FptFapClient(Settings.Instance.FapApiUrl);
+            Client.CacheData().Wait();
             InitAutoMapper();
             InitDI(services);
         }

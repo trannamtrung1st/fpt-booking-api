@@ -57,6 +57,7 @@ namespace FPTBooking.Data.Models
                     .IsUnicode(false)
                     .HasMaxLength(100);
                 entity.Property(e => e.FullName).HasMaxLength(255);
+                entity.Property(e => e.MemberCode).HasMaxLength(100).IsUnicode(false);
                 entity.Property(e => e.PhotoUrl).HasMaxLength(1000);
                 entity.HasOne(d => d.Member)
                     .WithOne(p => p.User)
@@ -355,6 +356,8 @@ namespace FPTBooking.Data.Models
             modelBuilder.Entity<Member>(entity =>
             {
                 entity.HasKey(e => e.UserId);
+                entity.Property(e => e.Code)
+                    .HasMaxLength(100).IsUnicode(false);
 
                 entity.HasIndex(e => e.MemberTypeCode);
 

@@ -1,5 +1,5 @@
 ﻿using FPTBooking.Business.Helpers;
-using FPTBooking.FAPClient.Models;
+using FPTBooking.Business.Clients.Models;
 using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
@@ -9,7 +9,7 @@ using System.Threading.Tasks;
 using System.Web;
 using System.Xml.Linq;
 
-namespace FPTBooking.FAPClient
+namespace FPTBooking.Business.Clients
 {
     /// <summary>
     /// This class need updating if FAP service is updated

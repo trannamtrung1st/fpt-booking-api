@@ -25,6 +25,7 @@ namespace FPTBooking.Business
         }
         public CultureInfo[] SupportedCultures { get; set; }
         public string Name { get; set; }
+        public string FapApiUrl { get; set; }
         public bool DevMode { get; set; }
 
         private static Settings _instance;

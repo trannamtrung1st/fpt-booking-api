@@ -6,7 +6,7 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\FPTBooking.FAPClient\FPTBooking.FAPClient.csproj" />
+    <ProjectReference Include="..\FPTBooking.Business\FPTBooking.Business.csproj" />
   </ItemGroup>
 
 </Project>
