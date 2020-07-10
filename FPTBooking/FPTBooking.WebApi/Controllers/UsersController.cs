@@ -41,37 +41,6 @@ namespace FPTBooking.WebApi.Controllers
         [HttpPost("login")]
         public async Task<IActionResult> LogIn(AuthorizationGrantModel model)
         {
-            if (Settings.Instance.Mocking.Enabled)
-            {
-                switch (new Random().Next(1, 7))
-                {
-                    case 1:
-                    case 2:
-                    case 3:
-                    case 4:
-                        return Ok(new
-                        {
-                            user_id = "mockuser",
-                            access_token = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1bmlxdWVfbmFtZSI6ImUxNTIyNWE3LThhZmQtNDAxOC04NWJiLTRiNjBlYWQ2NDQwNiIsInJvbGUiOiJBZG1pbmlzdHJhdG9yIiwianRpIjoiOWM0YTg1OTctMWExZC00YTcwLWE5ZjMtOTYxNDU5MDhjOTE1Iiwic3ViIjoiZTE1MjI1YTctOGFmZC00MDE4LTg1YmItNGI2MGVhZDY0NDA2IiwibmJmIjoxNTkyNTc1MzUxLCJleHAiOjE1OTI2NjE3NTEsImlhdCI6MTU5MjU3NTM1MSwiaXNzIjoidGFyY2gxc3QiLCJhdWQiOiJ0YXJjaDFzdCJ9.jmYWsWCjyx8m_t2e5xa5cg4GSrh8m6pY9kXkEd0qR40",
-                            token_type = "Bearer",
-                            expires_utc = "2020-06-20T14:02:31Z",
-                            issued_utc = "2020-06-19T14:02:31Z",
-                            refresh_token = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1bmlxdWVfbmFtZSI6ImUxNTIyNWE3LThhZmQtNDAxOC04NWJiLTRiNjBlYWQ2NDQwNiIsIm5iZiI6MTU5MjU3NTM1MSwiZXhwIjoxNTkyNTc4OTUxLCJpYXQiOjE1OTI1NzUzNTEsImlzcyI6InJlZnJlc2hfdGFyY2gxc3QiLCJhdWQiOiJyZWZyZXNoX3RhcmNoMXN0In0.PVmWlEsEaYd4xv4t0pNDQh9H_Jp-ZdrLP9u904wlTqo",
-                            email = "trungtnse130097@fpt.edu.vn",
-                            roles = new[]
-                            {
-                                Settings.Instance.Mocking.LoginRole
-                            }
-                        });
-                    case 5:
-                        var vData = new ValidationData();
-                        vData.Fail(code: AppResultCode.NotFound)
-                            .Fail(mess: "Test", code: AppResultCode.FailValidation);
-                        return BadRequest(AppResult.FailValidation(vData));
-                    case 6:
-                        throw new Exception("Test exception");
-                }
-            }
             var validationData = _service.ValidateLogin(User, model);
             if (!validationData.IsValid)
                 return BadRequest(AppResult.FailValidation(data: validationData));

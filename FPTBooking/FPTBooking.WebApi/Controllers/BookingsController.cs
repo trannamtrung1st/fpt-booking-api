@@ -49,103 +49,6 @@ namespace FPTBooking.WebApi.Controllers
             [FromQuery]BookingQueryPaging paging,
             [FromQuery]BookingQueryOptions options)
         {
-            if (Settings.Instance.Mocking.Enabled)
-            {
-                var randomCode = new Random().RandomStringFrom(RandomExtension.Uppers_Digits, 4);
-                var list = new List<object>
-                {
-                    new
-                    {
-                        id = 1,
-                        code = "B2",
-                        booked_date = DateTime.Now.ToString("dd/MM/yyyy"),
-                        from_time = "13:00",
-                        to_time = "14:00",
-                        room = new
-                        {
-                            code = randomCode,
-                            name = randomCode
-                        },
-                        type = "Schedule",
-                    },
-                    new
-                    {
-                        id = 2,
-                        code = "B2",
-                        booked_date = DateTime.Now.ToString("dd/MM/yyyy"),
-                        from_time = "13:00",
-                        to_time = "14:00",
-                        room = new
-                        {
-                            code = randomCode,
-                            name = randomCode
-                        },
-                        type = "Booking",
-                        status = "Processing"
-                    },
-                    new
-                    {
-                        id = 3,
-                        code = "B2",
-                        booked_date = DateTime.Now.ToString("dd/MM/yyyy"),
-                        from_time = "13:00",
-                        to_time = "14:00",
-                        room = new
-                        {
-                            code = randomCode,
-                            name = randomCode
-                        },
-                        type = "Booking",
-                        status = "Approved"
-                    },
-                    new
-                    {
-                        id = 4,
-                        code = "B2",
-                        booked_date = DateTime.Now.ToString("dd/MM/yyyy"),
-                        from_time = "13:00",
-                        to_time = "14:00",
-                        room = new
-                        {
-                            code = randomCode,
-                            name = randomCode
-                        },
-                        type = "Booking",
-                        status = "Denied"
-                    },
-                    new
-                    {
-                        id = 5,
-                        code = "B2",
-                        booked_date = DateTime.Now.ToString("dd/MM/yyyy"),
-                        from_time = "13:00",
-                        to_time = "14:00",
-                        room = new
-                        {
-                            code = randomCode,
-                            name = randomCode
-                        },
-                        type = "Booking",
-                        status = "Finished"
-                    },
-                };
-                list.AddRange(list);
-                list.AddRange(list);
-                switch (new Random().Next(1, 7))
-                {
-                    case 1:
-                    case 2:
-                    case 3:
-                    case 4:
-                        return Ok(AppResult.Success(data: new
-                        {
-                            list = list
-                        }));
-                    case 5:
-                    case 6:
-                        throw new Exception("Test exception");
-                }
-            }
             var validationData = _service.ValidateGetBookings(
                 User, BookingPrincipalRelationship.Owner, filter, sort, projection, paging, options);
             if (!validationData.IsValid)
@@ -167,89 +70,6 @@ namespace FPTBooking.WebApi.Controllers
             [FromQuery]BookingQueryPaging paging,
             [FromQuery]BookingQueryOptions options)
         {
-            if (Settings.Instance.Mocking.Enabled)
-            {
-                var randomCode = new Random().RandomStringFrom(RandomExtension.Uppers_Digits, 4);
-                var list = new List<object>
-                {
-                    new
-                    {
-                        id = 2,
-                        code = "B2",
-                        booked_date = DateTime.Now.ToString("dd/MM/yyyy"),
-                        from_time = "13:00",
-                        to_time = "14:00",
-                        room = new
-                        {
-                            code = randomCode,
-                            name = randomCode
-                        },
-                        type = "Booking",
-                        status = "Processing"
-                    },
-                    new
-                    {
-                        id = 3,
-                        code = "B2",
-                        booked_date = DateTime.Now.ToString("dd/MM/yyyy"),
-                        from_time = "13:00",
-                        to_time = "14:00",
-                        room = new
-                        {
-                            code = randomCode,
-                            name = randomCode
-                        },
-                        type = "Booking",
-                        status = "Approved"
-                    },
-                    new
-                    {
-                        id = 4,
-                        code = "B2",
-                        booked_date = DateTime.Now.ToString("dd/MM/yyyy"),
-                        from_time = "13:00",
-                        to_time = "14:00",
-                        room = new
-                        {
-                            code = randomCode,
-                            name = randomCode
-                        },
-                        type = "Booking",
-                        status = "Denied"
-                    },
-                    new
-                    {
-                        id = 5,
-                        code = "B2",
-                        booked_date = DateTime.Now.ToString("dd/MM/yyyy"),
-                        from_time = "13:00",
-                        to_time = "14:00",
-                        room = new
-                        {
-                            code = randomCode,
-                            name = randomCode
-                        },
-                        type = "Booking",
-                        status = "Finished"
-                    },
-                };
-                list.AddRange(list);
-                list.AddRange(list);
-                switch (new Random().Next(1, 7))
-                {
-                    case 1:
-                    case 2:
-                    case 3:
-                    case 4:
-                    case 5:
-                        return Ok(AppResult.Success(data: new
-                        {
-                            list = list
-                        }));
-                    case 6:
-                        throw new Exception("Test exception");
-                }
-            }
             var validationData = _service.ValidateGetBookings(
                 User, BookingPrincipalRelationship.Manager, filter, sort, projection, paging, options);
             if (!validationData.IsValid)
@@ -266,8 +86,6 @@ namespace FPTBooking.WebApi.Controllers
         [HttpPost("")]
         public async Task<IActionResult> Create(CreateBookingModel model)
         {
-            if (Settings.Instance.Mocking.Enabled)
-                return Ok(AppResult.Success(data: 1));
             var memberQuery = _memberService.Members;
             var member = _memberService.Members.Id(UserId).FirstOrDefault();
             var validationData = _service.ValidateCreateBooking(User, member, model);
@@ -323,8 +141,6 @@ namespace FPTBooking.WebApi.Controllers
         [HttpPost("{id}/cancel")]
         public async Task<IActionResult> CancelBooking(int id, CancelBookingModel model)
         {
-            if (Settings.Instance.Mocking.Enabled)
-                return NoContent();
             var entity = _service.Bookings.Id(id).FirstOrDefault();
             if (entity == null) return NotFound(AppResult.NotFound());
             var validationData = _service.ValidateCancelBooking(User, entity, model);
@@ -377,8 +193,6 @@ namespace FPTBooking.WebApi.Controllers
         [HttpPost("{id}/feedback")]
         public IActionResult FeedbackBooking(int id, FeedbackBookingModel model)
         {
-            if (Settings.Instance.Mocking.Enabled)
-                return NoContent();
             var entity = _service.Bookings.Id(id).FirstOrDefault();
             if (entity == null) return NotFound(AppResult.NotFound());
             var validationData = _service.ValidateFeedbackBooking(User, entity, model);
@@ -408,8 +222,6 @@ namespace FPTBooking.WebApi.Controllers
         [HttpPost("{id}/approval")]
         public async Task<IActionResult> ChangeApproveStatusOfBooking(int id, ChangeApprovalStatusOfBookingModel model)
         {
-            if (Settings.Instance.Mocking.Enabled)
-                return NoContent();
             var entity = _service.Bookings.Id(id).FirstOrDefault();
             if (entity == null) return NotFound(AppResult.NotFound());
             var member = _memberService.Members.Id(UserId).FirstOrDefault();
@@ -459,8 +271,6 @@ namespace FPTBooking.WebApi.Controllers
         [HttpPatch("{id}")]
         public async Task<IActionResult> UpdateBooking(int id, UpdateBookingModel model)
         {
-            if (Settings.Instance.Mocking.Enabled)
-                return NoContent();
             var entity = _service.Bookings.Id(id).FirstOrDefault();
             if (entity == null) return NotFound(AppResult.NotFound());
             var member = _memberService.Members.Id(UserId).FirstOrDefault();
@@ -500,61 +310,6 @@ namespace FPTBooking.WebApi.Controllers
             [FromQuery]BookingQueryProjection projection,
             [FromQuery]BookingQueryOptions options)
         {
-            if (Settings.Instance.Mocking.Enabled)
-            {
-                var rd = new Random();
-                var randomCode = rd.RandomStringFrom(RandomExtension.Uppers_Digits, 4);
-                switch (new Random().Next(1, 7))
-                {
-                    case 1:
-                    case 2:
-                    case 3:
-                    case 4:
-                        return Ok(AppResult.Success(data: new
-                        {
-                            single = new
-                            {
-                                id = 3,
-                                code = "B2",
-                                booked_date = DateTime.Now.ToString("dd/MM/yyyy"),
-                                from_time = "13:00",
-                                to_time = "14:00",
-                                room = new
-                                {
-                                    code = randomCode,
-                                    name = randomCode
-                                },
-                                type = "Booking",
-                                status = "Approved",
-                                num_of_people = rd.Next(1, 15),
-                                attached_services = new List<object>
-                                {
-                                    new
-                                    {
-                                        code = "TB",
-                                        name = "Tea-break"
-                                    }
-                                },
-                                book_member = new
-                                {
-                                    user_id = "user1",
-                                    email = "trungtnser130@fpt.edu.vn"
-                                },
-                                using_emails = new List<string>()
-                                {
-                                    "trungtnser130@fpt.edu.vn",
-                                    "abdeq@fpt.edu.vn"
-                                },
-                                note = "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed nec cursus urna, quis accumsan eros. Proin et neque dignissim nulla elementum sodales nec quis magna. In eu malesuada nulla. Fusce pulvinar sem non neque imperdiet maximus. Sed eu ornare nisi, sit amet mattis leo. Etiam consequat arcu sed efficitur faucibus",
-                                feedback = "This is the latest feedback",
-                                manager_message = "This is the manager message"
-                            }
-                        }));
-                    case 5:
-                    case 6:
-                        throw new Exception("Test exception");
-                }
-            }
             var getManagerType = projection.GetFieldsArr().Contains(BookingQueryProjection.MANAGER_TYPE);
             projection = new BookingQueryProjection { fields = BookingQueryProjection.DETAIL };
             var entity = _service.GetBookingDetail(id, projection);

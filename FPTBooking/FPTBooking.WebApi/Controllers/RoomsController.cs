@@ -50,82 +50,6 @@ namespace FPTBooking.WebApi.Controllers
             [FromQuery]RoomQueryPaging paging,
             [FromQuery]RoomQueryOptions options)
         {
-            if (Settings.Instance.Mocking.Enabled)
-            {
-                var rd = new Random();
-                Func<string> randomCode = () =>
-                    rd.RandomStringFrom(RandomExtension.Uppers_Digits, 4);
-                var list = new List<object>
-                {
-                    new
-                    {
-                        code = randomCode(),
-                        name = randomCode(),
-                        area_size = rd.Next(10, 30),
-                        people_capacity= rd.Next(10, 30),
-                        room_type = new
-                        {
-                            code = "Classroom",
-                            name = "Classroom"
-                        },
-                        is_available = true,
-                    },
-                    new
-                    {
-                        code = randomCode(),
-                        name = randomCode(),
-                        area_size = rd.Next(10, 30),
-                        people_capacity= rd.Next(10, 30),
-                        room_type = new
-                        {
-                            code = "Classroom",
-                            name = "Classroom"
-                        },
-                        is_available = true,
-                    },
-                    new
-                    {
-                        code = randomCode(),
-                        name = randomCode(),
-                        area_size = rd.Next(10, 30),
-                        people_capacity= rd.Next(10, 30),
-                        room_type = new
-                        {
-                            code = "Classroom",
-                            name = "Classroom"
-                        },
-                        is_available = true,
-                    },
-                    new
-                    {
-                        code = randomCode(),
-                        name = randomCode(),
-                        area_size = rd.Next(10, 30),
-                        people_capacity= rd.Next(10, 30),
-                        room_type = new
-                        {
-                            code = "Classroom",
-                            name = "Classroom"
-                        },
-                        is_available = true,
-                    },
-                };
-                list.AddRange(list);
-                switch (new Random().Next(1, 7))
-                {
-                    case 1:
-                    case 2:
-                    case 3:
-                    case 4:
-                        return Ok(AppResult.Success(data: new
-                        {
-                            list = list
-                        }));
-                    case 5:
-                    case 6:
-                        throw new Exception("Test exception");
-                }
-            }
             var validationData = _service.ValidateGetRooms(
                 filter, sort, projection, paging, options);
             if (!validationData.IsValid)
@@ -145,76 +69,6 @@ namespace FPTBooking.WebApi.Controllers
             [FromQuery]RoomQueryOptions options,
             bool hanging = false)
         {
-            if (Settings.Instance.Mocking.Enabled)
-            {
-                var rd = new Random();
-                var randomCode = rd.RandomStringFrom(RandomExtension.Uppers_Digits, 4);
-                switch (new Random().Next(1, 7))
-                {
-                    case 1:
-                    case 2:
-                    case 3:
-                    case 4:
-                        return Ok(AppResult.Success(data: new
-                        {
-                            single = new
-                            {
-                                code = randomCode,
-                                name = randomCode,
-                                area_size = rd.Next(10, 30),
-                                people_capacity = rd.Next(10, 30),
-                                description = "This is the room description",
-                                room_type = new
-                                {
-                                    code = "CR",
-                                    name = "Classroom"
-                                },
-                                block = new
-                                {
-                                    code = "B1",
-                                    name = "Block 1"
-                                },
-                                level = new
-                                {
-                                    code = "F1",
-                                    name = "Floor 1"
-                                },
-                                is_available = true,
-                                area = new
-                                {
-                                    code = "CR",
-                                    name = "Classroom"
-                                },
-                                department = new
-                                {
-                                    code = "D1",
-                                    name = "Department of Education"
-                                },
-                                resources = new List<object>
-                                {
-                                    new
-                                    {
-                                        id = 1,
-                                        code = "PRJ",
-                                        name = "Projector",
-                                        is_available = true,
-                                    },
-                                    new
-                                    {
-                                        id = 2,
-                                        code = "SCR",
-                                        name = "Display screen",
-                                        is_available = false,
-                                    }
-                                },
-                                note = "This is note from Room checker"
-                            }
-                        }));
-                    case 5:
-                    case 6:
-                        throw new Exception("Test exception");
-                }
-            }
             var checkerValid = projection.GetFieldsArr().Contains(RoomQueryProjection.CHECKER_VALID);
             projection = new RoomQueryProjection { fields = RoomQueryProjection.DETAIL };
             var entity = _service.GetRoomDetail(code, projection);
@@ -247,8 +101,6 @@ namespace FPTBooking.WebApi.Controllers
         public async Task<IActionResult> CheckRoomStatus(string code,
             CheckRoomStatusModel model)
         {
-            if (Settings.Instance.Mocking.Enabled)
-                return NoContent();
             var entity = _service.Rooms.Code(code).FirstOrDefault();
             if (entity == null) return NotFound(AppResult.NotFound());
             var validationData = _service.ValidateCheckRoomStatus(User, entity, model);
@@ -294,8 +146,6 @@ namespace FPTBooking.WebApi.Controllers
         public IActionResult ChangeRoomHangingStatus(
             ChangeRoomHangingStatusModel model)
         {
-            if (Settings.Instance.Mocking.Enabled)
-                return NoContent();
             Room entity = null;
             if (model.Code != null)
             {

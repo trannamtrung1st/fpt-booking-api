@@ -442,7 +442,7 @@ namespace FPTBooking.Business.Services
             {
                 decodedToken = await FirebaseAuth.DefaultInstance.VerifyIdTokenAsync(tokenStr);
             }
-            catch (FirebaseAuthException ex)
+            catch (FirebaseAuthException)
             {
             }
             return decodedToken;
@@ -450,9 +450,7 @@ namespace FPTBooking.Business.Services
 
         public bool ValidateEmailDomain(string email)
         {
-#if !RELEASE
-            return true;
-#endif
+            if (Settings.Instance.DevMode) return true;
             string[] emails = email.Trim().Split("@");
             if (emails.Length == 2)
                 return emails[1] == AllowedEmailDomains.FPT_DOMAIN;
