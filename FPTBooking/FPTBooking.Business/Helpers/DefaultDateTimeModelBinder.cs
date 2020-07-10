@@ -71,7 +71,7 @@ namespace FPTBooking.Business.Helpers
             var modelName = GetModelName(bindingContext);
 
             var paramDescriptor = bindingContext.ActionContext.ActionDescriptor.Parameters
-                .Where(x => x.ParameterType == typeof(DateTime?))
+                .Where(x => SUPPORTED_TYPES.Contains(x.ParameterType))
                 .Where((x) =>
                 {
                     // See comment in GetModelName() on why we do this.

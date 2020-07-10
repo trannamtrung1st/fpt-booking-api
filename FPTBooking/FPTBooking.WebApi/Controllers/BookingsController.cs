@@ -60,6 +60,23 @@ namespace FPTBooking.WebApi.Controllers
             return Ok(AppResult.Success(data: result));
         }
 
+        [Authorize]
+        [HttpGet("calendar")]
+        public async Task<IActionResult> GetCalendar(
+            [FromQuery][DefaultDateTimeModelBinder]DateTime date,
+            [FromQuery]BookingQueryProjection projection,
+            [FromQuery]BookingQueryOptions options)
+        {
+            var validationData = _service.ValidateGetOwnerBookings(
+                User, date, projection, options);
+            if (!validationData.IsValid)
+                return BadRequest(AppResult.FailValidation(data: validationData));
+            var member = _memberService.Members.Id(UserId).FirstOrDefault();
+            var result = await _service.QueryCalendarDynamic(User, member, projection,
+                date, validationData.TempData, options);
+            return Ok(AppResult.Success(data: result));
+        }
+
 #if !DEBUG
         [Authorize(Roles = RoleName.MANAGER)]
 #endif

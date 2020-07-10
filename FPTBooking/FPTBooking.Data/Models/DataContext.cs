@@ -415,10 +415,21 @@ namespace FPTBooking.Data.Models
                     new MemberType
                     {
                         Archived = false,
-                        Code = "GENERAL",
-                        Name = "General",
-                        Description = "General member type of user"
-                    }
+                        Code = MemberTypeName.GENERAL,
+                        Name = MemberTypeName.GENERAL,
+                    },
+                    new MemberType
+                    {
+                        Archived = false,
+                        Code = MemberTypeName.STUDENT,
+                        Name = MemberTypeName.STUDENT,
+                    },
+                    new MemberType
+                    {
+                        Archived = false,
+                        Code = MemberTypeName.TEACHER,
+                        Name = MemberTypeName.TEACHER,
+                    },
                 });
             });
 

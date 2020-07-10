@@ -111,6 +111,8 @@ namespace FPTBooking.Business.Models
         public string photo_url { get; set; }
         [JsonProperty("is_view_only_user")]
         public bool is_view_only_user { get; set; }
+        [JsonProperty("member_code")]
+        public string member_code { get; set; }
         //--- End extra ---
 
         [JsonProperty("access_token")]

@@ -45,6 +45,7 @@ namespace FPTBooking.Business
     {
         public const string UserName = "username";
         public const string PhotoUrl = "photo_url";
+        public const string MemberCode = "member_code";
     }
 
     public static class AppOAuthScope
@@ -93,6 +94,7 @@ namespace FPTBooking.Business
     public static class BookingTypeValues
     {
         public const string BOOKING = "Booking";
+        public const string SCHEDULE = "Schedule";
     }
 
     public static class BookingStatusValues

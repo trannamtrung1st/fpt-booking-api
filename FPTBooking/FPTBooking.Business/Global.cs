@@ -18,7 +18,7 @@ namespace FPTBooking.Business
     {
         public static Random Random { get; private set; }
         public static IMapper Mapper { get; private set; }
-        public static FptFapClient Client { get; private set; }
+        public static FptFapClient FapClient { get; private set; }
 
         private static void InitAutoMapper()
         {
@@ -60,8 +60,9 @@ namespace FPTBooking.Business
         public static void Init(IServiceCollection services)
         {
             Random = new Random();
-            Client = new FptFapClient(Settings.Instance.FapApiUrl);
-            Client.CacheData().Wait();
+            FapClient = new FptFapClient(Settings.Instance.FapApiUrl);
+            FapClient.CacheData().Wait();
+            services.AddSingleton(FapClient);
             InitAutoMapper();
             InitDI(services);
         }

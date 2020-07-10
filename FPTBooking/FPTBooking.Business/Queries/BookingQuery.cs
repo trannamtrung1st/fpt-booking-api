@@ -145,12 +145,12 @@ namespace FPTBooking.Business.Queries
             return query.Where(o => o.SentDate.Date < nextDate.Date);
         }
 
-        public static IQueryable<Booking> SortLatestBookedDate(this IQueryable<Booking> query)
+        public static IQueryable<Booking> SortOldestBookedDateFirst(this IQueryable<Booking> query)
         {
             return query.OrderBy(o => o.BookedDate).OrderBy(o => o.FromTime);
         }
 
-        public static IQueryable<Booking> SortOldestBookedDate(this IQueryable<Booking> query)
+        public static IQueryable<Booking> SortLatestBookedDateFirst(this IQueryable<Booking> query)
         {
             return query.OrderByDescending(o => o.BookedDate).OrderByDescending(o => o.FromTime);
         }
@@ -187,8 +187,8 @@ namespace FPTBooking.Business.Queries
                 {
                     case BookingQuerySort.BOOKED_DATE:
                         {
-                            if (asc) query = query.SortLatestBookedDate();
-                            else query = query.SortOldestBookedDate();
+                            if (asc) query = query.SortOldestBookedDateFirst();
+                            else query = query.SortLatestBookedDateFirst();
                         }
                         break;
                     case BookingQuerySort.SENT_DATE:

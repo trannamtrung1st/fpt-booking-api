@@ -170,6 +170,8 @@ namespace FPTBooking.Business.Services
             var claims = new List<Claim>();
             claims.Add(new Claim(AppClaimType.UserName, entity.UserName));
             claims.Add(new Claim(AppClaimType.PhotoUrl, entity.PhotoUrl));
+            if (entity.MemberCode != null)
+                claims.Add(new Claim(AppClaimType.MemberCode, entity.MemberCode));
             claims.Add(new Claim(ClaimTypes.Email, entity.Email));
             return claims;
         }
@@ -289,6 +291,7 @@ namespace FPTBooking.Business.Services
             resp.is_view_only_user = _memberService.Members.IsViewOnlyUser().Id(identity.Name).Any();
             resp.email = identity.FindFirst(ClaimTypes.Email)?.Value;
             resp.photo_url = identity.FindFirst(AppClaimType.PhotoUrl)?.Value;
+            resp.member_code = identity.FindFirst(AppClaimType.MemberCode)?.Value;
             resp.access_token = tokenString;
             resp.token_type = "bearer";
             if (properties.ExpiresUtc != null)

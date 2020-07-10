@@ -13,14 +13,18 @@ namespace FPTBooking.Business.Helpers
     public class DefaultDateTimeConverter : IsoDateTimeConverter
     {
         protected string[] dateFormats;
-        public DefaultDateTimeConverter(string dateFormatsStr)
+        public DefaultDateTimeConverter()
         {
-            var split = dateFormatsStr?.Split('\t');
-            if (split?.Length == 0)
-                this.DateTimeFormat = AppDateTimeFormat.DEFAULT_DATE_FORMAT;
-            else this.dateFormats = split;
             this.Culture = CultureInfo.InvariantCulture;
             this.DateTimeStyles = DateTimeStyles.None;
+            this.DateTimeFormat = AppDateTimeFormat.DEFAULT_DATE_FORMAT;
+        }
+
+        public DefaultDateTimeConverter(string dateFormatsStr) : this()
+        {
+            var split = dateFormatsStr?.Split('\t');
+            if (split?.Length > 0)
+                this.dateFormats = split;
         }
 
         public override object ReadJson(JsonReader reader, Type objectType, object existingValue, JsonSerializer serializer)
@@ -28,7 +32,7 @@ namespace FPTBooking.Business.Helpers
             try
             {
                 DateTime? dateTime = null;
-                if (this.dateFormats?.Length == 0)
+                if (this.dateFormats == null)
                     dateTime = base.ReadJson(reader, objectType, existingValue, serializer) as DateTime?;
                 else
                 {

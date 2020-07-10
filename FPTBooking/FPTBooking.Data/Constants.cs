@@ -19,5 +19,12 @@ namespace FPTBooking.Data
         public const string ROOM_CHECKER = "RoomChecker";
     }
 
+    public static class MemberTypeName
+    {
+        public const string TEACHER = "Teacher";
+        public const string STUDENT = "Student";
+        public const string GENERAL = "Employee";
+    }
+
 
 }

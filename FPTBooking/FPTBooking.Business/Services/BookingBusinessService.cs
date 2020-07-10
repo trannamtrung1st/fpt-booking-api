@@ -201,7 +201,7 @@ namespace FPTBooking.Business.Services
                                 display = timeStr,
                                 iso = $"{finishTime.ToUtc():s}Z"
                             };
-                            obj["type"] = BookingTypeValues.BOOKING;
+                            obj["type"] = entity.Id != 0 ? BookingTypeValues.BOOKING : BookingTypeValues.SCHEDULE;
                             obj["status"] = entity.Status;
                             obj["archived"] = entity.Archived;
                             obj["book_member_id"] = entity.BookMemberId;
@@ -221,16 +221,17 @@ namespace FPTBooking.Business.Services
                     case BookingQueryProjection.ROOM:
                         {
                             var entity = row.Room;
-                            obj["room"] = new
-                            {
-                                code = entity.Code,
-                                name = entity.Name
-                            };
+                            if (entity != null)
+                                obj["room"] = new
+                                {
+                                    code = entity.Code,
+                                    name = entity.Name
+                                };
                         }
                         break;
                     case BookingQueryProjection.SERVICES:
                         {
-                            var entities = row.AttachedService
+                            var entities = row.AttachedService?
                                 .Select(o => new
                                 {
                                     id = o.Id,
@@ -243,19 +244,24 @@ namespace FPTBooking.Business.Services
                     case BookingQueryProjection.MEMBER:
                         {
                             var entity = row.BookMember;
-                            obj["book_member"] = new
-                            {
-                                user_id = entity.UserId,
-                                email = entity.Email
-                            };
+                            if (entity != null)
+                                obj["book_member"] = new
+                                {
+                                    user_id = entity.UserId,
+                                    email = entity.Email,
+                                    code = entity.Code
+                                };
                         }
                         break;
                     case BookingQueryProjection.USING_EMAILS:
                         {
-                            var ids = row.UsingMemberIds.Split('\n');
-                            var usingEmails = _memberService.Members.Ids(ids)
-                                .Select(o => o.Email).ToList();
-                            obj["using_emails"] = usingEmails;
+                            if (row.UsingMemberIds != null)
+                            {
+                                var ids = row.UsingMemberIds.Split('\n');
+                                var usingEmails = _memberService.Members.Ids(ids)
+                                    .Select(o => o.Email).ToList();
+                                obj["using_emails"] = usingEmails;
+                            }
                         }
                         break;
                 }
@@ -291,6 +297,35 @@ namespace FPTBooking.Business.Services
             return query;
         }
 
+        public async Task<QueryResult<object>> QueryCalendarDynamic(
+            ClaimsPrincipal principal,
+            Member member,
+            BookingQueryProjection projection,
+            DateTime date,
+            IDictionary<string, object> tempData = null,
+            BookingQueryOptions options = null)
+        {
+            var query = Bookings
+                .BookedDate(date)
+                .OfBookMember(member.UserId)
+                .Project(projection).ToList();
+            int? totalCount = null;
+            var fapBookings = await GetFAPOwnerBooking(principal, member, date.ToDefaultTimeZone());
+            query.AddRange(fapBookings);
+            query = query.AsQueryable().SortOldestBookedDateFirst().ToList();
+            if (options != null)
+            {
+                if (options.count_total)
+                    totalCount = query.Count;
+            }
+            var results = GetBookingDynamic(query, projection, options);
+            return new QueryResult<object>()
+            {
+                Results = results,
+                TotalCount = totalCount
+            };
+        }
+
         public async Task<QueryResult<object>> QueryBookingDynamic(
             ClaimsPrincipal principal,
             Member member,
@@ -320,7 +355,9 @@ namespace FPTBooking.Business.Services
             }
             //-------------------------
             if (filter != null)
+            {
                 query = query.Filter(filter, tempData);
+            }
             int? totalCount = null; Task<int> countTask = null;
             query = query.Project(projection);
             if (options != null && !options.single_only)
@@ -354,9 +391,38 @@ namespace FPTBooking.Business.Services
                 TotalCount = totalCount
             };
         }
+
+        public async Task<List<Booking>> GetFAPOwnerBooking(ClaimsPrincipal principal,
+            Member member,
+            DateTime date)
+        {
+            var list = new List<Booking>();
+            if (member.MemberType.Name == MemberTypeName.STUDENT)
+            {
+                var resp = await Global.FapClient.GetActivityStudent(date, member.Code);
+                list = resp.Select(o => o.ToBooking()).ToList();
+            }
+            else if (member.MemberType.Name == MemberTypeName.TEACHER)
+            {
+                var resp = await Global.FapClient.GetActivityTeacher(date, member.Code);
+                list = resp.Select(o => o.ToBooking()).ToList();
+            }
+            return list;
+        }
+
         #endregion
 
         #region Validation
+        public ValidationData ValidateGetOwnerBookings(
+            ClaimsPrincipal principal,
+            DateTime date,
+            BookingQueryProjection projection,
+            BookingQueryOptions options)
+        {
+            var validationData = new ValidationData();
+            return validationData;
+        }
+
         public ValidationData ValidateGetBookings(
             ClaimsPrincipal principal,
             BookingPrincipalRelationship relationship,
