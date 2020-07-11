@@ -338,7 +338,7 @@ namespace FPTBooking.Business.Services
             BookingQueryPaging paging = null,
             BookingQueryOptions options = null)
         {
-            var query = Bookings;
+            var query = Bookings.AsNoTracking();
             //---- multi-tenants ------
             if (principal != null)
             {
@@ -360,6 +360,7 @@ namespace FPTBooking.Business.Services
                 query = query.Filter(filter, tempData);
             }
             int? totalCount = null; Task<int> countTask = null;
+            var countQuery = query;
             query = query.Project(projection);
             if (options != null && !options.single_only)
             {
@@ -370,9 +371,10 @@ namespace FPTBooking.Business.Services
                 #endregion
                 #region Count query
                 if (options.count_total)
-                    countTask = query.CountAsync();
+                    countTask = countQuery.CountAsync();
                 #endregion
             }
+            if (options != null && options.count_total) totalCount = await countTask;
             var queryResult = await query.ToListAsync();
             if (options != null && options.single_only)
             {
@@ -384,7 +386,6 @@ namespace FPTBooking.Business.Services
                     SingleResult = singleResult
                 };
             }
-            if (options != null && options.count_total) totalCount = await countTask;
             var results = GetBookingDynamic(queryResult, projection, options);
             return new QueryResult<object>()
             {
@@ -415,6 +416,9 @@ namespace FPTBooking.Business.Services
             BookingQueryOptions options)
         {
             var validationData = new ValidationData();
+            if (filter.to_date != null && filter.from_date != null &&
+                filter.to_date.Value.Subtract(filter.from_date.Value).TotalDays > 31)
+                validationData.Fail(mess: "Only 1 month range is allowed", code: AppResultCode.FailValidation);
             return validationData;
         }
 

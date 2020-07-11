@@ -237,7 +237,7 @@ namespace FPTBooking.Business.Models
         public bool single_only { get; set; }
         public bool load_all { get; set; }
 
-        public const bool IsLoadAllAllowed = true;
+        public const bool IsLoadAllAllowed = false;
         public const string GROUP_BY_DATE = "date";
     }
 

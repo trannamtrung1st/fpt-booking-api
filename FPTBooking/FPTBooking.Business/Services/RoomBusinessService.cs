@@ -222,10 +222,11 @@ namespace FPTBooking.Business.Services
             RoomQueryPaging paging = null,
             RoomQueryOptions options = null)
         {
-            var query = Rooms;
+            var query = Rooms.AsNoTracking();
             if (filter != null)
                 query = await query.FilterAsync(filter, userId, tempData, context.Booking);
             int? totalCount = null; Task<int> countTask = null;
+            var countQuery = query;
             query = query.Project(projection);
             if (options != null && !options.single_only)
             {
@@ -236,9 +237,10 @@ namespace FPTBooking.Business.Services
                 #endregion
                 #region Count query
                 if (options.count_total)
-                    countTask = query.CountAsync();
+                    countTask = countQuery.CountAsync();
                 #endregion
             }
+            if (options != null && options.count_total) totalCount = await countTask;
             var queryResult = await query.ToListAsync();
             if (options != null && options.single_only)
             {
@@ -250,7 +252,6 @@ namespace FPTBooking.Business.Services
                     SingleResult = singleResult
                 };
             }
-            if (options != null && options.count_total) totalCount = await countTask;
             var results = GetRoomDynamic(queryResult, projection, options);
             return new QueryResult<IDictionary<string, object>>()
             {
