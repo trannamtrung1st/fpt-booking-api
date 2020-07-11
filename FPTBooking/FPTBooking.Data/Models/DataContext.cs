@@ -31,8 +31,6 @@ namespace FPTBooking.Data.Models
         public virtual DbSet<DepartmentMember> DepartmentMember { get; set; }
         public virtual DbSet<Member> Member { get; set; }
         public virtual DbSet<MemberType> MemberType { get; set; }
-        public virtual DbSet<Resource> Resource { get; set; }
-        public virtual DbSet<ResourceCategory> ResourceCategory { get; set; }
         public virtual DbSet<Room> Room { get; set; }
         public virtual DbSet<RoomResource> RoomResource { get; set; }
         public virtual DbSet<RoomType> RoomType { get; set; }
@@ -256,6 +254,17 @@ namespace FPTBooking.Data.Models
                 entity.Property(e => e.Name)
                     .IsRequired()
                     .HasMaxLength(255);
+
+                entity.HasData(new[]
+                {
+                    new BookingService
+                    {
+                        Archived = false,
+                        Code = "TB",
+                        Name = "Tea-break",
+                        Description = "Tea-break party in break time"
+                    }
+                });
             });
 
             modelBuilder.Entity<BookingUsage>(entity =>
@@ -274,6 +283,24 @@ namespace FPTBooking.Data.Models
                 entity.Property(e => e.Name)
                     .IsRequired()
                     .HasMaxLength(255);
+
+                entity.HasData(new[]
+                {
+                    new BuildingArea
+                    {
+                        Archived = false,
+                        Code = "CR",
+                        Description = "This is classroom area",
+                        Name = "Classroom",
+                    },
+                    new BuildingArea
+                    {
+                        Archived = false,
+                        Code = "LUK",
+                        Description = "This is Litte UK area",
+                        Name = "Little UK",
+                    },
+                });
             });
 
             modelBuilder.Entity<BuildingBlock>(entity =>
@@ -323,6 +350,17 @@ namespace FPTBooking.Data.Models
                 entity.Property(e => e.Name)
                     .IsRequired()
                     .HasMaxLength(100);
+
+                entity.HasData(new[]
+                {
+                    new Department
+                    {
+                        Archived = false,
+                        Code = "DOE",
+                        Description = "This is department of education",
+                        Name = "Department of Education",
+                    }
+                });
             });
 
             modelBuilder.Entity<DepartmentMember>(entity =>
@@ -433,36 +471,6 @@ namespace FPTBooking.Data.Models
                 });
             });
 
-            modelBuilder.Entity<Resource>(entity =>
-            {
-                entity.HasIndex(e => e.ResourceCategoryId);
-
-                entity.Property(e => e.Code)
-                    .HasMaxLength(100)
-                    .IsUnicode(false);
-
-                entity.Property(e => e.Description).HasMaxLength(500);
-
-                entity.Property(e => e.Name).HasMaxLength(255);
-
-                entity.HasOne(d => d.ResourceCategory)
-                    .WithMany(p => p.Resource)
-                    .HasForeignKey(d => d.ResourceCategoryId)
-                    .OnDelete(DeleteBehavior.ClientSetNull)
-                    .HasConstraintName("FK_ResourceCategory_Resource");
-            });
-
-            modelBuilder.Entity<ResourceCategory>(entity =>
-            {
-                entity.Property(e => e.Code)
-                    .HasMaxLength(100)
-                    .IsUnicode(false);
-
-                entity.Property(e => e.Description).HasMaxLength(500);
-
-                entity.Property(e => e.Name).HasMaxLength(255);
-            });
-
             modelBuilder.Entity<Room>(entity =>
             {
                 entity.HasKey(e => e.Code);
@@ -486,15 +494,12 @@ namespace FPTBooking.Data.Models
                     .HasMaxLength(100);
 
                 entity.Property(e => e.BuildingBlockCode)
-                    .IsRequired()
                     .HasMaxLength(100);
 
                 entity.Property(e => e.BuildingLevelCode)
-                    .IsRequired()
                     .HasMaxLength(100);
 
                 entity.Property(e => e.DepartmentCode)
-                    .IsRequired()
                     .HasMaxLength(100);
 
                 entity.Property(e => e.Description).HasMaxLength(2000);
@@ -551,6 +556,17 @@ namespace FPTBooking.Data.Models
                 entity.Property(e => e.Name)
                     .IsRequired()
                     .HasMaxLength(255);
+
+                entity.HasData(new[]
+                {
+                    new RoomType
+                    {
+                        Archived = false,
+                        Code = "CR",
+                        Description = "This is a classroom",
+                        Name = "Classroom",
+                    }
+                });
             });
 
             modelBuilder.Entity<RoomTypeService>(entity =>
@@ -574,6 +590,16 @@ namespace FPTBooking.Data.Models
                 entity.HasOne(d => d.RoomType)
                     .WithMany(p => p.RoomTypeService)
                     .HasForeignKey(d => d.RoomTypeCode);
+
+                entity.HasData(new[]
+                {
+                    new RoomTypeService
+                    {
+                        BookingServiceCode = "TB",
+                        Id = 1,
+                        RoomTypeCode = "CR"
+                    }
+                });
             });
 
             modelBuilder.Entity<UsageOfBooking>(entity =>

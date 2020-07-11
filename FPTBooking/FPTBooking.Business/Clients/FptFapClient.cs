@@ -36,7 +36,7 @@ namespace FPTBooking.Business.Clients
 
         public async Task CacheData()
         {
-            var slots = await GetAllSlot();
+            var slots = await GetAllSlots();
             foreach (var o in slots)
             {
                 SlotMap[o.Slot.ToString()] = (new TimeSpan(o.StartHour, o.StartMinute, 0),
@@ -44,7 +44,7 @@ namespace FPTBooking.Business.Clients
             }
         }
 
-        public async Task<IEnumerable<FAPSlot>> GetAllSlot()
+        public async Task<IEnumerable<FAPSlot>> GetAllSlots()
         {
             var query = HttpUtility.ParseQueryString(string.Empty);
             query["key"] = this.key;
@@ -52,6 +52,17 @@ namespace FPTBooking.Business.Clients
             var respStr = await http.GetStringAsync($"/Slotview.asmx/GetAllSlot?{queryString}");
             XDocument doc = XDocument.Parse(respStr);
             return JsonConvert.DeserializeObject<IEnumerable<FAPSlot>>(doc.Element(
+                XName.Get("string", "http://tempuri.org/")).Value);
+        }
+
+        public async Task<IEnumerable<FAPRoom>> GetAllRooms()
+        {
+            var query = HttpUtility.ParseQueryString(string.Empty);
+            query["key"] = this.key;
+            string queryString = query.ToString();
+            var respStr = await http.GetStringAsync($"/Slotview.asmx/GetOneAllRoome?{queryString}");
+            XDocument doc = XDocument.Parse(respStr);
+            return JsonConvert.DeserializeObject<IEnumerable<FAPRoom>>(doc.Element(
                 XName.Get("string", "http://tempuri.org/")).Value);
         }
 

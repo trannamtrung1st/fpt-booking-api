@@ -1,5 +1,11 @@
 ﻿using FPTBooking.Business.Clients;
+using FPTBooking.Business.Clients.Models;
+using FPTBooking.Data;
+using FPTBooking.Data.Models;
+using Microsoft.EntityFrameworkCore;
 using System;
+using System.Collections.Generic;
+using System.Linq;
 
 namespace FPTBooking.ConsoleClient
 {
@@ -14,10 +20,26 @@ namespace FPTBooking.ConsoleClient
                 //    new DateTime(2020, 7, 10),
                 //    "KhanhT").Result;
 
-                //var test = fapClient.GetAllSlot().Result;
-                fapClient.CacheData().Wait();
-                var test = fapClient.GetActivityTeacher(DateTime.Now, "KhanhT").Result;
-                test = fapClient.GetActivityStudent(DateTime.Now, "SE130097").Result;
+                //var test = fapClient.GetAllSlots().Result;
+                //fapClient.CacheData().Wait();
+                //var test = fapClient.GetActivityTeacher(DateTime.Now, "KhanhT").Result;
+                //test = fapClient.GetActivityStudent(DateTime.Now, "SE130097").Result;
+                //InsertRooms(fapClient);
+            }
+        }
+
+        static void InsertRooms(FptFapClient fapClient)
+        {
+            var fapRooms = fapClient.GetAllRooms().Result;
+            var rooms = fapRooms.Select(o => o.ToRoom())
+                .Distinct(new RoomComparer()).ToList();
+            var builder = new DbContextOptionsBuilder<DataContext>().UseSqlServer(
+                DataConsts.CONN_STR);
+            var options = builder.Options;
+            using (var context = new DataContext(options))
+            {
+                context.Room.AddRange(rooms);
+                context.SaveChanges();
             }
         }
     }

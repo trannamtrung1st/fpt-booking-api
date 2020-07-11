@@ -85,28 +85,28 @@ namespace FPTBooking.Data.Migrations
                         new
                         {
                             Id = "Administrator",
-                            ConcurrencyStamp = "b6110651-9ef8-4353-8bac-511a01a4587a",
+                            ConcurrencyStamp = "32a269dc-0522-4a6b-b156-ea768e037760",
                             Name = "Administrator",
                             NormalizedName = "ADMINISTRATOR"
                         },
                         new
                         {
                             Id = "Manager",
-                            ConcurrencyStamp = "dcc76927-4095-43f7-b1d9-dc0d5e04661e",
+                            ConcurrencyStamp = "aa4039a1-c341-4edd-8410-8a69093008c3",
                             Name = "Manager",
                             NormalizedName = "MANAGER"
                         },
                         new
                         {
                             Id = "RoomChecker",
-                            ConcurrencyStamp = "f018d3c2-3da3-4033-8da5-5f0aaf32abd0",
+                            ConcurrencyStamp = "ff2dabea-d86d-476a-aff0-8c41dcd53759",
                             Name = "RoomChecker",
                             NormalizedName = "ROOMCHECKER"
                         },
                         new
                         {
                             Id = "User",
-                            ConcurrencyStamp = "ab32b32d-b799-4248-b3cc-806557ea6b10",
+                            ConcurrencyStamp = "e2e50649-3008-4534-ab56-b8d76bf4b441",
                             Name = "User",
                             NormalizedName = "USER"
                         });
@@ -390,6 +390,15 @@ namespace FPTBooking.Data.Migrations
                     b.HasKey("Code");
 
                     b.ToTable("BookingService");
+
+                    b.HasData(
+                        new
+                        {
+                            Code = "TB",
+                            Archived = false,
+                            Description = "Tea-break party in break time",
+                            Name = "Tea-break"
+                        });
                 });
 
             modelBuilder.Entity("FPTBooking.Data.Models.BookingUsage", b =>
@@ -435,6 +444,22 @@ namespace FPTBooking.Data.Migrations
                     b.HasKey("Code");
 
                     b.ToTable("BuildingArea");
+
+                    b.HasData(
+                        new
+                        {
+                            Code = "CR",
+                            Archived = false,
+                            Description = "This is classroom area",
+                            Name = "Classroom"
+                        },
+                        new
+                        {
+                            Code = "LUK",
+                            Archived = false,
+                            Description = "This is Litte UK area",
+                            Name = "Little UK"
+                        });
                 });
 
             modelBuilder.Entity("FPTBooking.Data.Models.BuildingBlock", b =>
@@ -511,6 +536,15 @@ namespace FPTBooking.Data.Migrations
                     b.HasKey("Code");
 
                     b.ToTable("Department");
+
+                    b.HasData(
+                        new
+                        {
+                            Code = "DOE",
+                            Archived = false,
+                            Description = "This is department of education",
+                            Name = "Department of Education"
+                        });
                 });
 
             modelBuilder.Entity("FPTBooking.Data.Models.DepartmentMember", b =>
@@ -623,66 +657,22 @@ namespace FPTBooking.Data.Migrations
                     b.HasData(
                         new
                         {
-                            Code = "GENERAL",
+                            Code = "Employee",
                             Archived = false,
-                            Description = "General member type of user",
-                            Name = "General"
+                            Name = "Employee"
+                        },
+                        new
+                        {
+                            Code = "Student",
+                            Archived = false,
+                            Name = "Student"
+                        },
+                        new
+                        {
+                            Code = "Teacher",
+                            Archived = false,
+                            Name = "Teacher"
                         });
-                });
-
-            modelBuilder.Entity("FPTBooking.Data.Models.Resource", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int")
-                        .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
-
-                    b.Property<string>("Code")
-                        .HasColumnType("varchar(100)")
-                        .HasMaxLength(100)
-                        .IsUnicode(false);
-
-                    b.Property<string>("Description")
-                        .HasColumnType("nvarchar(500)")
-                        .HasMaxLength(500);
-
-                    b.Property<string>("Name")
-                        .HasColumnType("nvarchar(255)")
-                        .HasMaxLength(255);
-
-                    b.Property<int>("ResourceCategoryId")
-                        .HasColumnType("int");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("ResourceCategoryId");
-
-                    b.ToTable("Resource");
-                });
-
-            modelBuilder.Entity("FPTBooking.Data.Models.ResourceCategory", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int")
-                        .HasAnnotation("SqlServer:ValueGenerationStrategy", SqlServerValueGenerationStrategy.IdentityColumn);
-
-                    b.Property<string>("Code")
-                        .HasColumnType("varchar(100)")
-                        .HasMaxLength(100)
-                        .IsUnicode(false);
-
-                    b.Property<string>("Description")
-                        .HasColumnType("nvarchar(500)")
-                        .HasMaxLength(500);
-
-                    b.Property<string>("Name")
-                        .HasColumnType("nvarchar(255)")
-                        .HasMaxLength(255);
-
-                    b.HasKey("Id");
-
-                    b.ToTable("ResourceCategory");
                 });
 
             modelBuilder.Entity("FPTBooking.Data.Models.Room", b =>
@@ -703,17 +693,14 @@ namespace FPTBooking.Data.Migrations
                         .HasMaxLength(100);
 
                     b.Property<string>("BuildingBlockCode")
-                        .IsRequired()
                         .HasColumnType("nvarchar(100)")
                         .HasMaxLength(100);
 
                     b.Property<string>("BuildingLevelCode")
-                        .IsRequired()
                         .HasColumnType("nvarchar(100)")
                         .HasMaxLength(100);
 
                     b.Property<string>("DepartmentCode")
-                        .IsRequired()
                         .HasColumnType("nvarchar(100)")
                         .HasMaxLength(100);
 
@@ -818,6 +805,15 @@ namespace FPTBooking.Data.Migrations
                     b.HasKey("Code");
 
                     b.ToTable("RoomType");
+
+                    b.HasData(
+                        new
+                        {
+                            Code = "CR",
+                            Archived = false,
+                            Description = "This is a classroom",
+                            Name = "Classroom"
+                        });
                 });
 
             modelBuilder.Entity("FPTBooking.Data.Models.RoomTypeService", b =>
@@ -844,6 +840,14 @@ namespace FPTBooking.Data.Migrations
                     b.HasIndex("RoomTypeCode");
 
                     b.ToTable("RoomTypeService");
+
+                    b.HasData(
+                        new
+                        {
+                            Id = 1,
+                            BookingServiceCode = "TB",
+                            RoomTypeCode = "CR"
+                        });
                 });
 
             modelBuilder.Entity("FPTBooking.Data.Models.UsageOfBooking", b =>
@@ -1077,15 +1081,6 @@ namespace FPTBooking.Data.Migrations
                         .IsRequired();
                 });
 
-            modelBuilder.Entity("FPTBooking.Data.Models.Resource", b =>
-                {
-                    b.HasOne("FPTBooking.Data.Models.ResourceCategory", "ResourceCategory")
-                        .WithMany("Resource")
-                        .HasForeignKey("ResourceCategoryId")
-                        .HasConstraintName("FK_ResourceCategory_Resource")
-                        .IsRequired();
-                });
-
             modelBuilder.Entity("FPTBooking.Data.Models.Room", b =>
                 {
                     b.HasOne("FPTBooking.Data.Models.BuildingArea", "BuildingArea")
@@ -1096,15 +1091,11 @@ namespace FPTBooking.Data.Migrations
 
                     b.HasOne("FPTBooking.Data.Models.BuildingLevel", "BuildingLevel")
                         .WithMany("Room")
-                        .HasForeignKey("BuildingLevelCode")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
+                        .HasForeignKey("BuildingLevelCode");
 
                     b.HasOne("FPTBooking.Data.Models.Department", "Department")
                         .WithMany("Room")
-                        .HasForeignKey("DepartmentCode")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
+                        .HasForeignKey("DepartmentCode");
 
                     b.HasOne("FPTBooking.Data.Models.RoomType", "RoomType")
                         .WithMany("Room")
