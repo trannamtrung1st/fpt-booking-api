@@ -86,11 +86,6 @@ namespace FPTBooking.Business
         public const string FPT_DOMAIN = "fpt.edu.vn";
     }
 
-    public static class MemberTypeValues
-    {
-        public const string GENERAL = "General";
-    }
-
     public static class BookingTypeValues
     {
         public const string BOOKING = "Booking";

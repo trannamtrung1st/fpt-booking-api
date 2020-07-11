@@ -23,7 +23,8 @@ namespace FPTBooking.Data
     {
         public const string TEACHER = "Teacher";
         public const string STUDENT = "Student";
-        public const string GENERAL = "Employee";
+        public const string EMPLOYEE = "Employee";
+        public const string GENERAL = "General";
     }
 
 

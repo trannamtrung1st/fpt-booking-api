@@ -70,7 +70,7 @@ namespace FPTBooking.Business.Services
         protected void PrepareCreate(Member entity)
         {
             if (entity.MemberTypeCode == null)
-                entity.MemberTypeCode = MemberTypeValues.GENERAL;
+                entity.MemberTypeCode = MemberTypeName.GENERAL;
         }
 
         public Member ConvertToMember(AppUser user)
