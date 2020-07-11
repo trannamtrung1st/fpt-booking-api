@@ -71,14 +71,13 @@ namespace FPTBooking.WebApi.Controllers
         {
             var checkerValid = projection.GetFieldsArr().Contains(RoomQueryProjection.CHECKER_VALID);
             projection = new RoomQueryProjection { fields = RoomQueryProjection.DETAIL };
-            var entity = _service.GetRoomDetail(code, projection);
+            var entity = _service.Rooms.Code(code).FirstOrDefault();
             if (entity == null) return NotFound(AppResult.NotFound());
             var validationData = _service.ValidateGetRoomDetail(entity, hanging, options);
             if (!validationData.IsValid)
                 return BadRequest(AppResult.FailValidation(data: validationData));
             if (hanging)
             {
-                entity = _service.Attach(entity);
                 _service.ReleaseHangingRoomByHangingUserId(UserId);
                 _service.ChangeRoomHangingStatus(entity, true, UserId);
                 context.SaveChanges();

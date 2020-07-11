@@ -31,7 +31,7 @@ namespace FPTBooking.Business.Services
         protected string GetBookingCode(Booking entity)
         {
             return "B-" + entity.RoomCode + "-" +
-                entity.BookedDate.Date.ToTimeZone(AppTimeZone.Map.First().Value).ToString("ddMMyyyy") + "-" +
+                entity.BookedDate.ToDefaultTimeZone().ToString("ddMMyyyy") + "-" +
                 entity.FromTime.ToString("hhmm") + entity.ToTime.ToString("hhmm");
         }
         protected void PrepareCreate(Booking entity, Member bookMember, Room bookedRoom)
@@ -307,7 +307,7 @@ namespace FPTBooking.Business.Services
         {
             var query = Bookings
                 .BookedDate(date)
-                .OfBookMember(member.UserId)
+                .RelatedToMember(member.UserId)
                 .Project(projection).ToList();
             int? totalCount = null;
             var fapBookings = await Global.FapClient
@@ -346,8 +346,7 @@ namespace FPTBooking.Business.Services
                 switch (relationship)
                 {
                     case BookingPrincipalRelationship.Owner:
-                        query = query.OfBookMember(memberId)
-                            .Union(query.UsedByMember(memberId));
+                        query = query.RelatedToMember(memberId);
                         break;
                     case BookingPrincipalRelationship.Manager:
                         query = QueryBookingsManagedByManager(member);
@@ -429,8 +428,7 @@ namespace FPTBooking.Business.Services
         {
             var validationData = new ValidationData();
             var userId = principal.Identity.Name;
-            if (entity.BookMemberId != userId &&
-                !entity.UsingMemberIds.Contains(userId))
+            if (entity.BookMemberId != userId)
             {
                 var managerIds = _memberService.QueryManagersOfMember(entity.BookMemberId)
                     .Select(o => o.UserId).ToList();
@@ -442,6 +440,8 @@ namespace FPTBooking.Business.Services
                     validationData.TempData["manager_type"] = "Department";
                 else if (areaManagerIds.Contains(userId))
                     validationData.TempData["manager_type"] = "Area";
+                else if (entity.UsingMemberIds.Contains(userId))
+                    validationData.TempData["manager_type"] = "UsingMember";
                 else validationData.Fail(code: AppResultCode.AccessDenied);
             }
             else validationData.TempData["manager_type"] = "Owner";
@@ -477,11 +477,12 @@ namespace FPTBooking.Business.Services
             if (entity.BookMemberId != userId)
                 validationData.Fail(code: AppResultCode.AccessDenied);
             var now = DateTime.UtcNow;
-            var startTime = entity.BookedDate.Date
-                .AddMinutes(entity.FromTime.TotalMinutes);
-            var allowFeedbackTime = entity.BookedDate.Date
+            var bookedDateDefault = entity.BookedDate.ToDefaultTimeZone();
+            var startTime = bookedDateDefault
+                .AddMinutes(entity.FromTime.TotalMinutes).ToUtc();
+            var allowFeedbackTime = bookedDateDefault
                 .AddMinutes(entity.ToTime.TotalMinutes)
-                .AddHours(4);
+                .AddHours(4).ToUtc();
             if (entity.Status != BookingStatusValues.APPROVED || allowFeedbackTime <= now
                 || startTime >= now)
                 validationData.Fail(mess: "Not allowed", code: AppResultCode.FailValidation);

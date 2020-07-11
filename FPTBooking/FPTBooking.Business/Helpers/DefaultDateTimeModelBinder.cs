@@ -76,9 +76,8 @@ namespace FPTBooking.Business.Helpers
                 {
                     // See comment in GetModelName() on why we do this.
                     var paramModelName = x.BindingInfo?.BinderModelName ?? x.Name;
-                    return paramModelName.Equals(modelName);
-                })
-                .FirstOrDefault();
+                    return paramModelName == modelName;
+                }).FirstOrDefault();
 
             var ctrlParamDescriptor = paramDescriptor as ControllerParameterDescriptor;
             if (ctrlParamDescriptor == null)

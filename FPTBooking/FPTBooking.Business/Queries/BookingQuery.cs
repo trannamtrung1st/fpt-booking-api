@@ -100,7 +100,12 @@ namespace FPTBooking.Business.Queries
 
         public static IQueryable<Booking> OfBookMember(this IQueryable<Booking> query, string userId)
         {
-            return query.Where(o => o.BookMemberId.Equals(userId));
+            return query.Where(o => o.BookMemberId == userId);
+        }
+
+        public static IQueryable<Booking> RelatedToMember(this IQueryable<Booking> query, string userId)
+        {
+            return query.Where(o => o.BookMemberId == userId || o.UsingMemberIds.Contains(userId));
         }
 
         public static IQueryable<Booking> IdOnly(this IQueryable<Booking> query)

@@ -136,41 +136,45 @@ namespace FPTBooking.Business.Services
                     case RoomQueryProjection.AREA:
                         {
                             var entity = row.BuildingArea;
-                            obj["area"] = new
-                            {
-                                code = entity.Code,
-                                name = entity.Name
-                            };
+                            if (entity != null)
+                                obj["area"] = new
+                                {
+                                    code = entity.Code,
+                                    name = entity.Name
+                                };
                         }
                         break;
                     case RoomQueryProjection.BLOCK:
                         {
-                            var entity = row.BuildingLevel.BuildingBlock;
-                            obj["block"] = new
-                            {
-                                code = entity.Code,
-                                name = entity.Name
-                            };
+                            var entity = row.BuildingLevel?.BuildingBlock;
+                            if (entity != null)
+                                obj["block"] = new
+                                {
+                                    code = entity.Code,
+                                    name = entity.Name
+                                };
                         }
                         break;
                     case RoomQueryProjection.DEPARTMENT:
                         {
                             var entity = row.Department;
-                            obj["department"] = new
-                            {
-                                code = entity.Code,
-                                name = entity.Name
-                            };
+                            if (entity != null)
+                                obj["department"] = new
+                                {
+                                    code = entity.Code,
+                                    name = entity.Name
+                                };
                         }
                         break;
                     case RoomQueryProjection.LEVEL:
                         {
                             var entity = row.BuildingLevel;
-                            obj["level"] = new
-                            {
-                                code = entity.Code,
-                                name = entity.Name
-                            };
+                            if (entity != null)
+                                obj["level"] = new
+                                {
+                                    code = entity.Code,
+                                    name = entity.Name
+                                };
                         }
                         break;
                     case RoomQueryProjection.ROOM_TYPE:
