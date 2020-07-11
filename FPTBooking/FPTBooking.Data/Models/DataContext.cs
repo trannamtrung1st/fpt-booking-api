@@ -453,6 +453,12 @@ namespace FPTBooking.Data.Models
                     new MemberType
                     {
                         Archived = false,
+                        Code = MemberTypeName.GENERAL,
+                        Name = MemberTypeName.GENERAL,
+                    },
+                    new MemberType
+                    {
+                        Archived = false,
                         Code = MemberTypeName.EMPLOYEE,
                         Name = MemberTypeName.EMPLOYEE,
                     },

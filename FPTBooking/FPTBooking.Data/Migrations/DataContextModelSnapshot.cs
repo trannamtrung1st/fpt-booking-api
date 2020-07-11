@@ -85,28 +85,28 @@ namespace FPTBooking.Data.Migrations
                         new
                         {
                             Id = "Administrator",
-                            ConcurrencyStamp = "32a269dc-0522-4a6b-b156-ea768e037760",
+                            ConcurrencyStamp = "143cc482-9789-47fe-8d9d-0f409e9601ff",
                             Name = "Administrator",
                             NormalizedName = "ADMINISTRATOR"
                         },
                         new
                         {
                             Id = "Manager",
-                            ConcurrencyStamp = "aa4039a1-c341-4edd-8410-8a69093008c3",
+                            ConcurrencyStamp = "ef7edc5f-a74b-4057-abde-af802985eda3",
                             Name = "Manager",
                             NormalizedName = "MANAGER"
                         },
                         new
                         {
                             Id = "RoomChecker",
-                            ConcurrencyStamp = "ff2dabea-d86d-476a-aff0-8c41dcd53759",
+                            ConcurrencyStamp = "8ffb4369-0c27-4560-bafa-d87b85267748",
                             Name = "RoomChecker",
                             NormalizedName = "ROOMCHECKER"
                         },
                         new
                         {
                             Id = "User",
-                            ConcurrencyStamp = "e2e50649-3008-4534-ab56-b8d76bf4b441",
+                            ConcurrencyStamp = "9e6a1bb1-c0fe-46ca-98e8-2e66ecfe3e6d",
                             Name = "User",
                             NormalizedName = "USER"
                         });
@@ -655,6 +655,12 @@ namespace FPTBooking.Data.Migrations
                     b.ToTable("MemberType");
 
                     b.HasData(
+                        new
+                        {
+                            Code = "General",
+                            Archived = false,
+                            Name = "General"
+                        },
                         new
                         {
                             Code = "Employee",

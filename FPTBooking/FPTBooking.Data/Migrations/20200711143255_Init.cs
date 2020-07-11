@@ -608,10 +608,10 @@ namespace FPTBooking.Data.Migrations
                 columns: new[] { "Id", "ConcurrencyStamp", "Name", "NormalizedName" },
                 values: new object[,]
                 {
-                    { "Administrator", "32a269dc-0522-4a6b-b156-ea768e037760", "Administrator", "ADMINISTRATOR" },
-                    { "Manager", "aa4039a1-c341-4edd-8410-8a69093008c3", "Manager", "MANAGER" },
-                    { "RoomChecker", "ff2dabea-d86d-476a-aff0-8c41dcd53759", "RoomChecker", "ROOMCHECKER" },
-                    { "User", "e2e50649-3008-4534-ab56-b8d76bf4b441", "User", "USER" }
+                    { "Administrator", "143cc482-9789-47fe-8d9d-0f409e9601ff", "Administrator", "ADMINISTRATOR" },
+                    { "Manager", "ef7edc5f-a74b-4057-abde-af802985eda3", "Manager", "MANAGER" },
+                    { "RoomChecker", "8ffb4369-0c27-4560-bafa-d87b85267748", "RoomChecker", "ROOMCHECKER" },
+                    { "User", "9e6a1bb1-c0fe-46ca-98e8-2e66ecfe3e6d", "User", "USER" }
                 });
 
             migrationBuilder.InsertData(
@@ -638,6 +638,7 @@ namespace FPTBooking.Data.Migrations
                 columns: new[] { "Code", "Archived", "Description", "Name" },
                 values: new object[,]
                 {
+                    { "General", false, null, "General" },
                     { "Employee", false, null, "Employee" },
                     { "Student", false, null, "Student" },
                     { "Teacher", false, null, "Teacher" }
