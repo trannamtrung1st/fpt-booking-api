@@ -57,10 +57,10 @@ namespace FPTBooking.Business
                 services.AddScoped(t);
         }
 
-        public static void Init(IServiceCollection services)
+        public static void Init(IServiceCollection services, string fapSecret)
         {
             Random = new Random();
-            FapClient = new FptFapClient(Settings.Instance.FapApiUrl);
+            FapClient = new FptFapClient(Settings.Instance.FapApiUrl, fapSecret);
             FapClient.CacheData().Wait();
             services.AddSingleton(FapClient);
             InitAutoMapper();

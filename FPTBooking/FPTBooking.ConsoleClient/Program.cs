@@ -13,7 +13,7 @@ namespace FPTBooking.ConsoleClient
     {
         static void Main(string[] args)
         {
-            using (var fapClient = new FptFapClient("http://fap.fpt.edu.vn"))
+            using (var fapClient = new FptFapClient("http://fap.fpt.edu.vn", "fap-secret-key"))
             {
                 //var test = fapClient.GetScheduleInDateRangeAsync(
                 //    new DateTime(2020, 7, 7),

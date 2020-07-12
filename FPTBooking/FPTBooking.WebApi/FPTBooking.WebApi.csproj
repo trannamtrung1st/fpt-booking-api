@@ -32,8 +32,4 @@
     <ProjectReference Include="..\FPTBooking\FPTBooking.csproj" />
   </ItemGroup>
 
-  <ItemGroup>
-    <Folder Include="Secrets\" />
-  </ItemGroup>
-
 </Project>

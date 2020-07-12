@@ -18,6 +18,7 @@ namespace FPTBooking.WebApi
         public double TokenValidHours { get; set; }
         public double RefreshTokenValidHours { get; set; }
         public string FirebaseCredentials { get; set; }
+        public string FapSecretFile { get; set; }
 
         private static Settings _instance;
         public static Settings Instance

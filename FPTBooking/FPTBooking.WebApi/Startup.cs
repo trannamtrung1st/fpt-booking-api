@@ -77,7 +77,8 @@ namespace FPTBooking.WebApi
                 options.SuppressModelStateInvalidFilter = true;
             });
             Data.Global.Init(services);
-            Business.Global.Init(services);
+            var fapSecret = File.ReadAllText(Settings.Instance.FapSecretFile);
+            Business.Global.Init(services, fapSecret);
             #region OAuth
             services.AddIdentityCore<AppUser>(options =>
             {

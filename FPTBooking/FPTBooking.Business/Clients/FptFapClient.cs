@@ -25,7 +25,7 @@ namespace FPTBooking.Business.Clients
 
         protected readonly HttpClient http;
         protected readonly string key;
-        public FptFapClient(string baseAddress, string key = "d41d8cd98f00b204e9800998ecf8427e")
+        public FptFapClient(string baseAddress, string key)
         {
             this.key = key;
             http = new HttpClient()
