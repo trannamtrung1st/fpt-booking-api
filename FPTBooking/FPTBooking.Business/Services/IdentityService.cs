@@ -16,6 +16,7 @@ using FPTBooking.Data;
 using FPTBooking.Data.Models;
 using TNT.Core.Helpers.DI;
 using FirebaseAdmin.Auth;
+using System.Text.RegularExpressions;
 
 namespace FPTBooking.Business.Services
 {
@@ -117,7 +118,21 @@ namespace FPTBooking.Business.Services
         #endregion
 
         #region User
-        public AppUser ConvertToUser(UserRecord firebaseUser)
+        public string GetStudentCodeOrNull(string fptEmail)
+        {
+            try
+            {
+                var match = Regex.Match(fptEmail, "([a-zA-Z]{2}[0-9]+?)@", RegexOptions.IgnoreCase);
+                var code = match.Groups[1].Value;
+                return code;
+            }
+            catch (Exception)
+            {
+                return null;
+            }
+        }
+
+        public AppUser ConvertToUser(UserRecord firebaseUser, string code)
         {
             var entity = new AppUser
             {
@@ -126,7 +141,8 @@ namespace FPTBooking.Business.Services
                 Email = firebaseUser.Email,
                 EmailConfirmed = firebaseUser.EmailVerified,
                 PhoneNumber = firebaseUser.PhoneNumber,
-                PhotoUrl = firebaseUser.PhotoUrl
+                PhotoUrl = firebaseUser.PhotoUrl,
+                MemberCode = code
             };
             return entity;
         }

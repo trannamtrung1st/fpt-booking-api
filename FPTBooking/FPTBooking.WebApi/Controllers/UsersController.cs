@@ -88,7 +88,8 @@ namespace FPTBooking.WebApi.Controllers
                         entity = await _service.GetUserByUserNameAsync(userRecord.Uid);
                         if (entity == null)
                         {
-                            entity = _service.ConvertToUser(userRecord);
+                            var code = _service.GetStudentCodeOrNull(userRecord.Email);
+                            entity = _service.ConvertToUser(userRecord, code);
                             using (var transaction = context.Database.BeginTransaction())
                             {
                                 var result = await _service
@@ -101,7 +102,7 @@ namespace FPTBooking.WebApi.Controllers
                                     return BadRequest(builder);
                                 }
                                 _logger.CustomProperties(entity).Info("Register new user");
-                                var memberEntity = _memberService.ConvertToMember(entity);
+                                var memberEntity = _memberService.ConvertToMember(entity, code);
                                 memberEntity = _memberService.CreateMember(memberEntity);
                                 //log event
                                 var ev = _sysService.GetEventForNewUser(

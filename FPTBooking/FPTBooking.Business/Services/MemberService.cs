@@ -73,7 +73,7 @@ namespace FPTBooking.Business.Services
                 entity.MemberTypeCode = MemberTypeName.GENERAL;
         }
 
-        public Member ConvertToMember(AppUser user)
+        public Member ConvertToMember(AppUser user, string code)
         {
             var entity = new Member()
             {
@@ -83,7 +83,20 @@ namespace FPTBooking.Business.Services
                 Email = user.Email,
                 FullName = user.FullName,
                 Phone = user.PhoneNumber,
+                Code = code,
+                MemberTypeCode = code != null ? MemberTypeName.STUDENT : MemberTypeName.GENERAL,
             };
+            //Dev only
+            if (Settings.Instance.DevMode)
+                entity.DepartmentMember = code == null ? null : new List<DepartmentMember>
+                {
+                    new DepartmentMember
+                    {
+                        DepartmentCode = "DOE",
+                        IsManager = false,
+                        MemberId = entity.UserId
+                    }
+                };
             return entity;
         }
 
