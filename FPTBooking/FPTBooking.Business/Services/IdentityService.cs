@@ -118,20 +118,6 @@ namespace FPTBooking.Business.Services
         #endregion
 
         #region User
-        public string GetStudentCodeOrNull(string fptEmail)
-        {
-            try
-            {
-                var match = Regex.Match(fptEmail, "([a-zA-Z]{2}[0-9]+?)@", RegexOptions.IgnoreCase);
-                var code = match.Groups[1].Value;
-                return code;
-            }
-            catch (Exception)
-            {
-                return null;
-            }
-        }
-
         public AppUser ConvertToUser(UserRecord firebaseUser, string code)
         {
             var entity = new AppUser
@@ -470,10 +456,7 @@ namespace FPTBooking.Business.Services
         public bool ValidateEmailDomain(string email)
         {
             if (Settings.Instance.DevMode) return true;
-            string[] emails = email.Trim().Split("@");
-            if (emails.Length == 2)
-                return emails[1] == AllowedEmailDomains.FPT_DOMAIN;
-            return false;
+            return email.IsFptEmail();
         }
         #endregion
 

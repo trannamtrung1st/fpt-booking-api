@@ -109,21 +109,19 @@ namespace FPTBooking.Business.Clients
                 XName.Get("string", "http://tempuri.org/")).Value);
         }
 
-        public async Task<List<Booking>> GetFAPOwnerBookingAsync(ClaimsPrincipal principal,
-            Member member,
+        public async Task<List<Booking>> GetFAPStudentBookings(string code,
             DateTime date)
         {
-            var list = new List<Booking>();
-            if (member.MemberType.Name == MemberTypeName.STUDENT)
-            {
-                var resp = await Global.FapClient.GetActivityStudent(date, member.Code);
-                list = resp.Select(o => o.ToBooking()).ToList();
-            }
-            else if (member.MemberType.Name == MemberTypeName.TEACHER)
-            {
-                var resp = await Global.FapClient.GetActivityTeacher(date, member.Code);
-                list = resp.Select(o => o.ToBooking()).ToList();
-            }
+            var resp = await Global.FapClient.GetActivityStudent(date, code);
+            var list = resp.Select(o => o.ToBooking()).ToList();
+            return list;
+        }
+
+        public async Task<List<Booking>> GetFAPTeacherBookings(string code,
+            DateTime date)
+        {
+            var resp = await Global.FapClient.GetActivityTeacher(date, code);
+            var list = resp.Select(o => o.ToBooking()).ToList();
             return list;
         }
 

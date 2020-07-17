@@ -1,5 +1,6 @@
 ﻿using FPTBooking.Business.Clients;
 using FPTBooking.Business.Clients.Models;
+using FPTBooking.Business.Helpers;
 using FPTBooking.Data;
 using FPTBooking.Data.Models;
 using Microsoft.EntityFrameworkCore;
@@ -13,6 +14,9 @@ namespace FPTBooking.ConsoleClient
     {
         static void Main(string[] args)
         {
+            var test = "Khanht@fpt.edu.vn";
+            var code = test.GetTeacherCode();
+            Console.WriteLine(code);
             using (var fapClient = new FptFapClient("http://fap.fpt.edu.vn", "fap-secret-key"))
             {
                 //var test = fapClient.GetScheduleInDateRangeAsync(

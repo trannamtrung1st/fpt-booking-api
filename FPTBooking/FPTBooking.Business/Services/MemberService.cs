@@ -73,7 +73,7 @@ namespace FPTBooking.Business.Services
                 entity.MemberTypeCode = MemberTypeName.GENERAL;
         }
 
-        public Member ConvertToMember(AppUser user, string code)
+        public Member ConvertToMember(AppUser user, string code, string memberType)
         {
             var entity = new Member()
             {
@@ -84,7 +84,7 @@ namespace FPTBooking.Business.Services
                 FullName = user.FullName,
                 Phone = user.PhoneNumber,
                 Code = code,
-                MemberTypeCode = code != null ? MemberTypeName.STUDENT : MemberTypeName.GENERAL,
+                MemberTypeCode = memberType
             };
             //Dev only
             if (Settings.Instance.DevMode)

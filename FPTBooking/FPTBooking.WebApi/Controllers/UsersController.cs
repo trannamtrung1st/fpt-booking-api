@@ -19,6 +19,8 @@ using FPTBooking.Data.Models;
 using FirebaseAdmin.Auth;
 using FPTBooking.WebApi.Helpers;
 using FPTBooking.Data.Helpers;
+using FPTBooking.Business.Helpers;
+using FPTBooking.Data;
 
 namespace FPTBooking.WebApi.Controllers
 {
@@ -88,8 +90,8 @@ namespace FPTBooking.WebApi.Controllers
                         entity = await _service.GetUserByUserNameAsync(userRecord.Uid);
                         if (entity == null)
                         {
-                            var code = _service.GetStudentCodeOrNull(userRecord.Email);
-                            entity = _service.ConvertToUser(userRecord, code);
+                            var emailInfo = userRecord.Email.GetEmailInfo();
+                            entity = _service.ConvertToUser(userRecord, emailInfo.Item4);
                             using (var transaction = context.Database.BeginTransaction())
                             {
                                 var result = await _service
@@ -102,7 +104,9 @@ namespace FPTBooking.WebApi.Controllers
                                     return BadRequest(builder);
                                 }
                                 _logger.CustomProperties(entity).Info("Register new user");
-                                var memberEntity = _memberService.ConvertToMember(entity, code);
+                                var memberType = emailInfo.Item2 ? MemberTypeName.STUDENT :
+                                    (emailInfo.Item3 ? MemberTypeName.TEACHER : MemberTypeName.GENERAL);
+                                var memberEntity = _memberService.ConvertToMember(entity, emailInfo.Item4, memberType);
                                 memberEntity = _memberService.CreateMember(memberEntity);
                                 //log event
                                 var ev = _sysService.GetEventForNewUser(

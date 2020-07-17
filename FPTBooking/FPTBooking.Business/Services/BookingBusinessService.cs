@@ -18,6 +18,8 @@ namespace FPTBooking.Business.Services
 {
     public class BookingBusinessService : Service
     {
+        private static NLog.Logger _logger = NLog.LogManager.GetCurrentClassLogger();
+
         [Inject]
         protected readonly MemberService _memberService;
         [Inject]
@@ -310,8 +312,22 @@ namespace FPTBooking.Business.Services
                 .RelatedToMember(member.UserId)
                 .Project(projection).ToList();
             int? totalCount = null;
-            var fapBookings = await Global.FapClient
-                .GetFAPOwnerBookingAsync(principal, member, date.ToDefaultTimeZone());
+            var emailInfo = member.Email.GetEmailInfo();
+            List<Booking> fapBookings = new List<Booking>();
+            try
+            {
+                var defaultTimeZone = date.ToDefaultTimeZone();
+                if (emailInfo.Item2)
+                    fapBookings = await Global.FapClient
+                            .GetFAPStudentBookings(emailInfo.Item4, defaultTimeZone);
+                else if (emailInfo.Item3)
+                    fapBookings = await Global.FapClient
+                            .GetFAPTeacherBookings(emailInfo.Item4, defaultTimeZone);
+            }
+            catch (Exception e)
+            {
+                _logger.Error(e);
+            }
             query.AddRange(fapBookings);
             query = query.AsQueryable().SortOldestBookedDateFirst().ToList();
             if (options != null)
