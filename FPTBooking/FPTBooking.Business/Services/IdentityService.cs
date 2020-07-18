@@ -118,24 +118,37 @@ namespace FPTBooking.Business.Services
         #endregion
 
         #region User
+        public void Detach(AppUser entity)
+        {
+            context.Entry(entity).State = EntityState.Detached;
+        }
+
         public AppUser ConvertToUser(UserRecord firebaseUser, string code)
         {
             var entity = new AppUser
             {
-                UserName = firebaseUser.Uid,
-                FullName = firebaseUser.DisplayName,
+                Id = firebaseUser.Email,
+                UserName = firebaseUser.Email,
                 Email = firebaseUser.Email,
+                FullName = firebaseUser.DisplayName,
                 EmailConfirmed = firebaseUser.EmailVerified,
                 PhoneNumber = firebaseUser.PhoneNumber,
                 PhotoUrl = firebaseUser.PhotoUrl,
-                MemberCode = code
+                MemberCode = code,
+                LoggedIn = true,
             };
             return entity;
         }
 
-        public AppUser ConvertToUser(RegisterModel model)
+        public AppUser ConvertToUser(CreateUserModel model, string code)
         {
-            var entity = new AppUser { UserName = model.username, FullName = model.full_name };
+            var entity = new AppUser
+            {
+                UserName = model.email,
+                Email = model.email,
+                MemberCode = code,
+                LoggedIn = false
+            };
             return entity;
         }
 
@@ -194,6 +207,11 @@ namespace FPTBooking.Business.Services
         public async Task<AppUser> GetUserByUserNameAsync(string username)
         {
             return await _userManager.FindByNameAsync(username);
+        }
+
+        public async Task<AppUser> GetUserByEmailAsync(string email)
+        {
+            return await _userManager.FindByEmailAsync(email);
         }
 
         public async Task<AppUser> GetUserByIdAsync(string id)

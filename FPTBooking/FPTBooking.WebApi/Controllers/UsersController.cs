@@ -87,33 +87,47 @@ namespace FPTBooking.WebApi.Controllers
                         bool checkEmailDomain = _service.ValidateEmailDomain(userRecord.Email);
                         if (!checkEmailDomain)
                             return Unauthorized(AppResult.InvalidEmailDomain());
-                        entity = await _service.GetUserByUserNameAsync(userRecord.Uid);
-                        if (entity == null)
+                        entity = await _service.GetUserByEmailAsync(userRecord.Email);
+                        if (entity == null || !entity.LoggedIn)
                         {
                             var emailInfo = userRecord.Email.GetEmailInfo();
-                            entity = _service.ConvertToUser(userRecord, emailInfo.Item4);
                             using (var transaction = context.Database.BeginTransaction())
                             {
-                                var result = await _service
-                                        .CreateUserWithoutPassAsync(entity);
-                                if (!result.Succeeded)
+                                if (entity != null) _service.Detach(entity);
+                                entity = _service.ConvertToUser(userRecord, emailInfo.Item3);
+                                var memberEntity = _memberService.ConvertToMember(entity, emailInfo.Item3);
+                                if (entity == null)
                                 {
-                                    foreach (var err in result.Errors)
-                                        ModelState.AddModelError(err.Code, err.Description);
-                                    var builder = ResultHelper.MakeInvalidAccountRegistrationResults(ModelState);
-                                    return BadRequest(builder);
+                                    var result = await _service
+                                        .CreateUserWithoutPassAsync(entity);
+                                    if (!result.Succeeded)
+                                    {
+                                        foreach (var err in result.Errors)
+                                            ModelState.AddModelError(err.Code, err.Description);
+                                        var builder = ResultHelper.MakeInvalidAccountRegistrationResults(ModelState);
+                                        return BadRequest(builder);
+                                    }
+                                    _logger.CustomProperties(entity).Info("Register new user");
+                                    memberEntity = _memberService.CreateMember(memberEntity);
+                                    //log event
+                                    var ev = _sysService.GetEventForNewUser(
+                                        $"{memberEntity.Email} has logged into system for the first time",
+                                        memberEntity.UserId);
+                                    _sysService.CreateAppEvent(ev);
+                                    //end log event
                                 }
-                                _logger.CustomProperties(entity).Info("Register new user");
-                                var memberType = emailInfo.Item2 ? MemberTypeName.STUDENT :
-                                    (emailInfo.Item3 ? MemberTypeName.TEACHER : MemberTypeName.GENERAL);
-                                var memberEntity = _memberService.ConvertToMember(entity, emailInfo.Item4, memberType);
-                                memberEntity = _memberService.CreateMember(memberEntity);
-                                //log event
-                                var ev = _sysService.GetEventForNewUser(
-                                    $"{memberEntity.Email} has logged into system for the first time",
-                                    memberEntity.UserId);
-                                _sysService.CreateAppEvent(ev);
-                                //end log event
+                                else
+                                {
+                                    var result = await _service.UpdateUserAsync(entity);
+                                    if (!result.Succeeded)
+                                    {
+                                        foreach (var err in result.Errors)
+                                            ModelState.AddModelError(err.Code, err.Description);
+                                        var builder = ResultHelper.MakeInvalidAccountRegistrationResults(ModelState);
+                                        return BadRequest(builder);
+                                    }
+                                    memberEntity = _memberService.CreateMember(memberEntity);
+                                }
                                 context.SaveChanges();
                                 transaction.Commit();
                             }
@@ -162,6 +176,43 @@ namespace FPTBooking.WebApi.Controllers
 
 #if DEBUG
         #region Administration
+        [HttpPost("")]
+        public async Task<IActionResult> CreateUser(CreateUserModel model)
+        {
+            bool checkEmailDomain = _service.ValidateEmailDomain(model.email);
+            if (!checkEmailDomain)
+                return Unauthorized(AppResult.InvalidEmailDomain());
+            var entity = await _service.GetUserByEmailAsync(model.email);
+            if (entity != null)
+                return BadRequest(AppResult.EmailExisted());
+            var emailInfo = model.email.GetEmailInfo();
+            entity = _service.ConvertToUser(model, emailInfo.Item3);
+            using (var transaction = context.Database.BeginTransaction())
+            {
+                var result = await _service
+                        .CreateUserWithoutPassAsync(entity);
+                if (!result.Succeeded)
+                {
+                    foreach (var err in result.Errors)
+                        ModelState.AddModelError(err.Code, err.Description);
+                    var builder = ResultHelper.MakeInvalidAccountRegistrationResults(ModelState);
+                    return BadRequest(builder);
+                }
+                _logger.CustomProperties(entity).Info("Register new user");
+                var memberEntity = _memberService.ConvertToMember(entity, emailInfo.Item3);
+                memberEntity = _memberService.CreateMember(memberEntity);
+                //log event
+                var ev = _sysService.GetEventForNewUser(
+                    $"Admin has created a user with email {model.email}",
+                    memberEntity.UserId);
+                _sysService.CreateAppEvent(ev);
+                //end log event
+                context.SaveChanges();
+                transaction.Commit();
+            }
+            return NoContent();
+        }
+
         [HttpPost("role")]
         public async Task<IActionResult> AddRole(AddRolesToUserModel model)
         {

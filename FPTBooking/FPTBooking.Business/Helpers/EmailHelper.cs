@@ -35,14 +35,13 @@ namespace FPTBooking.Business.Helpers
             return false;
         }
 
-        public static ValueTuple<bool, bool, bool, string> GetEmailInfo(this string email)
+        public static ValueTuple<bool, bool, string> GetEmailInfo(this string email)
         {
             var isFptEmail = email.IsFptEmail();
             var isStudent = isFptEmail ? email.IsStudent() : false;
-            var isTeacher = !isStudent;
             var code = isStudent ? email.GetStudentCode() :
-                (isTeacher ? email.GetTeacherCode() : null);
-            return (isFptEmail, isStudent, isTeacher, code);
+                (!isStudent ? email.GetTeacherCode() : null);
+            return (isFptEmail, isStudent, code);
         }
     }
 }

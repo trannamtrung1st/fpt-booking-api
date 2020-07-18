@@ -77,6 +77,16 @@ namespace FPTBooking.Business.Models
         public bool remember_me { get; set; }
     }
 
+    public class CreateUserModel
+    {
+        [JsonProperty("email")]
+        public string email { get; set; }
+        [JsonProperty("role")]
+        public string role { get; set; }
+        [JsonProperty("member_type")]
+        public string member_type { get; set; }
+    }
+
     public class RegisterModel
     {
         [Required]

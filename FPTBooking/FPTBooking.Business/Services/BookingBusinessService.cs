@@ -319,10 +319,9 @@ namespace FPTBooking.Business.Services
                 var defaultTimeZone = date.ToDefaultTimeZone();
                 if (emailInfo.Item2)
                     fapBookings = await Global.FapClient
-                            .GetFAPStudentBookings(emailInfo.Item4, defaultTimeZone);
-                else if (emailInfo.Item3)
-                    fapBookings = await Global.FapClient
-                            .GetFAPTeacherBookings(emailInfo.Item4, defaultTimeZone);
+                            .GetFAPStudentBookings(emailInfo.Item3, defaultTimeZone);
+                else fapBookings = await Global.FapClient
+                            .GetFAPTeacherBookings(emailInfo.Item3, defaultTimeZone);
             }
             catch (Exception e)
             {

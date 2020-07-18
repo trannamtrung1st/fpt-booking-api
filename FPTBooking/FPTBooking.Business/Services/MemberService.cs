@@ -69,11 +69,9 @@ namespace FPTBooking.Business.Services
         #region Create Member
         protected void PrepareCreate(Member entity)
         {
-            if (entity.MemberTypeCode == null)
-                entity.MemberTypeCode = MemberTypeName.GENERAL;
         }
 
-        public Member ConvertToMember(AppUser user, string code, string memberType)
+        public Member ConvertToMember(AppUser user, string code)
         {
             var entity = new Member()
             {
@@ -84,7 +82,6 @@ namespace FPTBooking.Business.Services
                 FullName = user.FullName,
                 Phone = user.PhoneNumber,
                 Code = code,
-                MemberTypeCode = memberType
             };
             //Dev only
             if (Settings.Instance.DevMode)
@@ -92,7 +89,7 @@ namespace FPTBooking.Business.Services
                 {
                     new DepartmentMember
                     {
-                        DepartmentCode = "DOE",
+                        DepartmentCode = DeparmentValues.ADMIN.Code,
                         IsManager = false,
                         MemberId = entity.UserId
                     }
@@ -104,6 +101,18 @@ namespace FPTBooking.Business.Services
         {
             PrepareCreate(entity);
             return context.Member.Add(entity).Entity;
+        }
+        #endregion
+
+        #region Update Member
+        public void PrepareUpdate(Member entity)
+        {
+        }
+
+        public Member UpdateMember(Member entity)
+        {
+            PrepareUpdate(entity);
+            return context.Member.Update(entity).Entity;
         }
         #endregion
 

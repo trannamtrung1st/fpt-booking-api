@@ -12,6 +12,7 @@ namespace FPTBooking.Data.Models
         public string FullName { get; set; }
         public string PhotoUrl { get; set; }
         public string MemberCode { get; set; }
+        public bool LoggedIn { get; set; }
 
         public virtual Member Member { get; set; }
     }

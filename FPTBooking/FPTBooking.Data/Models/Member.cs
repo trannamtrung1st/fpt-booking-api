@@ -22,9 +22,7 @@ namespace FPTBooking.Data.Models
         public string LastName { get; set; }
         public string FullName { get; set; }
         public string MiddleName { get; set; }
-        public string MemberTypeCode { get; set; }
 
-        public virtual MemberType MemberType { get; set; }
         public virtual AppUser User { get; set; }
         public virtual ICollection<AppEvent> AppEvent { get; set; }
         public virtual ICollection<AreaMember> AreaMember { get; set; }

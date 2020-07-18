@@ -1,4 +1,7 @@
 ﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Design;
@@ -30,7 +33,6 @@ namespace FPTBooking.Data.Models
         public virtual DbSet<Department> Department { get; set; }
         public virtual DbSet<DepartmentMember> DepartmentMember { get; set; }
         public virtual DbSet<Member> Member { get; set; }
-        public virtual DbSet<MemberType> MemberType { get; set; }
         public virtual DbSet<Room> Room { get; set; }
         public virtual DbSet<RoomResource> RoomResource { get; set; }
         public virtual DbSet<RoomType> RoomType { get; set; }
@@ -60,7 +62,36 @@ namespace FPTBooking.Data.Models
                 entity.HasOne(d => d.Member)
                     .WithOne(p => p.User)
                     .HasForeignKey<Member>(d => d.UserId);
+
+                entity.HasData(new[]
+                {
+                    new AppUser
+                    {
+                        ConcurrencyStamp = Guid.NewGuid().ToString(),
+                        Email = UserValues.LIB_EMAIL,
+                        Id = UserValues.LIB_EMAIL,
+                        UserName = UserValues.LIB_EMAIL,
+                        LoggedIn = false,
+                        MemberCode = UserValues.LIB_EMAIL.Split('@')[0],
+                        NormalizedEmail = UserValues.LIB_EMAIL.ToUpperInvariant(),
+                        NormalizedUserName = UserValues.LIB_EMAIL.ToUpperInvariant(),
+                        SecurityStamp = Guid.NewGuid().ToString(),
+                    },
+                    new AppUser
+                    {
+                        ConcurrencyStamp = Guid.NewGuid().ToString(),
+                        Email = UserValues.ADMIN_EMAIL,
+                        Id = UserValues.ADMIN_EMAIL,
+                        UserName = UserValues.ADMIN_EMAIL,
+                        LoggedIn = false,
+                        MemberCode = UserValues.ADMIN_EMAIL.Split('@')[0],
+                        NormalizedEmail = UserValues.ADMIN_EMAIL.ToUpperInvariant(),
+                        NormalizedUserName = UserValues.ADMIN_EMAIL.ToUpperInvariant(),
+                        SecurityStamp = Guid.NewGuid().ToString(),
+                    },
+                });
             });
+
             modelBuilder.Entity<AppRole>(entity =>
             {
                 entity.Property(e => e.Id)
@@ -99,6 +130,33 @@ namespace FPTBooking.Data.Models
                     },
                 });
 
+            });
+
+            modelBuilder.Entity<IdentityUserRole<string>>(entity =>
+            {
+                entity.HasData(new[]
+                {
+                    new IdentityUserRole<string>
+                    {
+                        RoleId = RoleName.MANAGER,
+                        UserId = UserValues.LIB_EMAIL,
+                    },
+                    new IdentityUserRole<string>
+                    {
+                        RoleId = RoleName.MANAGER,
+                        UserId = UserValues.ADMIN_EMAIL,
+                    },
+                    new IdentityUserRole<string>
+                    {
+                        RoleId = RoleName.ROOM_CHECKER,
+                        UserId = UserValues.LIB_EMAIL,
+                    },
+                    new IdentityUserRole<string>
+                    {
+                        RoleId = RoleName.ROOM_CHECKER,
+                        UserId = UserValues.ADMIN_EMAIL,
+                    },
+                });
             });
 
             modelBuilder.Entity<AppEvent>(entity =>
@@ -146,6 +204,24 @@ namespace FPTBooking.Data.Models
                 entity.HasOne(d => d.Member)
                     .WithMany(p => p.AreaMember)
                     .HasForeignKey(d => d.MemberId);
+
+                entity.HasData(new[]
+                {
+                    new AreaMember
+                    {
+                        AreaCode = BuildingAreaValues.LIBRARY.Code,
+                        Id = 1,
+                        IsManager = true,
+                        MemberId = UserValues.LIB_EMAIL
+                    },
+                    new AreaMember
+                    {
+                        AreaCode = BuildingAreaValues.ADMIN.Code,
+                        Id = 2,
+                        IsManager = true,
+                        MemberId = UserValues.ADMIN_EMAIL
+                    },
+                });
             });
 
             modelBuilder.Entity<AttachedService>(entity =>
@@ -261,8 +337,8 @@ namespace FPTBooking.Data.Models
                     {
                         Archived = false,
                         Code = "TB",
-                        Name = "Tea-break",
-                        Description = "Tea-break party in break time"
+                        Name = "Tea break",
+                        Description = "Tea break party in break time"
                     }
                 });
             });
@@ -286,20 +362,8 @@ namespace FPTBooking.Data.Models
 
                 entity.HasData(new[]
                 {
-                    new BuildingArea
-                    {
-                        Archived = false,
-                        Code = "CR",
-                        Description = "This is classroom area",
-                        Name = "Classroom",
-                    },
-                    new BuildingArea
-                    {
-                        Archived = false,
-                        Code = "LUK",
-                        Description = "This is Litte UK area",
-                        Name = "Little UK",
-                    },
+                    BuildingAreaValues.LIBRARY,
+                    BuildingAreaValues.ADMIN,
                 });
             });
 
@@ -314,6 +378,11 @@ namespace FPTBooking.Data.Models
                 entity.Property(e => e.Name)
                     .IsRequired()
                     .HasMaxLength(255);
+
+                entity.HasData(new[]
+                {
+                    BuildingBlockValues.MAIN
+                });
             });
 
             modelBuilder.Entity<BuildingLevel>(entity =>
@@ -337,6 +406,14 @@ namespace FPTBooking.Data.Models
                 entity.HasOne(d => d.BuildingBlock)
                     .WithMany(p => p.BuildingLevel)
                     .HasForeignKey(d => d.BuildingBlockCode);
+
+                entity.HasData(new[]
+                {
+                    BuildingLevelValues.L1,
+                    BuildingLevelValues.L2,
+                    BuildingLevelValues.L3,
+                    BuildingLevelValues.L4,
+                });
             });
 
             modelBuilder.Entity<Department>(entity =>
@@ -353,13 +430,8 @@ namespace FPTBooking.Data.Models
 
                 entity.HasData(new[]
                 {
-                    new Department
-                    {
-                        Archived = false,
-                        Code = "DOE",
-                        Description = "This is department of education",
-                        Name = "Department of Education",
-                    }
+                    DeparmentValues.LIBRARY,
+                    DeparmentValues.ADMIN,
                 });
             });
 
@@ -389,6 +461,24 @@ namespace FPTBooking.Data.Models
                 entity.HasOne(d => d.Member)
                     .WithMany(p => p.DepartmentMember)
                     .HasForeignKey(d => d.MemberId);
+
+                entity.HasData(new[]
+                {
+                    new DepartmentMember
+                    {
+                        DepartmentCode = DeparmentValues.LIBRARY.Code,
+                        Id = 1,
+                        IsManager = true,
+                        MemberId = UserValues.LIB_EMAIL,
+                    },
+                    new DepartmentMember
+                    {
+                        DepartmentCode = DeparmentValues.ADMIN.Code,
+                        Id = 2,
+                        IsManager = true,
+                        MemberId = UserValues.ADMIN_EMAIL,
+                    },
+                });
             });
 
             modelBuilder.Entity<Member>(entity =>
@@ -396,8 +486,6 @@ namespace FPTBooking.Data.Models
                 entity.HasKey(e => e.UserId);
                 entity.Property(e => e.Code)
                     .HasMaxLength(100).IsUnicode(false);
-
-                entity.HasIndex(e => e.MemberTypeCode);
 
                 entity.Property(e => e.UserId)
                     .HasMaxLength(100)
@@ -408,74 +496,52 @@ namespace FPTBooking.Data.Models
                     .HasMaxLength(100);
 
                 entity.Property(e => e.FirstName)
-                    .IsRequired()
                     .HasMaxLength(255);
 
                 entity.Property(e => e.LastName)
-                    .IsRequired()
                     .HasMaxLength(255);
 
                 entity.Property(e => e.FullName)
-                    .IsRequired()
                     .HasMaxLength(255);
-
-                entity.Property(e => e.MemberTypeCode)
-                    .IsRequired()
-                    .HasMaxLength(100);
 
                 entity.Property(e => e.MiddleName).HasMaxLength(255);
 
                 entity.Property(e => e.Phone).HasMaxLength(100);
 
-                entity.HasOne(d => d.MemberType)
-                    .WithMany(p => p.Member)
-                    .HasForeignKey(d => d.MemberTypeCode);
-
                 entity.HasOne(d => d.User)
                     .WithOne(p => p.Member)
                     .HasForeignKey<Member>(d => d.UserId);
-            });
 
-            modelBuilder.Entity<MemberType>(entity =>
-            {
-                entity.HasKey(e => e.Code);
-
-                entity.Property(e => e.Code).HasMaxLength(100);
-
-                entity.Property(e => e.Description).HasMaxLength(2000);
-
-                entity.Property(e => e.Name)
-                    .IsRequired()
-                    .HasMaxLength(255);
-
-                entity.HasData(new MemberType[]
+                entity.HasData(new[]
                 {
-                    new MemberType
+                    new Member
                     {
-                        Archived = false,
-                        Code = MemberTypeName.GENERAL,
-                        Name = MemberTypeName.GENERAL,
+                        Code = UserValues.LIB_EMAIL.Split('@')[0],
+                        Email = UserValues.LIB_EMAIL,
+                        UserId = UserValues.LIB_EMAIL,
                     },
-                    new MemberType
+                    new Member
                     {
-                        Archived = false,
-                        Code = MemberTypeName.EMPLOYEE,
-                        Name = MemberTypeName.EMPLOYEE,
-                    },
-                    new MemberType
-                    {
-                        Archived = false,
-                        Code = MemberTypeName.STUDENT,
-                        Name = MemberTypeName.STUDENT,
-                    },
-                    new MemberType
-                    {
-                        Archived = false,
-                        Code = MemberTypeName.TEACHER,
-                        Name = MemberTypeName.TEACHER,
+                        Code = UserValues.ADMIN_EMAIL.Split('@')[0],
+                        Email = UserValues.ADMIN_EMAIL,
+                        UserId = UserValues.ADMIN_EMAIL,
                     },
                 });
             });
+
+            var adminRoomRes = new List<RoomResource>();
+            var resId = 1;
+            Func<string, string, string, RoomResource> newRoomResForRoom = (code, name, roomCode) =>
+            {
+                return new RoomResource
+                {
+                    Code = code,
+                    Name = name,
+                    RoomCode = roomCode,
+                    Id = resId++,
+                    IsAvailable = true
+                };
+            };
 
             modelBuilder.Entity<Room>(entity =>
             {
@@ -534,6 +600,103 @@ namespace FPTBooking.Data.Models
                 entity.HasOne(d => d.RoomType)
                     .WithMany(p => p.Room)
                     .HasForeignKey(d => d.RoomTypeCode);
+
+                var libRooms = new List<Room>()
+                {
+                    new Room
+                    {
+                        Code = "LB. 12",
+                        ActiveFromTime = new TimeSpan(8,0,0),
+                        ActiveToTime = new TimeSpan(17,0,0),
+                        Description = "This room is managed by Library department.",
+                        Name = "LB. 12",
+                        PeopleCapacity = 10,
+                    },
+                    new Room
+                    {
+                        Code = "LB. 13",
+                        ActiveFromTime = new TimeSpan(13,0,0),
+                        ActiveToTime = new TimeSpan(17,0,0),
+                        Description = "This room is Business room. Library department can only use the room from 13:00 to 17:00.",
+                        Name = "LB. 13",
+                        PeopleCapacity = 15,
+                    },
+                    new Room
+                    {
+                        Code = "LB. 15",
+                        ActiveFromTime = new TimeSpan(8,0,0),
+                        ActiveToTime = new TimeSpan(17,0,0),
+                        Description = "This room is managed by Library department.",
+                        Name = "LB. 15",
+                        PeopleCapacity = 8,
+                    },
+                    new Room
+                    {
+                        Code = "LB. 21",
+                        ActiveFromTime = new TimeSpan(8,0,0),
+                        ActiveToTime = new TimeSpan(17,0,0),
+                        Description = "This room is managed by Library department.",
+                        Name = "LB. 21",
+                        PeopleCapacity = 10,
+                        BuildingLevelCode = BuildingLevelValues.L2.Code,
+                    },
+                    new Room
+                    {
+                        Code = "Seminar",
+                        ActiveFromTime = new TimeSpan(8,0,0),
+                        ActiveToTime = new TimeSpan(17,0,0),
+                        Description = "This room is managed by Library department.",
+                        Name = "Seminar",
+                        PeopleCapacity = 80,
+                    },
+                };
+                foreach (var r in libRooms)
+                {
+                    r.Archived = false;
+                    r.BuildingAreaCode = BuildingAreaValues.LIBRARY.Code;
+                    r.BuildingBlockCode = BuildingBlockValues.MAIN.Code;
+                    r.BuildingLevelCode = r.BuildingLevelCode ?? BuildingLevelValues.L1.Code;
+                    r.DepartmentCode = DeparmentValues.LIBRARY.Code;
+                    r.RoomTypeCode = RoomTypeValues.LIBRARY.Code;
+                    r.IsAvailable = true;
+                }
+                var adminRoomsGeneral = new List<ValueTuple<string, int, int>>()
+                {
+                    (BuildingLevelValues.L1.Code, 101,137),
+                    (BuildingLevelValues.L2.Code, 201,234),
+                    (BuildingLevelValues.L3.Code, 301,315),
+                    (BuildingLevelValues.L4.Code, 401,422),
+                };
+                var adminRooms = adminRoomsGeneral.SelectMany(o =>
+                {
+                    var rooms = new List<Room>();
+                    for (var i = o.Item2; i <= o.Item3; i++)
+                    {
+                        rooms.Add(new Room
+                        {
+                            Code = i.ToString(),
+                            ActiveFromTime = new TimeSpan(6, 0, 0),
+                            ActiveToTime = new TimeSpan(22, 0, 0),
+                            Description = "This room is managed by Administrative department.",
+                            Name = i.ToString(),
+                            PeopleCapacity = 35,
+                            Archived = false,
+                            BuildingAreaCode = BuildingAreaValues.ADMIN.Code,
+                            BuildingBlockCode = BuildingBlockValues.MAIN.Code,
+                            BuildingLevelCode = o.Item1,
+                            DepartmentCode = DeparmentValues.ADMIN.Code,
+                            RoomTypeCode = RoomTypeValues.ADMIN.Code,
+                            IsAvailable = true,
+                        });
+                        adminRoomRes.Add(
+                            newRoomResForRoom("AC", "Air-conditioner", i.ToString()));
+                        adminRoomRes.Add(
+                            newRoomResForRoom("FURNITURE", "Furniture", i.ToString()));
+                    }
+                    return rooms;
+                });
+
+                entity.HasData(libRooms.Concat(adminRooms).ToList());
             });
 
             modelBuilder.Entity<RoomResource>(entity =>
@@ -549,6 +712,24 @@ namespace FPTBooking.Data.Models
                 entity.HasOne(d => d.Room)
                     .WithMany(p => p.RoomResource)
                     .HasForeignKey(d => d.RoomCode);
+
+                var libRooms = new List<RoomResource>()
+                {
+                    newRoomResForRoom("TV-DS","TV screen", "LB. 12"),
+                    newRoomResForRoom("AC","Air-conditioner", "LB. 12"),
+                    newRoomResForRoom("FURNITURE","Furniture", "LB. 12"),
+                    newRoomResForRoom("TV-DS","TV screen", "LB. 13"),
+                    newRoomResForRoom("AC","Air-conditioner", "LB. 13"),
+                    newRoomResForRoom("FURNITURE","Furniture", "LB. 13"),
+                    newRoomResForRoom("AC","Air-conditioner", "LB. 15"),
+                    newRoomResForRoom("FURNITURE","Furniture", "LB. 15"),
+                    newRoomResForRoom("TV-DS","TV screen", "LB. 21"),
+                    newRoomResForRoom("AC","Air-conditioner", "LB. 21"),
+                    newRoomResForRoom("FURNITURE","Furniture", "LB. 21"),
+                    newRoomResForRoom("TV-DS","TV screen", "Seminar"),
+                    newRoomResForRoom("AC","Air-conditioner", "Seminar"),
+                    newRoomResForRoom("FURNITURE","Furniture", "Seminar"),
+                };
             });
 
             modelBuilder.Entity<RoomType>(entity =>
@@ -565,13 +746,8 @@ namespace FPTBooking.Data.Models
 
                 entity.HasData(new[]
                 {
-                    new RoomType
-                    {
-                        Archived = false,
-                        Code = "CR",
-                        Description = "This is a classroom",
-                        Name = "Classroom",
-                    }
+                    RoomTypeValues.LIBRARY,
+                    RoomTypeValues.ADMIN,
                 });
             });
 
@@ -597,15 +773,21 @@ namespace FPTBooking.Data.Models
                     .WithMany(p => p.RoomTypeService)
                     .HasForeignKey(d => d.RoomTypeCode);
 
-                entity.HasData(new[]
-                {
-                    new RoomTypeService
-                    {
-                        BookingServiceCode = "TB",
-                        Id = 1,
-                        RoomTypeCode = "CR"
-                    }
-                });
+                //entity.HasData(new[]
+                //{
+                //    new RoomTypeService
+                //    {
+                //        BookingServiceCode = "TB",
+                //        Id = 1,
+                //        RoomTypeCode = RoomTypeValues.LIBRARY.Code
+                //    },
+                //    new RoomTypeService
+                //    {
+                //        BookingServiceCode = "TB",
+                //        Id = 2,
+                //        RoomTypeCode = RoomTypeValues.CR_ADMIN.Code
+                //    },
+                //});
             });
 
             modelBuilder.Entity<UsageOfBooking>(entity =>

@@ -26,8 +26,9 @@ namespace FPTBooking.Business
         [Display(Name = "Invalid email domain")]
         InvalidEmailDomain = 9,
         [Display(Name = "Access denied")]
-        AccessDenied = 10
-
+        AccessDenied = 10,
+        [Display(Name = "Email existed")]
+        EmailExisted = 11
     }
 
     public class JWT

@@ -107,6 +107,15 @@ namespace FPTBooking.Business.Models
                 Data = data,
             };
         }
+        public static AppResult EmailExisted(object data = null, string mess = null)
+        {
+            return new AppResult
+            {
+                Code = AppResultCode.EmailExisted,
+                Message = mess ?? AppResultCode.EmailExisted.DisplayName(),
+                Data = data,
+            };
+        }
 
     }
 
