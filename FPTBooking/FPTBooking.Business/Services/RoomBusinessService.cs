@@ -98,6 +98,8 @@ namespace FPTBooking.Business.Services
                             obj["area_code"] = entity.BuildingAreaCode;
                             obj["block_code"] = entity.BuildingBlockCode;
                             obj["level_code"] = entity.BuildingLevelCode;
+                            obj["active_from_time"] = entity.ActiveFromTime.ToString("hh\\:mm");
+                            obj["active_to_time"] = entity.ActiveToTime.ToString("hh\\:mm");
                             obj["code"] = entity.Code;
                             obj["department_code"] = entity.DepartmentCode;
                             obj["description"] = entity.Description;

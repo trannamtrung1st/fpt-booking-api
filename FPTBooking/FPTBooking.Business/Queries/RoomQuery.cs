@@ -78,6 +78,12 @@ namespace FPTBooking.Business.Queries
                 || o.RoomType.Name.Contains(search));
         }
 
+        public static IQueryable<Room> InActiveTime(this IQueryable<Room> query, TimeSpan fromTime,
+            TimeSpan toTime)
+        {
+            return query.Where(o => o.ActiveFromTime <= fromTime && o.ActiveToTime >= toTime);
+        }
+
         public static IQueryable<Room> AvailableForBooking(this IQueryable<Room> query,
             string userId,
             IQueryable<Booking> bookingQuery,
@@ -90,6 +96,7 @@ namespace FPTBooking.Business.Queries
                 .Select(b => b.Room);
             return query = query.Except(notAvailableRoom)
                 .Available(true)
+                .InActiveTime(fromTime, toTime)
                 //not hanging by someone else
                 .NotHangingExcept(now, userId)
                 .CanHandle(numOfPeople);
@@ -132,6 +139,7 @@ namespace FPTBooking.Business.Queries
                     .Select(b => b.RoomCode).ToList();
                 notAvailableRoomCode = notAvailableRoomCode.Union(fapNotAvailableRoom).ToList();
                 query = query.ExceptCodes(notAvailableRoomCode)
+                    .InActiveTime(model.from_time.Value, model.to_time.Value)
                     //not hanging by someone else
                     .NotHangingExcept(now, userId);
 
@@ -194,6 +202,9 @@ namespace FPTBooking.Business.Queries
                     BuildingBlock = o.BuildingLevel.BuildingBlock
                 } : null),
                 BuildingLevelCode = o.BuildingLevelCode,
+                ActiveFromTime = o.ActiveFromTime,
+                ActiveToTime = o.ActiveToTime,
+                HangingUserId = o.HangingUserId,
                 Code = o.Code,
                 Department = dep ? o.Department : null,
                 DepartmentCode = o.DepartmentCode,
