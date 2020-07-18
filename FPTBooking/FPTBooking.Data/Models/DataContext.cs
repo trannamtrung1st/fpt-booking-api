@@ -69,7 +69,7 @@ namespace FPTBooking.Data.Models
                     {
                         ConcurrencyStamp = Guid.NewGuid().ToString(),
                         Email = UserValues.LIB_EMAIL,
-                        Id = UserValues.LIB_EMAIL,
+                        Id = UserValues.LIB_EMAIL.Replace('@', '_'),
                         UserName = UserValues.LIB_EMAIL,
                         LoggedIn = false,
                         MemberCode = UserValues.LIB_EMAIL.Split('@')[0],
@@ -81,7 +81,7 @@ namespace FPTBooking.Data.Models
                     {
                         ConcurrencyStamp = Guid.NewGuid().ToString(),
                         Email = UserValues.ADMIN_EMAIL,
-                        Id = UserValues.ADMIN_EMAIL,
+                        Id = UserValues.ADMIN_EMAIL.Replace('@', '_'),
                         UserName = UserValues.ADMIN_EMAIL,
                         LoggedIn = false,
                         MemberCode = UserValues.ADMIN_EMAIL.Split('@')[0],
@@ -139,22 +139,22 @@ namespace FPTBooking.Data.Models
                     new IdentityUserRole<string>
                     {
                         RoleId = RoleName.MANAGER,
-                        UserId = UserValues.LIB_EMAIL,
+                        UserId = UserValues.LIB_EMAIL.Replace('@', '_'),
                     },
                     new IdentityUserRole<string>
                     {
                         RoleId = RoleName.MANAGER,
-                        UserId = UserValues.ADMIN_EMAIL,
+                        UserId = UserValues.ADMIN_EMAIL.Replace('@', '_'),
                     },
                     new IdentityUserRole<string>
                     {
                         RoleId = RoleName.ROOM_CHECKER,
-                        UserId = UserValues.LIB_EMAIL,
+                        UserId = UserValues.LIB_EMAIL.Replace('@', '_'),
                     },
                     new IdentityUserRole<string>
                     {
                         RoleId = RoleName.ROOM_CHECKER,
-                        UserId = UserValues.ADMIN_EMAIL,
+                        UserId = UserValues.ADMIN_EMAIL.Replace('@', '_'),
                     },
                 });
             });
@@ -212,14 +212,14 @@ namespace FPTBooking.Data.Models
                         AreaCode = BuildingAreaValues.LIBRARY.Code,
                         Id = 1,
                         IsManager = true,
-                        MemberId = UserValues.LIB_EMAIL
+                        MemberId = UserValues.LIB_EMAIL.Replace('@', '_')
                     },
                     new AreaMember
                     {
                         AreaCode = BuildingAreaValues.ADMIN.Code,
                         Id = 2,
                         IsManager = true,
-                        MemberId = UserValues.ADMIN_EMAIL
+                        MemberId = UserValues.ADMIN_EMAIL.Replace('@', '_')
                     },
                 });
             });
@@ -469,14 +469,14 @@ namespace FPTBooking.Data.Models
                         DepartmentCode = DeparmentValues.LIBRARY.Code,
                         Id = 1,
                         IsManager = true,
-                        MemberId = UserValues.LIB_EMAIL,
+                        MemberId = UserValues.LIB_EMAIL.Replace('@', '_'),
                     },
                     new DepartmentMember
                     {
                         DepartmentCode = DeparmentValues.ADMIN.Code,
                         Id = 2,
                         IsManager = true,
-                        MemberId = UserValues.ADMIN_EMAIL,
+                        MemberId = UserValues.ADMIN_EMAIL.Replace('@', '_'),
                     },
                 });
             });
@@ -518,13 +518,13 @@ namespace FPTBooking.Data.Models
                     {
                         Code = UserValues.LIB_EMAIL.Split('@')[0],
                         Email = UserValues.LIB_EMAIL,
-                        UserId = UserValues.LIB_EMAIL,
+                        UserId = UserValues.LIB_EMAIL.Replace('@', '_'),
                     },
                     new Member
                     {
                         Code = UserValues.ADMIN_EMAIL.Split('@')[0],
                         Email = UserValues.ADMIN_EMAIL,
-                        UserId = UserValues.ADMIN_EMAIL,
+                        UserId = UserValues.ADMIN_EMAIL.Replace('@', '_'),
                     },
                 });
             });
@@ -730,6 +730,8 @@ namespace FPTBooking.Data.Models
                     newRoomResForRoom("AC","Air-conditioner", "Seminar"),
                     newRoomResForRoom("FURNITURE","Furniture", "Seminar"),
                 };
+
+                entity.HasData(adminRoomRes.Concat(libRooms).ToList());
             });
 
             modelBuilder.Entity<RoomType>(entity =>

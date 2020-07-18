@@ -71,6 +71,18 @@ namespace FPTBooking.Business.Services
         {
         }
 
+        public Member UpdateMember(Member entity, AppUser user)
+        {
+            entity.FirstName = user.FullName;
+            entity.LastName = user.FullName;
+            entity.UserId = user.Id;
+            entity.Email = user.Email;
+            entity.FullName = user.FullName;
+            entity.Phone = user.PhoneNumber;
+            entity.Code = user.MemberCode;
+            return entity;
+        }
+
         public Member ConvertToMember(AppUser user, string code)
         {
             var entity = new Member()

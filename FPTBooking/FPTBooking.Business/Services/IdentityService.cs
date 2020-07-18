@@ -67,7 +67,7 @@ namespace FPTBooking.Business.Services
 
         protected void PrepareCreate(AppRole entity)
         {
-            entity.Id = Guid.NewGuid().ToString();
+            entity.Id = entity.Id ?? Guid.NewGuid().ToString();
         }
 
         public async Task<IdentityResult> CreateRoleAsync(CreateRoleModel model)
@@ -118,16 +118,31 @@ namespace FPTBooking.Business.Services
         #endregion
 
         #region User
+        public AppUser Attach(AppUser entity)
+        {
+            return context.Attach(entity).Entity;
+        }
+
         public void Detach(AppUser entity)
         {
             context.Entry(entity).State = EntityState.Detached;
+        }
+
+        public AppUser UpdateUser(AppUser entity, UserRecord firebaseUser)
+        {
+            entity.FullName = firebaseUser.DisplayName;
+            entity.EmailConfirmed = firebaseUser.EmailVerified;
+            entity.PhoneNumber = firebaseUser.PhoneNumber;
+            entity.PhotoUrl = firebaseUser.PhotoUrl;
+            entity.LoggedIn = true;
+            return entity;
         }
 
         public AppUser ConvertToUser(UserRecord firebaseUser, string code)
         {
             var entity = new AppUser
             {
-                Id = firebaseUser.Email,
+                Id = firebaseUser.Email.Replace('@', '_'),
                 UserName = firebaseUser.Email,
                 Email = firebaseUser.Email,
                 FullName = firebaseUser.DisplayName,
@@ -144,6 +159,7 @@ namespace FPTBooking.Business.Services
         {
             var entity = new AppUser
             {
+                Id = model.email.Replace('@', '_'),
                 UserName = model.email,
                 Email = model.email,
                 MemberCode = code,
@@ -157,12 +173,14 @@ namespace FPTBooking.Business.Services
             await _signInManager.SignOutAsync();
         }
 
-        public async Task<IdentityResult> CreateUserWithoutPassAsync(AppUser entity)
+        public async Task<IdentityResult> CreateUserWithoutPassAsync(AppUser entity,
+            IEnumerable<string> roles = null)
         {
             PrepareCreate(entity);
             var result = await _userManager.CreateAsync(entity);
             if (!result.Succeeded) return result;
-            result = await _userManager.AddToRoleAsync(entity, RoleName.USER);
+            roles = roles != null && roles.Count() > 0 ? roles : new List<string> { RoleName.USER };
+            result = await _userManager.AddToRolesAsync(entity, roles);
             return result;
         }
 
@@ -201,7 +219,7 @@ namespace FPTBooking.Business.Services
 
         protected void PrepareCreate(AppUser entity)
         {
-            entity.Id = Guid.NewGuid().ToString();
+            entity.Id = entity.Id ?? Guid.NewGuid().ToString();
         }
 
         public async Task<AppUser> GetUserByUserNameAsync(string username)
@@ -249,18 +267,6 @@ namespace FPTBooking.Business.Services
         {
             PrepareCreate(entity);
             var result = await _userManager.CreateAsync(entity, password);
-            return result;
-        }
-
-        public async Task<IdentityResult> CreateUserWithRolesTransactionAsync(AppUser entity, string password,
-            IEnumerable<string> roles = null)
-        {
-            PrepareCreate(entity);
-            var result = await _userManager.CreateAsync(entity, password);
-            if (!result.Succeeded)
-                return result;
-            if (roles != null)
-                result = await _userManager.AddToRolesAsync(entity, roles);
             return result;
         }
 

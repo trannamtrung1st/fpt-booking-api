@@ -81,10 +81,8 @@ namespace FPTBooking.Business.Models
     {
         [JsonProperty("email")]
         public string email { get; set; }
-        [JsonProperty("role")]
-        public string role { get; set; }
-        [JsonProperty("member_type")]
-        public string member_type { get; set; }
+        [JsonProperty("roles")]
+        public IEnumerable<string> roles { get; set; }
     }
 
     public class RegisterModel

@@ -21,6 +21,7 @@ using FPTBooking.WebApi.Helpers;
 using FPTBooking.Data.Helpers;
 using FPTBooking.Business.Helpers;
 using FPTBooking.Data;
+using FPTBooking.Business.Queries;
 
 namespace FPTBooking.WebApi.Controllers
 {
@@ -88,16 +89,16 @@ namespace FPTBooking.WebApi.Controllers
                         if (!checkEmailDomain)
                             return Unauthorized(AppResult.InvalidEmailDomain());
                         entity = await _service.GetUserByEmailAsync(userRecord.Email);
-                        if (entity == null || !entity.LoggedIn)
+                        var userExisted = entity != null;
+                        if (!userExisted || !entity.LoggedIn)
                         {
-                            var emailInfo = userRecord.Email.GetEmailInfo();
                             using (var transaction = context.Database.BeginTransaction())
                             {
-                                if (entity != null) _service.Detach(entity);
-                                entity = _service.ConvertToUser(userRecord, emailInfo.Item3);
-                                var memberEntity = _memberService.ConvertToMember(entity, emailInfo.Item3);
-                                if (entity == null)
+                                Member memberEntity;
+                                if (!userExisted)
                                 {
+                                    var emailInfo = userRecord.Email.GetEmailInfo();
+                                    entity = _service.ConvertToUser(userRecord, emailInfo.Item3);
                                     var result = await _service
                                         .CreateUserWithoutPassAsync(entity);
                                     if (!result.Succeeded)
@@ -108,16 +109,12 @@ namespace FPTBooking.WebApi.Controllers
                                         return BadRequest(builder);
                                     }
                                     _logger.CustomProperties(entity).Info("Register new user");
+                                    memberEntity = _memberService.ConvertToMember(entity, entity.MemberCode);
                                     memberEntity = _memberService.CreateMember(memberEntity);
-                                    //log event
-                                    var ev = _sysService.GetEventForNewUser(
-                                        $"{memberEntity.Email} has logged into system for the first time",
-                                        memberEntity.UserId);
-                                    _sysService.CreateAppEvent(ev);
-                                    //end log event
                                 }
                                 else
                                 {
+                                    entity = _service.UpdateUser(entity, userRecord);
                                     var result = await _service.UpdateUserAsync(entity);
                                     if (!result.Succeeded)
                                     {
@@ -126,8 +123,15 @@ namespace FPTBooking.WebApi.Controllers
                                         var builder = ResultHelper.MakeInvalidAccountRegistrationResults(ModelState);
                                         return BadRequest(builder);
                                     }
-                                    memberEntity = _memberService.CreateMember(memberEntity);
+                                    memberEntity = _memberService.Members.Id(entity.Id).FirstOrDefault();
+                                    memberEntity = _memberService.UpdateMember(memberEntity, entity);
                                 }
+                                //log event
+                                var ev = _sysService.GetEventForNewUser(
+                                    $"{memberEntity.Email} has logged into system for the first time",
+                                    memberEntity.UserId);
+                                _sysService.CreateAppEvent(ev);
+                                //end log event
                                 context.SaveChanges();
                                 transaction.Commit();
                             }
@@ -174,7 +178,7 @@ namespace FPTBooking.WebApi.Controllers
             return Ok(AppResult.Success(data));
         }
 
-#if DEBUG
+#if !RELEASE
         #region Administration
         [HttpPost("")]
         public async Task<IActionResult> CreateUser(CreateUserModel model)
@@ -190,7 +194,7 @@ namespace FPTBooking.WebApi.Controllers
             using (var transaction = context.Database.BeginTransaction())
             {
                 var result = await _service
-                        .CreateUserWithoutPassAsync(entity);
+                        .CreateUserWithoutPassAsync(entity, model.roles);
                 if (!result.Succeeded)
                 {
                     foreach (var err in result.Errors)

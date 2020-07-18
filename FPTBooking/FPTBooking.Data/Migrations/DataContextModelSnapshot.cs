@@ -85,28 +85,28 @@ namespace FPTBooking.Data.Migrations
                         new
                         {
                             Id = "Administrator",
-                            ConcurrencyStamp = "25a2acab-0da3-41ca-ab9d-c2ab27f7e59b",
+                            ConcurrencyStamp = "3deac901-afbb-4bfb-82e5-aa009611868b",
                             Name = "Administrator",
                             NormalizedName = "ADMINISTRATOR"
                         },
                         new
                         {
                             Id = "Manager",
-                            ConcurrencyStamp = "178ffb87-c240-417f-9526-763eb29f7b70",
+                            ConcurrencyStamp = "e4ffae77-0191-44b0-948e-3e5c7eb93f5a",
                             Name = "Manager",
                             NormalizedName = "MANAGER"
                         },
                         new
                         {
                             Id = "RoomChecker",
-                            ConcurrencyStamp = "7f78b3ae-a76c-4365-b3ba-1eaf6fa8b799",
+                            ConcurrencyStamp = "b91e080a-7458-4144-8d0f-5ed8411c8a55",
                             Name = "RoomChecker",
                             NormalizedName = "ROOMCHECKER"
                         },
                         new
                         {
                             Id = "User",
-                            ConcurrencyStamp = "7e3cfde4-3781-48d3-b082-745b5b88b88b",
+                            ConcurrencyStamp = "e20b5c24-525f-4fdd-8deb-acea292d4976",
                             Name = "User",
                             NormalizedName = "USER"
                         });
@@ -197,9 +197,9 @@ namespace FPTBooking.Data.Migrations
                     b.HasData(
                         new
                         {
-                            Id = "TraPTP@fpt.edu.vn",
+                            Id = "TraPTP_fpt.edu.vn",
                             AccessFailedCount = 0,
-                            ConcurrencyStamp = "c52a3749-058a-457a-8275-fe657fd7d0b8",
+                            ConcurrencyStamp = "00656312-9814-427b-b793-14b6ea478bf7",
                             Email = "TraPTP@fpt.edu.vn",
                             EmailConfirmed = false,
                             LockoutEnabled = false,
@@ -208,15 +208,15 @@ namespace FPTBooking.Data.Migrations
                             NormalizedEmail = "TRAPTP@FPT.EDU.VN",
                             NormalizedUserName = "TRAPTP@FPT.EDU.VN",
                             PhoneNumberConfirmed = false,
-                            SecurityStamp = "5597a2b1-5421-47fd-b60b-b45106fa7855",
+                            SecurityStamp = "aa05bc40-2b88-4c4c-bfb4-b18c67a2004f",
                             TwoFactorEnabled = false,
                             UserName = "TraPTP@fpt.edu.vn"
                         },
                         new
                         {
-                            Id = "utnt@fpt.edu.vn",
+                            Id = "utnt_fpt.edu.vn",
                             AccessFailedCount = 0,
-                            ConcurrencyStamp = "8a4588e8-807b-4a66-811c-6c0377883b50",
+                            ConcurrencyStamp = "e7fff6ba-35f1-4326-adf1-9944b1b5310d",
                             Email = "utnt@fpt.edu.vn",
                             EmailConfirmed = false,
                             LockoutEnabled = false,
@@ -225,7 +225,7 @@ namespace FPTBooking.Data.Migrations
                             NormalizedEmail = "UTNT@FPT.EDU.VN",
                             NormalizedUserName = "UTNT@FPT.EDU.VN",
                             PhoneNumberConfirmed = false,
-                            SecurityStamp = "e07afedc-21c1-4f0b-97e8-4c90f9df1e0a",
+                            SecurityStamp = "8fd370d4-8a43-47e2-bd77-c600f0e480db",
                             TwoFactorEnabled = false,
                             UserName = "utnt@fpt.edu.vn"
                         });
@@ -267,14 +267,14 @@ namespace FPTBooking.Data.Migrations
                             Id = 1,
                             AreaCode = "LB",
                             IsManager = true,
-                            MemberId = "TraPTP@fpt.edu.vn"
+                            MemberId = "TraPTP_fpt.edu.vn"
                         },
                         new
                         {
                             Id = 2,
                             AreaCode = "ADMIN",
                             IsManager = true,
-                            MemberId = "utnt@fpt.edu.vn"
+                            MemberId = "utnt_fpt.edu.vn"
                         });
                 });
 
@@ -685,14 +685,14 @@ namespace FPTBooking.Data.Migrations
                             Id = 1,
                             DepartmentCode = "LB",
                             IsManager = true,
-                            MemberId = "TraPTP@fpt.edu.vn"
+                            MemberId = "TraPTP_fpt.edu.vn"
                         },
                         new
                         {
                             Id = 2,
                             DepartmentCode = "ADMIN",
                             IsManager = true,
-                            MemberId = "utnt@fpt.edu.vn"
+                            MemberId = "utnt_fpt.edu.vn"
                         });
                 });
 
@@ -740,13 +740,13 @@ namespace FPTBooking.Data.Migrations
                     b.HasData(
                         new
                         {
-                            UserId = "TraPTP@fpt.edu.vn",
+                            UserId = "TraPTP_fpt.edu.vn",
                             Code = "TraPTP",
                             Email = "TraPTP@fpt.edu.vn"
                         },
                         new
                         {
-                            UserId = "utnt@fpt.edu.vn",
+                            UserId = "utnt_fpt.edu.vn",
                             Code = "utnt",
                             Email = "utnt@fpt.edu.vn"
                         });
@@ -2675,6 +2675,1848 @@ namespace FPTBooking.Data.Migrations
                     b.HasIndex("RoomCode");
 
                     b.ToTable("RoomResource");
+
+                    b.HasData(
+                        new
+                        {
+                            Id = 1,
+                            Code = "AC",
+                            IsAvailable = true,
+                            Name = "Air-conditioner",
+                            RoomCode = "101"
+                        },
+                        new
+                        {
+                            Id = 2,
+                            Code = "FURNITURE",
+                            IsAvailable = true,
+                            Name = "Furniture",
+                            RoomCode = "101"
+                        },
+                        new
+                        {
+                            Id = 3,
+                            Code = "AC",
+                            IsAvailable = true,
+                            Name = "Air-conditioner",
+                            RoomCode = "102"
+                        },
+                        new
+                        {
+                            Id = 4,
+                            Code = "FURNITURE",
+                            IsAvailable = true,
+                            Name = "Furniture",
+                            RoomCode = "102"
+                        },
+                        new
+                        {
+                            Id = 5,
+                            Code = "AC",
+                            IsAvailable = true,
+                            Name = "Air-conditioner",
+                            RoomCode = "103"
+                        },
+                        new
+                        {
+                            Id = 6,
+                            Code = "FURNITURE",
+                            IsAvailable = true,
+                            Name = "Furniture",
+                            RoomCode = "103"
+                        },
+                        new
+                        {
+                            Id = 7,
+                            Code = "AC",
+                            IsAvailable = true,
+                            Name = "Air-conditioner",
+                            RoomCode = "104"
+                        },
+                        new
+                        {
+                            Id = 8,
+                            Code = "FURNITURE",
+                            IsAvailable = true,
+                            Name = "Furniture",
+                            RoomCode = "104"
+                        },
+                        new
+                        {
+                            Id = 9,
+                            Code = "AC",
+                            IsAvailable = true,
+                            Name = "Air-conditioner",
+                            RoomCode = "105"
+                        },
+                        new
+                        {
+                            Id = 10,
+                            Code = "FURNITURE",
+                            IsAvailable = true,
+                            Name = "Furniture",
+                            RoomCode = "105"
+                        },
+                        new
+                        {
+                            Id = 11,
+                            Code = "AC",
+                            IsAvailable = true,
+                            Name = "Air-conditioner",
+                            RoomCode = "106"
+                        },
+                        new
+                        {
+                            Id = 12,
+                            Code = "FURNITURE",
+                            IsAvailable = true,
+                            Name = "Furniture",
+                            RoomCode = "106"
+                        },
+                        new
+                        {
+                            Id = 13,
+                            Code = "AC",
+                            IsAvailable = true,
+                            Name = "Air-conditioner",
+                            RoomCode = "107"
+                        },
+                        new
+                        {
+                            Id = 14,
+                            Code = "FURNITURE",
+                            IsAvailable = true,
+                            Name = "Furniture",
+                            RoomCode = "107"
+                        },
+                        new
+                        {
+                            Id = 15,
+                            Code = "AC",
+                            IsAvailable = true,
+                            Name = "Air-conditioner",
+                            RoomCode = "108"
+                        },
+                        new
+                        {
+                            Id = 16,
+                            Code = "FURNITURE",
+                            IsAvailable = true,
+                            Name = "Furniture",
+                            RoomCode = "108"
+                        },
+                        new
+                        {
+                            Id = 17,
+                            Code = "AC",
+                            IsAvailable = true,
+                            Name = "Air-conditioner",
+                            RoomCode = "109"
+                        },
+                        new
+                        {
+                            Id = 18,
+                            Code = "FURNITURE",
+                            IsAvailable = true,
+                            Name = "Furniture",
+                            RoomCode = "109"
+                        },
+                        new
+                        {
+                            Id = 19,
+                            Code = "AC",
+                            IsAvailable = true,
+                            Name = "Air-conditioner",
+                            RoomCode = "110"
+                        },
+                        new
+                        {
+                            Id = 20,
+                            Code = "FURNITURE",
+                            IsAvailable = true,
+                            Name = "Furniture",
+                            RoomCode = "110"
+                        },
+                        new
+                        {
+                            Id = 21,
+                            Code = "AC",
+                            IsAvailable = true,
+                            Name = "Air-conditioner",
+                            RoomCode = "111"
+                        },
+                        new
+                        {
+                            Id = 22,
+                            Code = "FURNITURE",
+                            IsAvailable = true,
+                            Name = "Furniture",
+                            RoomCode = "111"
+                        },
+                        new
+                        {
+                            Id = 23,
+                            Code = "AC",
+                            IsAvailable = true,
+                            Name = "Air-conditioner",
+                            RoomCode = "112"
+                        },
+                        new
+                        {
+                            Id = 24,
+                            Code = "FURNITURE",
+                            IsAvailable = true,
+                            Name = "Furniture",
+                            RoomCode = "112"
+                        },
+                        new
+                        {
+                            Id = 25,
+                            Code = "AC",
+                            IsAvailable = true,
+                            Name = "Air-conditioner",
+                            RoomCode = "113"
+                        },
+                        new
+                        {
+                            Id = 26,
+                            Code = "FURNITURE",
+                            IsAvailable = true,
+                            Name = "Furniture",
+                            RoomCode = "113"
+                        },
+                        new
+                        {
+                            Id = 27,
+                            Code = "AC",
+                            IsAvailable = true,
+                            Name = "Air-conditioner",
+                            RoomCode = "114"
+                        },
+                        new
+                        {
+                            Id = 28,
+                            Code = "FURNITURE",
+                            IsAvailable = true,
+                            Name = "Furniture",
+                            RoomCode = "114"
+                        },
+                        new
+                        {
+                            Id = 29,
+                            Code = "AC",
+                            IsAvailable = true,
+                            Name = "Air-conditioner",
+                            RoomCode = "115"
+                        },
+                        new
+                        {
+                            Id = 30,
+                            Code = "FURNITURE",
+                            IsAvailable = true,
+                            Name = "Furniture",
+                            RoomCode = "115"
+                        },
+                        new
+                        {
+                            Id = 31,
+                            Code = "AC",
+                            IsAvailable = true,
+                            Name = "Air-conditioner",
+                            RoomCode = "116"
+                        },
+                        new
+                        {
+                            Id = 32,
+                            Code = "FURNITURE",
+                            IsAvailable = true,
+                            Name = "Furniture",
+                            RoomCode = "116"
+                        },
+                        new
+                        {
+                            Id = 33,
+                            Code = "AC",
+                            IsAvailable = true,
+                            Name = "Air-conditioner",
+                            RoomCode = "117"
+                        },
+                        new
+                        {
+                            Id = 34,
+                            Code = "FURNITURE",
+                            IsAvailable = true,
+                            Name = "Furniture",
+                            RoomCode = "117"
+                        },
+                        new
+                        {
+                            Id = 35,
+                            Code = "AC",
+                            IsAvailable = true,
+                            Name = "Air-conditioner",
+                            RoomCode = "118"
+                        },
+                        new
+                        {
+                            Id = 36,
+                            Code = "FURNITURE",
+                            IsAvailable = true,
+                            Name = "Furniture",
+                            RoomCode = "118"
+                        },
+                        new
+                        {
+                            Id = 37,
+                            Code = "AC",
+                            IsAvailable = true,
+                            Name = "Air-conditioner",
+                            RoomCode = "119"
+                        },
+                        new
+                        {
+                            Id = 38,
+                            Code = "FURNITURE",
+                            IsAvailable = true,
+                            Name = "Furniture",
+                            RoomCode = "119"
+                        },
+                        new
+                        {
+                            Id = 39,
+                            Code = "AC",
+                            IsAvailable = true,
+                            Name = "Air-conditioner",
+                            RoomCode = "120"
+                        },
+                        new
+                        {
+                            Id = 40,
+                            Code = "FURNITURE",
+                            IsAvailable = true,
+                            Name = "Furniture",
+                            RoomCode = "120"
+                        },
+                        new
+                        {
+                            Id = 41,
+                            Code = "AC",
+                            IsAvailable = true,
+                            Name = "Air-conditioner",
+                            RoomCode = "121"
+                        },
+                        new
+                        {
+                            Id = 42,
+                            Code = "FURNITURE",
+                            IsAvailable = true,
+                            Name = "Furniture",
+                            RoomCode = "121"
+                        },
+                        new
+                        {
+                            Id = 43,
+                            Code = "AC",
+                            IsAvailable = true,
+                            Name = "Air-conditioner",
+                            RoomCode = "122"
+                        },
+                        new
+                        {
+                            Id = 44,
+                            Code = "FURNITURE",
+                            IsAvailable = true,
+                            Name = "Furniture",
+                            RoomCode = "122"
+                        },
+                        new
+                        {
+                            Id = 45,
+                            Code = "AC",
+                            IsAvailable = true,
+                            Name = "Air-conditioner",
+                            RoomCode = "123"
+                        },
+                        new
+                        {
+                            Id = 46,
+                            Code = "FURNITURE",
+                            IsAvailable = true,
+                            Name = "Furniture",
+                            RoomCode = "123"
+                        },
+                        new
+                        {
+                            Id = 47,
+                            Code = "AC",
+                            IsAvailable = true,
+                            Name = "Air-conditioner",
+                            RoomCode = "124"
+                        },
+                        new
+                        {
+                            Id = 48,
+                            Code = "FURNITURE",
+                            IsAvailable = true,
+                            Name = "Furniture",
+                            RoomCode = "124"
+                        },
+                        new
+                        {
+                            Id = 49,
+                            Code = "AC",
+                            IsAvailable = true,
+                            Name = "Air-conditioner",
+                            RoomCode = "125"
+                        },
+                        new
+                        {
+                            Id = 50,
+                            Code = "FURNITURE",
+                            IsAvailable = true,
+                            Name = "Furniture",
+                            RoomCode = "125"
+                        },
+                        new
+                        {
+                            Id = 51,
+                            Code = "AC",
+                            IsAvailable = true,
+                            Name = "Air-conditioner",
+                            RoomCode = "126"
+                        },
+                        new
+                        {
+                            Id = 52,
+                            Code = "FURNITURE",
+                            IsAvailable = true,
+                            Name = "Furniture",
+                            RoomCode = "126"
+                        },
+                        new
+                        {
+                            Id = 53,
+                            Code = "AC",
+                            IsAvailable = true,
+                            Name = "Air-conditioner",
+                            RoomCode = "127"
+                        },
+                        new
+                        {
+                            Id = 54,
+                            Code = "FURNITURE",
+                            IsAvailable = true,
+                            Name = "Furniture",
+                            RoomCode = "127"
+                        },
+                        new
+                        {
+                            Id = 55,
+                            Code = "AC",
+                            IsAvailable = true,
+                            Name = "Air-conditioner",
+                            RoomCode = "128"
+                        },
+                        new
+                        {
+                            Id = 56,
+                            Code = "FURNITURE",
+                            IsAvailable = true,
+                            Name = "Furniture",
+                            RoomCode = "128"
+                        },
+                        new
+                        {
+                            Id = 57,
+                            Code = "AC",
+                            IsAvailable = true,
+                            Name = "Air-conditioner",
+                            RoomCode = "129"
+                        },
+                        new
+                        {
+                            Id = 58,
+                            Code = "FURNITURE",
+                            IsAvailable = true,
+                            Name = "Furniture",
+                            RoomCode = "129"
+                        },
+                        new
+                        {
+                            Id = 59,
+                            Code = "AC",
+                            IsAvailable = true,
+                            Name = "Air-conditioner",
+                            RoomCode = "130"
+                        },
+                        new
+                        {
+                            Id = 60,
+                            Code = "FURNITURE",
+                            IsAvailable = true,
+                            Name = "Furniture",
+                            RoomCode = "130"
+                        },
+                        new
+                        {
+                            Id = 61,
+                            Code = "AC",
+                            IsAvailable = true,
+                            Name = "Air-conditioner",
+                            RoomCode = "131"
+                        },
+                        new
+                        {
+                            Id = 62,
+                            Code = "FURNITURE",
+                            IsAvailable = true,
+                            Name = "Furniture",
+                            RoomCode = "131"
+                        },
+                        new
+                        {
+                            Id = 63,
+                            Code = "AC",
+                            IsAvailable = true,
+                            Name = "Air-conditioner",
+                            RoomCode = "132"
+                        },
+                        new
+                        {
+                            Id = 64,
+                            Code = "FURNITURE",
+                            IsAvailable = true,
+                            Name = "Furniture",
+                            RoomCode = "132"
+                        },
+                        new
+                        {
+                            Id = 65,
+                            Code = "AC",
+                            IsAvailable = true,
+                            Name = "Air-conditioner",
+                            RoomCode = "133"
+                        },
+                        new
+                        {
+                            Id = 66,
+                            Code = "FURNITURE",
+                            IsAvailable = true,
+                            Name = "Furniture",
+                            RoomCode = "133"
+                        },
+                        new
+                        {
+                            Id = 67,
+                            Code = "AC",
+                            IsAvailable = true,
+                            Name = "Air-conditioner",
+                            RoomCode = "134"
+                        },
+                        new
+                        {
+                            Id = 68,
+                            Code = "FURNITURE",
+                            IsAvailable = true,
+                            Name = "Furniture",
+                            RoomCode = "134"
+                        },
+                        new
+                        {
+                            Id = 69,
+                            Code = "AC",
+                            IsAvailable = true,
+                            Name = "Air-conditioner",
+                            RoomCode = "135"
+                        },
+                        new
+                        {
+                            Id = 70,
+                            Code = "FURNITURE",
+                            IsAvailable = true,
+                            Name = "Furniture",
+                            RoomCode = "135"
+                        },
+                        new
+                        {
+                            Id = 71,
+                            Code = "AC",
+                            IsAvailable = true,
+                            Name = "Air-conditioner",
+                            RoomCode = "136"
+                        },
+                        new
+                        {
+                            Id = 72,
+                            Code = "FURNITURE",
+                            IsAvailable = true,
+                            Name = "Furniture",
+                            RoomCode = "136"
+                        },
+                        new
+                        {
+                            Id = 73,
+                            Code = "AC",
+                            IsAvailable = true,
+                            Name = "Air-conditioner",
+                            RoomCode = "137"
+                        },
+                        new
+                        {
+                            Id = 74,
+                            Code = "FURNITURE",
+                            IsAvailable = true,
+                            Name = "Furniture",
+                            RoomCode = "137"
+                        },
+                        new
+                        {
+                            Id = 75,
+                            Code = "AC",
+                            IsAvailable = true,
+                            Name = "Air-conditioner",
+                            RoomCode = "201"
+                        },
+                        new
+                        {
+                            Id = 76,
+                            Code = "FURNITURE",
+                            IsAvailable = true,
+                            Name = "Furniture",
+                            RoomCode = "201"
+                        },
+                        new
+                        {
+                            Id = 77,
+                            Code = "AC",
+                            IsAvailable = true,
+                            Name = "Air-conditioner",
+                            RoomCode = "202"
+                        },
+                        new
+                        {
+                            Id = 78,
+                            Code = "FURNITURE",
+                            IsAvailable = true,
+                            Name = "Furniture",
+                            RoomCode = "202"
+                        },
+                        new
+                        {
+                            Id = 79,
+                            Code = "AC",
+                            IsAvailable = true,
+                            Name = "Air-conditioner",
+                            RoomCode = "203"
+                        },
+                        new
+                        {
+                            Id = 80,
+                            Code = "FURNITURE",
+                            IsAvailable = true,
+                            Name = "Furniture",
+                            RoomCode = "203"
+                        },
+                        new
+                        {
+                            Id = 81,
+                            Code = "AC",
+                            IsAvailable = true,
+                            Name = "Air-conditioner",
+                            RoomCode = "204"
+                        },
+                        new
+                        {
+                            Id = 82,
+                            Code = "FURNITURE",
+                            IsAvailable = true,
+                            Name = "Furniture",
+                            RoomCode = "204"
+                        },
+                        new
+                        {
+                            Id = 83,
+                            Code = "AC",
+                            IsAvailable = true,
+                            Name = "Air-conditioner",
+                            RoomCode = "205"
+                        },
+                        new
+                        {
+                            Id = 84,
+                            Code = "FURNITURE",
+                            IsAvailable = true,
+                            Name = "Furniture",
+                            RoomCode = "205"
+                        },
+                        new
+                        {
+                            Id = 85,
+                            Code = "AC",
+                            IsAvailable = true,
+                            Name = "Air-conditioner",
+                            RoomCode = "206"
+                        },
+                        new
+                        {
+                            Id = 86,
+                            Code = "FURNITURE",
+                            IsAvailable = true,
+                            Name = "Furniture",
+                            RoomCode = "206"
+                        },
+                        new
+                        {
+                            Id = 87,
+                            Code = "AC",
+                            IsAvailable = true,
+                            Name = "Air-conditioner",
+                            RoomCode = "207"
+                        },
+                        new
+                        {
+                            Id = 88,
+                            Code = "FURNITURE",
+                            IsAvailable = true,
+                            Name = "Furniture",
+                            RoomCode = "207"
+                        },
+                        new
+                        {
+                            Id = 89,
+                            Code = "AC",
+                            IsAvailable = true,
+                            Name = "Air-conditioner",
+                            RoomCode = "208"
+                        },
+                        new
+                        {
+                            Id = 90,
+                            Code = "FURNITURE",
+                            IsAvailable = true,
+                            Name = "Furniture",
+                            RoomCode = "208"
+                        },
+                        new
+                        {
+                            Id = 91,
+                            Code = "AC",
+                            IsAvailable = true,
+                            Name = "Air-conditioner",
+                            RoomCode = "209"
+                        },
+                        new
+                        {
+                            Id = 92,
+                            Code = "FURNITURE",
+                            IsAvailable = true,
+                            Name = "Furniture",
+                            RoomCode = "209"
+                        },
+                        new
+                        {
+                            Id = 93,
+                            Code = "AC",
+                            IsAvailable = true,
+                            Name = "Air-conditioner",
+                            RoomCode = "210"
+                        },
+                        new
+                        {
+                            Id = 94,
+                            Code = "FURNITURE",
+                            IsAvailable = true,
+                            Name = "Furniture",
+                            RoomCode = "210"
+                        },
+                        new
+                        {
+                            Id = 95,
+                            Code = "AC",
+                            IsAvailable = true,
+                            Name = "Air-conditioner",
+                            RoomCode = "211"
+                        },
+                        new
+                        {
+                            Id = 96,
+                            Code = "FURNITURE",
+                            IsAvailable = true,
+                            Name = "Furniture",
+                            RoomCode = "211"
+                        },
+                        new
+                        {
+                            Id = 97,
+                            Code = "AC",
+                            IsAvailable = true,
+                            Name = "Air-conditioner",
+                            RoomCode = "212"
+                        },
+                        new
+                        {
+                            Id = 98,
+                            Code = "FURNITURE",
+                            IsAvailable = true,
+                            Name = "Furniture",
+                            RoomCode = "212"
+                        },
+                        new
+                        {
+                            Id = 99,
+                            Code = "AC",
+                            IsAvailable = true,
+                            Name = "Air-conditioner",
+                            RoomCode = "213"
+                        },
+                        new
+                        {
+                            Id = 100,
+                            Code = "FURNITURE",
+                            IsAvailable = true,
+                            Name = "Furniture",
+                            RoomCode = "213"
+                        },
+                        new
+                        {
+                            Id = 101,
+                            Code = "AC",
+                            IsAvailable = true,
+                            Name = "Air-conditioner",
+                            RoomCode = "214"
+                        },
+                        new
+                        {
+                            Id = 102,
+                            Code = "FURNITURE",
+                            IsAvailable = true,
+                            Name = "Furniture",
+                            RoomCode = "214"
+                        },
+                        new
+                        {
+                            Id = 103,
+                            Code = "AC",
+                            IsAvailable = true,
+                            Name = "Air-conditioner",
+                            RoomCode = "215"
+                        },
+                        new
+                        {
+                            Id = 104,
+                            Code = "FURNITURE",
+                            IsAvailable = true,
+                            Name = "Furniture",
+                            RoomCode = "215"
+                        },
+                        new
+                        {
+                            Id = 105,
+                            Code = "AC",
+                            IsAvailable = true,
+                            Name = "Air-conditioner",
+                            RoomCode = "216"
+                        },
+                        new
+                        {
+                            Id = 106,
+                            Code = "FURNITURE",
+                            IsAvailable = true,
+                            Name = "Furniture",
+                            RoomCode = "216"
+                        },
+                        new
+                        {
+                            Id = 107,
+                            Code = "AC",
+                            IsAvailable = true,
+                            Name = "Air-conditioner",
+                            RoomCode = "217"
+                        },
+                        new
+                        {
+                            Id = 108,
+                            Code = "FURNITURE",
+                            IsAvailable = true,
+                            Name = "Furniture",
+                            RoomCode = "217"
+                        },
+                        new
+                        {
+                            Id = 109,
+                            Code = "AC",
+                            IsAvailable = true,
+                            Name = "Air-conditioner",
+                            RoomCode = "218"
+                        },
+                        new
+                        {
+                            Id = 110,
+                            Code = "FURNITURE",
+                            IsAvailable = true,
+                            Name = "Furniture",
+                            RoomCode = "218"
+                        },
+                        new
+                        {
+                            Id = 111,
+                            Code = "AC",
+                            IsAvailable = true,
+                            Name = "Air-conditioner",
+                            RoomCode = "219"
+                        },
+                        new
+                        {
+                            Id = 112,
+                            Code = "FURNITURE",
+                            IsAvailable = true,
+                            Name = "Furniture",
+                            RoomCode = "219"
+                        },
+                        new
+                        {
+                            Id = 113,
+                            Code = "AC",
+                            IsAvailable = true,
+                            Name = "Air-conditioner",
+                            RoomCode = "220"
+                        },
+                        new
+                        {
+                            Id = 114,
+                            Code = "FURNITURE",
+                            IsAvailable = true,
+                            Name = "Furniture",
+                            RoomCode = "220"
+                        },
+                        new
+                        {
+                            Id = 115,
+                            Code = "AC",
+                            IsAvailable = true,
+                            Name = "Air-conditioner",
+                            RoomCode = "221"
+                        },
+                        new
+                        {
+                            Id = 116,
+                            Code = "FURNITURE",
+                            IsAvailable = true,
+                            Name = "Furniture",
+                            RoomCode = "221"
+                        },
+                        new
+                        {
+                            Id = 117,
+                            Code = "AC",
+                            IsAvailable = true,
+                            Name = "Air-conditioner",
+                            RoomCode = "222"
+                        },
+                        new
+                        {
+                            Id = 118,
+                            Code = "FURNITURE",
+                            IsAvailable = true,
+                            Name = "Furniture",
+                            RoomCode = "222"
+                        },
+                        new
+                        {
+                            Id = 119,
+                            Code = "AC",
+                            IsAvailable = true,
+                            Name = "Air-conditioner",
+                            RoomCode = "223"
+                        },
+                        new
+                        {
+                            Id = 120,
+                            Code = "FURNITURE",
+                            IsAvailable = true,
+                            Name = "Furniture",
+                            RoomCode = "223"
+                        },
+                        new
+                        {
+                            Id = 121,
+                            Code = "AC",
+                            IsAvailable = true,
+                            Name = "Air-conditioner",
+                            RoomCode = "224"
+                        },
+                        new
+                        {
+                            Id = 122,
+                            Code = "FURNITURE",
+                            IsAvailable = true,
+                            Name = "Furniture",
+                            RoomCode = "224"
+                        },
+                        new
+                        {
+                            Id = 123,
+                            Code = "AC",
+                            IsAvailable = true,
+                            Name = "Air-conditioner",
+                            RoomCode = "225"
+                        },
+                        new
+                        {
+                            Id = 124,
+                            Code = "FURNITURE",
+                            IsAvailable = true,
+                            Name = "Furniture",
+                            RoomCode = "225"
+                        },
+                        new
+                        {
+                            Id = 125,
+                            Code = "AC",
+                            IsAvailable = true,
+                            Name = "Air-conditioner",
+                            RoomCode = "226"
+                        },
+                        new
+                        {
+                            Id = 126,
+                            Code = "FURNITURE",
+                            IsAvailable = true,
+                            Name = "Furniture",
+                            RoomCode = "226"
+                        },
+                        new
+                        {
+                            Id = 127,
+                            Code = "AC",
+                            IsAvailable = true,
+                            Name = "Air-conditioner",
+                            RoomCode = "227"
+                        },
+                        new
+                        {
+                            Id = 128,
+                            Code = "FURNITURE",
+                            IsAvailable = true,
+                            Name = "Furniture",
+                            RoomCode = "227"
+                        },
+                        new
+                        {
+                            Id = 129,
+                            Code = "AC",
+                            IsAvailable = true,
+                            Name = "Air-conditioner",
+                            RoomCode = "228"
+                        },
+                        new
+                        {
+                            Id = 130,
+                            Code = "FURNITURE",
+                            IsAvailable = true,
+                            Name = "Furniture",
+                            RoomCode = "228"
+                        },
+                        new
+                        {
+                            Id = 131,
+                            Code = "AC",
+                            IsAvailable = true,
+                            Name = "Air-conditioner",
+                            RoomCode = "229"
+                        },
+                        new
+                        {
+                            Id = 132,
+                            Code = "FURNITURE",
+                            IsAvailable = true,
+                            Name = "Furniture",
+                            RoomCode = "229"
+                        },
+                        new
+                        {
+                            Id = 133,
+                            Code = "AC",
+                            IsAvailable = true,
+                            Name = "Air-conditioner",
+                            RoomCode = "230"
+                        },
+                        new
+                        {
+                            Id = 134,
+                            Code = "FURNITURE",
+                            IsAvailable = true,
+                            Name = "Furniture",
+                            RoomCode = "230"
+                        },
+                        new
+                        {
+                            Id = 135,
+                            Code = "AC",
+                            IsAvailable = true,
+                            Name = "Air-conditioner",
+                            RoomCode = "231"
+                        },
+                        new
+                        {
+                            Id = 136,
+                            Code = "FURNITURE",
+                            IsAvailable = true,
+                            Name = "Furniture",
+                            RoomCode = "231"
+                        },
+                        new
+                        {
+                            Id = 137,
+                            Code = "AC",
+                            IsAvailable = true,
+                            Name = "Air-conditioner",
+                            RoomCode = "232"
+                        },
+                        new
+                        {
+                            Id = 138,
+                            Code = "FURNITURE",
+                            IsAvailable = true,
+                            Name = "Furniture",
+                            RoomCode = "232"
+                        },
+                        new
+                        {
+                            Id = 139,
+                            Code = "AC",
+                            IsAvailable = true,
+                            Name = "Air-conditioner",
+                            RoomCode = "233"
+                        },
+                        new
+                        {
+                            Id = 140,
+                            Code = "FURNITURE",
+                            IsAvailable = true,
+                            Name = "Furniture",
+                            RoomCode = "233"
+                        },
+                        new
+                        {
+                            Id = 141,
+                            Code = "AC",
+                            IsAvailable = true,
+                            Name = "Air-conditioner",
+                            RoomCode = "234"
+                        },
+                        new
+                        {
+                            Id = 142,
+                            Code = "FURNITURE",
+                            IsAvailable = true,
+                            Name = "Furniture",
+                            RoomCode = "234"
+                        },
+                        new
+                        {
+                            Id = 143,
+                            Code = "AC",
+                            IsAvailable = true,
+                            Name = "Air-conditioner",
+                            RoomCode = "301"
+                        },
+                        new
+                        {
+                            Id = 144,
+                            Code = "FURNITURE",
+                            IsAvailable = true,
+                            Name = "Furniture",
+                            RoomCode = "301"
+                        },
+                        new
+                        {
+                            Id = 145,
+                            Code = "AC",
+                            IsAvailable = true,
+                            Name = "Air-conditioner",
+                            RoomCode = "302"
+                        },
+                        new
+                        {
+                            Id = 146,
+                            Code = "FURNITURE",
+                            IsAvailable = true,
+                            Name = "Furniture",
+                            RoomCode = "302"
+                        },
+                        new
+                        {
+                            Id = 147,
+                            Code = "AC",
+                            IsAvailable = true,
+                            Name = "Air-conditioner",
+                            RoomCode = "303"
+                        },
+                        new
+                        {
+                            Id = 148,
+                            Code = "FURNITURE",
+                            IsAvailable = true,
+                            Name = "Furniture",
+                            RoomCode = "303"
+                        },
+                        new
+                        {
+                            Id = 149,
+                            Code = "AC",
+                            IsAvailable = true,
+                            Name = "Air-conditioner",
+                            RoomCode = "304"
+                        },
+                        new
+                        {
+                            Id = 150,
+                            Code = "FURNITURE",
+                            IsAvailable = true,
+                            Name = "Furniture",
+                            RoomCode = "304"
+                        },
+                        new
+                        {
+                            Id = 151,
+                            Code = "AC",
+                            IsAvailable = true,
+                            Name = "Air-conditioner",
+                            RoomCode = "305"
+                        },
+                        new
+                        {
+                            Id = 152,
+                            Code = "FURNITURE",
+                            IsAvailable = true,
+                            Name = "Furniture",
+                            RoomCode = "305"
+                        },
+                        new
+                        {
+                            Id = 153,
+                            Code = "AC",
+                            IsAvailable = true,
+                            Name = "Air-conditioner",
+                            RoomCode = "306"
+                        },
+                        new
+                        {
+                            Id = 154,
+                            Code = "FURNITURE",
+                            IsAvailable = true,
+                            Name = "Furniture",
+                            RoomCode = "306"
+                        },
+                        new
+                        {
+                            Id = 155,
+                            Code = "AC",
+                            IsAvailable = true,
+                            Name = "Air-conditioner",
+                            RoomCode = "307"
+                        },
+                        new
+                        {
+                            Id = 156,
+                            Code = "FURNITURE",
+                            IsAvailable = true,
+                            Name = "Furniture",
+                            RoomCode = "307"
+                        },
+                        new
+                        {
+                            Id = 157,
+                            Code = "AC",
+                            IsAvailable = true,
+                            Name = "Air-conditioner",
+                            RoomCode = "308"
+                        },
+                        new
+                        {
+                            Id = 158,
+                            Code = "FURNITURE",
+                            IsAvailable = true,
+                            Name = "Furniture",
+                            RoomCode = "308"
+                        },
+                        new
+                        {
+                            Id = 159,
+                            Code = "AC",
+                            IsAvailable = true,
+                            Name = "Air-conditioner",
+                            RoomCode = "309"
+                        },
+                        new
+                        {
+                            Id = 160,
+                            Code = "FURNITURE",
+                            IsAvailable = true,
+                            Name = "Furniture",
+                            RoomCode = "309"
+                        },
+                        new
+                        {
+                            Id = 161,
+                            Code = "AC",
+                            IsAvailable = true,
+                            Name = "Air-conditioner",
+                            RoomCode = "310"
+                        },
+                        new
+                        {
+                            Id = 162,
+                            Code = "FURNITURE",
+                            IsAvailable = true,
+                            Name = "Furniture",
+                            RoomCode = "310"
+                        },
+                        new
+                        {
+                            Id = 163,
+                            Code = "AC",
+                            IsAvailable = true,
+                            Name = "Air-conditioner",
+                            RoomCode = "311"
+                        },
+                        new
+                        {
+                            Id = 164,
+                            Code = "FURNITURE",
+                            IsAvailable = true,
+                            Name = "Furniture",
+                            RoomCode = "311"
+                        },
+                        new
+                        {
+                            Id = 165,
+                            Code = "AC",
+                            IsAvailable = true,
+                            Name = "Air-conditioner",
+                            RoomCode = "312"
+                        },
+                        new
+                        {
+                            Id = 166,
+                            Code = "FURNITURE",
+                            IsAvailable = true,
+                            Name = "Furniture",
+                            RoomCode = "312"
+                        },
+                        new
+                        {
+                            Id = 167,
+                            Code = "AC",
+                            IsAvailable = true,
+                            Name = "Air-conditioner",
+                            RoomCode = "313"
+                        },
+                        new
+                        {
+                            Id = 168,
+                            Code = "FURNITURE",
+                            IsAvailable = true,
+                            Name = "Furniture",
+                            RoomCode = "313"
+                        },
+                        new
+                        {
+                            Id = 169,
+                            Code = "AC",
+                            IsAvailable = true,
+                            Name = "Air-conditioner",
+                            RoomCode = "314"
+                        },
+                        new
+                        {
+                            Id = 170,
+                            Code = "FURNITURE",
+                            IsAvailable = true,
+                            Name = "Furniture",
+                            RoomCode = "314"
+                        },
+                        new
+                        {
+                            Id = 171,
+                            Code = "AC",
+                            IsAvailable = true,
+                            Name = "Air-conditioner",
+                            RoomCode = "315"
+                        },
+                        new
+                        {
+                            Id = 172,
+                            Code = "FURNITURE",
+                            IsAvailable = true,
+                            Name = "Furniture",
+                            RoomCode = "315"
+                        },
+                        new
+                        {
+                            Id = 173,
+                            Code = "AC",
+                            IsAvailable = true,
+                            Name = "Air-conditioner",
+                            RoomCode = "401"
+                        },
+                        new
+                        {
+                            Id = 174,
+                            Code = "FURNITURE",
+                            IsAvailable = true,
+                            Name = "Furniture",
+                            RoomCode = "401"
+                        },
+                        new
+                        {
+                            Id = 175,
+                            Code = "AC",
+                            IsAvailable = true,
+                            Name = "Air-conditioner",
+                            RoomCode = "402"
+                        },
+                        new
+                        {
+                            Id = 176,
+                            Code = "FURNITURE",
+                            IsAvailable = true,
+                            Name = "Furniture",
+                            RoomCode = "402"
+                        },
+                        new
+                        {
+                            Id = 177,
+                            Code = "AC",
+                            IsAvailable = true,
+                            Name = "Air-conditioner",
+                            RoomCode = "403"
+                        },
+                        new
+                        {
+                            Id = 178,
+                            Code = "FURNITURE",
+                            IsAvailable = true,
+                            Name = "Furniture",
+                            RoomCode = "403"
+                        },
+                        new
+                        {
+                            Id = 179,
+                            Code = "AC",
+                            IsAvailable = true,
+                            Name = "Air-conditioner",
+                            RoomCode = "404"
+                        },
+                        new
+                        {
+                            Id = 180,
+                            Code = "FURNITURE",
+                            IsAvailable = true,
+                            Name = "Furniture",
+                            RoomCode = "404"
+                        },
+                        new
+                        {
+                            Id = 181,
+                            Code = "AC",
+                            IsAvailable = true,
+                            Name = "Air-conditioner",
+                            RoomCode = "405"
+                        },
+                        new
+                        {
+                            Id = 182,
+                            Code = "FURNITURE",
+                            IsAvailable = true,
+                            Name = "Furniture",
+                            RoomCode = "405"
+                        },
+                        new
+                        {
+                            Id = 183,
+                            Code = "AC",
+                            IsAvailable = true,
+                            Name = "Air-conditioner",
+                            RoomCode = "406"
+                        },
+                        new
+                        {
+                            Id = 184,
+                            Code = "FURNITURE",
+                            IsAvailable = true,
+                            Name = "Furniture",
+                            RoomCode = "406"
+                        },
+                        new
+                        {
+                            Id = 185,
+                            Code = "AC",
+                            IsAvailable = true,
+                            Name = "Air-conditioner",
+                            RoomCode = "407"
+                        },
+                        new
+                        {
+                            Id = 186,
+                            Code = "FURNITURE",
+                            IsAvailable = true,
+                            Name = "Furniture",
+                            RoomCode = "407"
+                        },
+                        new
+                        {
+                            Id = 187,
+                            Code = "AC",
+                            IsAvailable = true,
+                            Name = "Air-conditioner",
+                            RoomCode = "408"
+                        },
+                        new
+                        {
+                            Id = 188,
+                            Code = "FURNITURE",
+                            IsAvailable = true,
+                            Name = "Furniture",
+                            RoomCode = "408"
+                        },
+                        new
+                        {
+                            Id = 189,
+                            Code = "AC",
+                            IsAvailable = true,
+                            Name = "Air-conditioner",
+                            RoomCode = "409"
+                        },
+                        new
+                        {
+                            Id = 190,
+                            Code = "FURNITURE",
+                            IsAvailable = true,
+                            Name = "Furniture",
+                            RoomCode = "409"
+                        },
+                        new
+                        {
+                            Id = 191,
+                            Code = "AC",
+                            IsAvailable = true,
+                            Name = "Air-conditioner",
+                            RoomCode = "410"
+                        },
+                        new
+                        {
+                            Id = 192,
+                            Code = "FURNITURE",
+                            IsAvailable = true,
+                            Name = "Furniture",
+                            RoomCode = "410"
+                        },
+                        new
+                        {
+                            Id = 193,
+                            Code = "AC",
+                            IsAvailable = true,
+                            Name = "Air-conditioner",
+                            RoomCode = "411"
+                        },
+                        new
+                        {
+                            Id = 194,
+                            Code = "FURNITURE",
+                            IsAvailable = true,
+                            Name = "Furniture",
+                            RoomCode = "411"
+                        },
+                        new
+                        {
+                            Id = 195,
+                            Code = "AC",
+                            IsAvailable = true,
+                            Name = "Air-conditioner",
+                            RoomCode = "412"
+                        },
+                        new
+                        {
+                            Id = 196,
+                            Code = "FURNITURE",
+                            IsAvailable = true,
+                            Name = "Furniture",
+                            RoomCode = "412"
+                        },
+                        new
+                        {
+                            Id = 197,
+                            Code = "AC",
+                            IsAvailable = true,
+                            Name = "Air-conditioner",
+                            RoomCode = "413"
+                        },
+                        new
+                        {
+                            Id = 198,
+                            Code = "FURNITURE",
+                            IsAvailable = true,
+                            Name = "Furniture",
+                            RoomCode = "413"
+                        },
+                        new
+                        {
+                            Id = 199,
+                            Code = "AC",
+                            IsAvailable = true,
+                            Name = "Air-conditioner",
+                            RoomCode = "414"
+                        },
+                        new
+                        {
+                            Id = 200,
+                            Code = "FURNITURE",
+                            IsAvailable = true,
+                            Name = "Furniture",
+                            RoomCode = "414"
+                        },
+                        new
+                        {
+                            Id = 201,
+                            Code = "AC",
+                            IsAvailable = true,
+                            Name = "Air-conditioner",
+                            RoomCode = "415"
+                        },
+                        new
+                        {
+                            Id = 202,
+                            Code = "FURNITURE",
+                            IsAvailable = true,
+                            Name = "Furniture",
+                            RoomCode = "415"
+                        },
+                        new
+                        {
+                            Id = 203,
+                            Code = "AC",
+                            IsAvailable = true,
+                            Name = "Air-conditioner",
+                            RoomCode = "416"
+                        },
+                        new
+                        {
+                            Id = 204,
+                            Code = "FURNITURE",
+                            IsAvailable = true,
+                            Name = "Furniture",
+                            RoomCode = "416"
+                        },
+                        new
+                        {
+                            Id = 205,
+                            Code = "AC",
+                            IsAvailable = true,
+                            Name = "Air-conditioner",
+                            RoomCode = "417"
+                        },
+                        new
+                        {
+                            Id = 206,
+                            Code = "FURNITURE",
+                            IsAvailable = true,
+                            Name = "Furniture",
+                            RoomCode = "417"
+                        },
+                        new
+                        {
+                            Id = 207,
+                            Code = "AC",
+                            IsAvailable = true,
+                            Name = "Air-conditioner",
+                            RoomCode = "418"
+                        },
+                        new
+                        {
+                            Id = 208,
+                            Code = "FURNITURE",
+                            IsAvailable = true,
+                            Name = "Furniture",
+                            RoomCode = "418"
+                        },
+                        new
+                        {
+                            Id = 209,
+                            Code = "AC",
+                            IsAvailable = true,
+                            Name = "Air-conditioner",
+                            RoomCode = "419"
+                        },
+                        new
+                        {
+                            Id = 210,
+                            Code = "FURNITURE",
+                            IsAvailable = true,
+                            Name = "Furniture",
+                            RoomCode = "419"
+                        },
+                        new
+                        {
+                            Id = 211,
+                            Code = "AC",
+                            IsAvailable = true,
+                            Name = "Air-conditioner",
+                            RoomCode = "420"
+                        },
+                        new
+                        {
+                            Id = 212,
+                            Code = "FURNITURE",
+                            IsAvailable = true,
+                            Name = "Furniture",
+                            RoomCode = "420"
+                        },
+                        new
+                        {
+                            Id = 213,
+                            Code = "AC",
+                            IsAvailable = true,
+                            Name = "Air-conditioner",
+                            RoomCode = "421"
+                        },
+                        new
+                        {
+                            Id = 214,
+                            Code = "FURNITURE",
+                            IsAvailable = true,
+                            Name = "Furniture",
+                            RoomCode = "421"
+                        },
+                        new
+                        {
+                            Id = 215,
+                            Code = "AC",
+                            IsAvailable = true,
+                            Name = "Air-conditioner",
+                            RoomCode = "422"
+                        },
+                        new
+                        {
+                            Id = 216,
+                            Code = "FURNITURE",
+                            IsAvailable = true,
+                            Name = "Furniture",
+                            RoomCode = "422"
+                        },
+                        new
+                        {
+                            Id = 217,
+                            Code = "TV-DS",
+                            IsAvailable = true,
+                            Name = "TV screen",
+                            RoomCode = "LB. 12"
+                        },
+                        new
+                        {
+                            Id = 218,
+                            Code = "AC",
+                            IsAvailable = true,
+                            Name = "Air-conditioner",
+                            RoomCode = "LB. 12"
+                        },
+                        new
+                        {
+                            Id = 219,
+                            Code = "FURNITURE",
+                            IsAvailable = true,
+                            Name = "Furniture",
+                            RoomCode = "LB. 12"
+                        },
+                        new
+                        {
+                            Id = 220,
+                            Code = "TV-DS",
+                            IsAvailable = true,
+                            Name = "TV screen",
+                            RoomCode = "LB. 13"
+                        },
+                        new
+                        {
+                            Id = 221,
+                            Code = "AC",
+                            IsAvailable = true,
+                            Name = "Air-conditioner",
+                            RoomCode = "LB. 13"
+                        },
+                        new
+                        {
+                            Id = 222,
+                            Code = "FURNITURE",
+                            IsAvailable = true,
+                            Name = "Furniture",
+                            RoomCode = "LB. 13"
+                        },
+                        new
+                        {
+                            Id = 223,
+                            Code = "AC",
+                            IsAvailable = true,
+                            Name = "Air-conditioner",
+                            RoomCode = "LB. 15"
+                        },
+                        new
+                        {
+                            Id = 224,
+                            Code = "FURNITURE",
+                            IsAvailable = true,
+                            Name = "Furniture",
+                            RoomCode = "LB. 15"
+                        },
+                        new
+                        {
+                            Id = 225,
+                            Code = "TV-DS",
+                            IsAvailable = true,
+                            Name = "TV screen",
+                            RoomCode = "LB. 21"
+                        },
+                        new
+                        {
+                            Id = 226,
+                            Code = "AC",
+                            IsAvailable = true,
+                            Name = "Air-conditioner",
+                            RoomCode = "LB. 21"
+                        },
+                        new
+                        {
+                            Id = 227,
+                            Code = "FURNITURE",
+                            IsAvailable = true,
+                            Name = "Furniture",
+                            RoomCode = "LB. 21"
+                        },
+                        new
+                        {
+                            Id = 228,
+                            Code = "TV-DS",
+                            IsAvailable = true,
+                            Name = "TV screen",
+                            RoomCode = "Seminar"
+                        },
+                        new
+                        {
+                            Id = 229,
+                            Code = "AC",
+                            IsAvailable = true,
+                            Name = "Air-conditioner",
+                            RoomCode = "Seminar"
+                        },
+                        new
+                        {
+                            Id = 230,
+                            Code = "FURNITURE",
+                            IsAvailable = true,
+                            Name = "Furniture",
+                            RoomCode = "Seminar"
+                        });
                 });
 
             modelBuilder.Entity("FPTBooking.Data.Models.RoomType", b =>
@@ -2851,22 +4693,22 @@ namespace FPTBooking.Data.Migrations
                     b.HasData(
                         new
                         {
-                            UserId = "TraPTP@fpt.edu.vn",
+                            UserId = "TraPTP_fpt.edu.vn",
                             RoleId = "Manager"
                         },
                         new
                         {
-                            UserId = "utnt@fpt.edu.vn",
+                            UserId = "utnt_fpt.edu.vn",
                             RoleId = "Manager"
                         },
                         new
                         {
-                            UserId = "TraPTP@fpt.edu.vn",
+                            UserId = "TraPTP_fpt.edu.vn",
                             RoleId = "RoomChecker"
                         },
                         new
                         {
-                            UserId = "utnt@fpt.edu.vn",
+                            UserId = "utnt_fpt.edu.vn",
                             RoleId = "RoomChecker"
                         });
                 });
