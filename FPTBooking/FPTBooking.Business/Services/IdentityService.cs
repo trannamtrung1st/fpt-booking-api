@@ -480,7 +480,7 @@ namespace FPTBooking.Business.Services
         public bool ValidateEmailDomain(string email)
         {
             if (Settings.Instance.DevMode) return true;
-            return email.IsFptEmail();
+            return email.IsFptEmail() && !email.IsStudent();
         }
         #endregion
 
