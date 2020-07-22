@@ -130,7 +130,7 @@ namespace FPTBooking.Business.Services
 
         public AppUser UpdateUser(AppUser entity, UserRecord firebaseUser)
         {
-            entity.FullName = firebaseUser.DisplayName;
+            entity.FullName = entity.FullName ?? firebaseUser.DisplayName;
             entity.EmailConfirmed = firebaseUser.EmailVerified;
             entity.PhoneNumber = firebaseUser.PhoneNumber;
             entity.PhotoUrl = firebaseUser.PhotoUrl;
