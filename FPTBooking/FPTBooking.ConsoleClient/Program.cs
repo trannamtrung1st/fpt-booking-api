@@ -14,8 +14,8 @@ namespace FPTBooking.ConsoleClient
     {
         static void Main(string[] args)
         {
-            var test = "Khanht@fpt.edu.vn";
-            var code = test.GetTeacherCode();
+            var test = "hungnx162312@fpt.edu.vn";
+            var code = test.IsStudent();
             Console.WriteLine(code);
             using (var fapClient = new FptFapClient("http://fap.fpt.edu.vn", "fap-secret-key"))
             {

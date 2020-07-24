@@ -10,7 +10,7 @@ namespace FPTBooking.Business.Helpers
     {
         public static bool IsStudent(this string email)
         {
-            return Regex.IsMatch(email, "([a-zA-Z]{2}[0-9]+?)@", RegexOptions.IgnoreCase);
+            return Regex.IsMatch(email, "([a-zA-Z]{2}[0-9]{5,}?)@", RegexOptions.IgnoreCase);
         }
 
         public static string GetStudentCode(this string email)
