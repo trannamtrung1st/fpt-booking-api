@@ -360,3 +360,4 @@ MigrationBackup/
 FodyWeavers.xsd
 /FPTBooking/FPTBooking.WebApi/Secrets/firebase.json
 /FPTBooking/FPTBooking.WebApi/Secrets
+/FPTBooking/FPTBooking.WebAdmin/Secrets
