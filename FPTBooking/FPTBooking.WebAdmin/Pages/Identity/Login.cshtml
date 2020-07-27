@@ -36,6 +36,7 @@
                 <form id="form-main" method="post">
                     <div class="row">
                         <div class="col-12">
+                            <input type="hidden" name="firebase_token" />
                             <div class="icheck-primary">
                                 <input type="checkbox" id="remember" name="remember_me" value="true">
                                 <label for="remember">
@@ -50,9 +51,9 @@
                     <a href="#" class="btn btn-block btn-primary">
                         <i class="fab fa-facebook mr-2"></i> Sign in using Facebook
                     </a>
-                    <a href="#" class="btn btn-block btn-danger">
+                    <button onclick="onGoogleLoginClick()" class="btn btn-block btn-danger">
                         <i class="fab fa-google-plus mr-2"></i> Sign in using Google+
-                    </a>
+                    </button>
                 </div>
                 <!-- /.social-auth-links -->
 
@@ -76,6 +77,50 @@
     <!-- AdminLTE App -->
     <script src="/dist/js/adminlte.min.js"></script>
     <partial name="AppScript" />
+    <!-- Insert these scripts at the bottom of the HTML, but before you use any Firebase services -->
+    <!-- Firebase App (the core Firebase SDK) is always required and must be listed first -->
+    <script src="https://www.gstatic.com/firebasejs/7.17.1/firebase-app.js"></script>
+
+    <!-- Add Firebase products that you want to use -->
+    <script src="https://www.gstatic.com/firebasejs/7.17.1/firebase-auth.js"></script>
+
+    <!-- Firebase init -->
+    <script src="~/dist/js/firebase.js"></script>
+
+    <script>
+        //Google login
+        var provider = new firebase.auth.GoogleAuthProvider();
+
+        function onGoogleLoginClick() {
+            firebase.auth().signInWithPopup(provider).then(function (result) {
+                firebase.auth().currentUser.getIdToken(/* forceRefresh */ true).then(function (idToken) {
+                    var form = $('#form-main');
+                    form.find('input[name = firebase_token]').val(idToken);
+                    form.submit();
+                }).catch(function (error) {
+                });
+            }).catch(function (error) {
+                // Handle Errors here.
+                var errorCode = error.code;
+                var errorMessage = error.message;
+                // The email of the user's account used.
+                var email = error.email;
+                // The firebase.auth.AuthCredential type that was used.
+                var credential = error.credential;
+                // ...
+            });
+        }
+
+        function logOut() {
+            firebase.auth().signOut().then(function () {
+                // Sign-out successful.
+            }).catch(function (error) {
+                // An error happened.
+            });
+        }
+
+    </script>
+
     <script>
         clearToken();
         $(document).ready(() => {
@@ -84,10 +129,10 @@
                     form.submit();
                 },
                 rules: {
-                    
+
                 },
                 messages: {
-                    
+
                 },
                 errorElement: 'span',
                 errorPlacement: function (error, element) {

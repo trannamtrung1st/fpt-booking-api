@@ -1,4 +1,40 @@
 ﻿@page
 @model FPTBooking.WebAdmin.Pages.Identity.LogoutModel
 @{
+    Layout = null;
 }
+
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <title>Process...</title>
+</head>
+<body class="hold-transition login-page">
+
+    <!-- Insert these scripts at the bottom of the HTML, but before you use any Firebase services -->
+    <!-- Firebase App (the core Firebase SDK) is always required and must be listed first -->
+    <script src="https://www.gstatic.com/firebasejs/7.17.1/firebase-app.js"></script>
+
+    <!-- Add Firebase products that you want to use -->
+    <script src="https://www.gstatic.com/firebasejs/7.17.1/firebase-auth.js"></script>
+
+    <!-- Firebase init -->
+    <script src="~/dist/js/firebase.js"></script>
+
+    <script>
+        //Google login
+        var provider = new firebase.auth.GoogleAuthProvider();
+        logOut();
+        function logOut() {
+            firebase.auth().signOut().then(function () {
+                location.href = "@Routing.DASHBOARD";
+            }).catch(function (error) {
+                // An error happened.
+            });
+        }
+
+    </script>
+</body>
+</html>

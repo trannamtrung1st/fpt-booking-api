@@ -21,7 +21,7 @@ namespace FPTBooking.WebAdmin.Pages.Identity
         {
             if (User.Identity.IsAuthenticated)
                 await identityService.SignOutAsync();
-            return LocalRedirect(Routing.DASHBOARD);
+            return Page();
         }
 
         protected override void SetPageInfo()

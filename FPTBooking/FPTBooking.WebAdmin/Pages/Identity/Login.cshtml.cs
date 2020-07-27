@@ -24,6 +24,7 @@ using FirebaseAdmin.Auth;
 using FPTBooking.Business.Helpers;
 using FPTBooking.WebHelpers;
 using FPTBooking.Business.Queries;
+using FPTBooking.Data;
 
 namespace FPTBooking.WebAdmin.Pages.Identity
 {
@@ -108,6 +109,11 @@ namespace FPTBooking.WebAdmin.Pages.Identity
             }
             #region Custom Signin for extra claims store
             var principal = await identityService.GetApplicationPrincipalAsync(entity);
+            if (!principal.IsInRole(RoleName.ADMIN) && !Business.Settings.Instance.DevMode)
+            {
+                Message = "Access denied";
+                return Page();
+            }
             var utcNow = DateTime.UtcNow;
             var cookieProps = new AuthenticationProperties()
             {

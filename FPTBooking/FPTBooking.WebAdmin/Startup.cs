@@ -20,6 +20,8 @@ using FPTBooking.Data.Models;
 using FPTBooking.WebAdmin.Pages.Shared;
 using TNT.Core.Helpers.DI;
 using System.IO;
+using FirebaseAdmin;
+using Google.Apis.Auth.OAuth2;
 
 namespace FPTBooking.WebAdmin
 {
@@ -37,6 +39,10 @@ namespace FPTBooking.WebAdmin
         // This method gets called by the runtime. Use this method to add services to the container.
         public void ConfigureServices(IServiceCollection services)
         {
+            FirebaseApp.Create(new AppOptions()
+            {
+                Credential = GoogleCredential.FromFile(Settings.Instance.FirebaseCredentials),
+            });
             ServiceInjection.Register(new List<Assembly>()
             {
                 Assembly.GetExecutingAssembly()
