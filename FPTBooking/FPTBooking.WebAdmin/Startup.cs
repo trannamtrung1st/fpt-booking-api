@@ -112,13 +112,11 @@ namespace FPTBooking.WebAdmin
             {
                 var allowAnnonymousPages = new[] {
                     "/AccessDenied", "/Error", "/Status", "/Identity/Login", "/Identity/Register" };
-#if !DEBUG
                 var authorizeFolders = new[] { "/" };
                 foreach (var f in authorizeFolders)
                     options.Conventions.AuthorizeFolder(f);
                 foreach (var p in allowAnnonymousPages)
                     options.Conventions.AllowAnonymousToPage(p);
-#endif
             }).AddViewLocalization(LanguageViewLocationExpanderFormat.Suffix)
             .AddDataAnnotationsLocalization(); ;
         }

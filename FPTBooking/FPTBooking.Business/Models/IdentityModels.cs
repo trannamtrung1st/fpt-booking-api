@@ -72,8 +72,7 @@ namespace FPTBooking.Business.Models
 
     public class LoginModel
     {
-        public string username { get; set; }
-        public string password { get; set; }
+        public string firebase_token { get; set; }
         public bool remember_me { get; set; }
     }
 

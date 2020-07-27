@@ -6,7 +6,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 
-namespace FPTBooking.WebApi.Helpers
+namespace FPTBooking.WebHelpers
 {
     public class ResultHelper
     {

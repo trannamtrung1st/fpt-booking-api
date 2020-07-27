@@ -29,6 +29,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\FPTBooking.Business\FPTBooking.Business.csproj" />
+    <ProjectReference Include="..\FPTBooking.WebHelpers\FPTBooking.WebHelpers.csproj" />
     <ProjectReference Include="..\FPTBooking\FPTBooking.csproj" />
   </ItemGroup>
 
