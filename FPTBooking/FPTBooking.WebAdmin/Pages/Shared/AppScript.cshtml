@@ -127,9 +127,10 @@
             let json = resp.responseJSON;
             if (json.code == @((int)AppResultCode.FailValidation)) {
                 html = 'Some inputs are not valid';
-                let data = json.data;
+                let data = json.data.results;
                 for (var i = 0; i < data.length; i++) {
                     var result = data[i];
+                    html += '<br/>' + result.message;
                     console.log(result);
                 }
             } else if (badReqMessage)

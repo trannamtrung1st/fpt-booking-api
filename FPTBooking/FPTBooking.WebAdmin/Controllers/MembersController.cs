@@ -53,7 +53,11 @@ namespace FPTBooking.WebAdmin.Controllers
                 return Unauthorized(AppResult.InvalidEmailDomain());
             var entity = await _identityService.GetUserByEmailAsync(model.Email);
             if (entity != null)
-                return BadRequest(AppResult.EmailExisted());
+            {
+                var validationData = new ValidationData();
+                validationData = validationData.Fail(code: AppResultCode.EmailExisted);
+                return BadRequest(AppResult.FailValidation(validationData));
+            }
             var emailInfo = model.Email.GetEmailInfo();
             entity = _identityService.ConvertToUser(model, emailInfo.Item3);
             using (var transaction = context.Database.BeginTransaction())
@@ -69,8 +73,7 @@ namespace FPTBooking.WebAdmin.Controllers
                     return BadRequest(builder);
                 }
                 _logger.CustomProperties(entity).Info("Register new user");
-                var memberEntity = _service.ConvertToMember(entity, emailInfo.Item3);
-                memberEntity = _service.CreateMember(memberEntity);
+                var memberEntity = _service.CreateMember(model, entity, emailInfo);
                 //log event
                 var ev = _sysService.GetEventForNewUser(
                     $"Admin has created a user with email {model.Email}",

@@ -207,6 +207,19 @@ namespace FPTBooking.Business.Services
             PrepareCreate(entity);
             return context.Member.Add(entity).Entity;
         }
+
+        public Member CreateMember(CreateMemberModel model, AppUser userEntity, (bool, bool, string) emailInfo)
+        {
+            var entity = ConvertToMember(userEntity, emailInfo.Item3);
+            PrepareCreate(entity);
+            entity.DepartmentMember.Add(new DepartmentMember
+            {
+                DepartmentCode = model.DepartmentCode,
+                IsManager = model.IsManager,
+                MemberId = entity.UserId
+            });
+            return context.Member.Add(entity).Entity;
+        }
         #endregion
 
         #region Update Member
