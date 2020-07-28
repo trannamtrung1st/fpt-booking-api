@@ -98,6 +98,7 @@ namespace FPTBooking.Business.Services
                             var entities = row.DepartmentMember
                                 .Select(o => new
                                 {
+                                    id = o.Id,
                                     name = o.Department.Name,
                                     code = o.DepartmentCode,
                                     is_manager = o.IsManager

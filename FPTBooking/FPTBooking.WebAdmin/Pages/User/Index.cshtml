@@ -16,6 +16,7 @@
     <style>
         [class*=icheck-] > label {
             padding-left: 0 !important;
+            line-height: unset!important;
         }
     </style>
 }
@@ -121,8 +122,71 @@
 </section>
 <!-- /.content -->
 
+<div class="modal fade" id="modal-edit">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 class="card-title">Edit user</h3>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <div class="modal-body">
+                <form id="form-edit-user">
+                    <input type="hidden" name="user_id" value="" />
+                    <div class="form-group">
+                        <label>Full name</label>
+                        <input type="text" name="full_name" class="form-control" placeholder="Enter user full name">
+                    </div>
+                    <div class="form-group">
+                        <label>Department(s)</label>
+                        <div class="row">
+                            <div class="col-10">
+                                <select class="form-control select2" name="department_code">
+                                    <option value="">--- Not selected ---</option>
+                                </select>
+                            </div>
+                            <div class="col-2">
+                                <button class="btn btn-default w-100">
+                                    <i class="fa fa-plus"></i>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                    <div id="dep-member-container">
+                        <div class="form-group">
+                            Abc -
+                            <span class="icheck-primary">
+                                <label for="test" class="pr-2" style="font-weight: normal">
+                                    Is manager
+                                </label>
+                                <input type="checkbox" id="test" name="test" value="" />
+                            </span>
+                            <span class="ml-3"><i class="fa fa-times-circle"></i></span>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label>Email</label>
+                        <input type="text" name="email" class="form-control" placeholder="Enter user email">
+                    </div>
+                </form>
+                <!-- /.card -->
+            </div>
+            <div class="modal-footer">
+                <button type="button" onclick="confirmEdit()" class="btn btn-primary">
+                    <i class="fa fa-pen mr-2"></i>SUBMIT
+                </button>
+            </div>
+        </div>
+        <!-- /.modal-content -->
+    </div>
+    <!-- /.modal-dialog -->
+</div>
+
 @section scripts {
 
+    <!-- iCheck -->
+    <script src="~/plugins/icheck/icheck.min.js"></script>
     <!-- jquery-validation -->
     <script src="/plugins/jquery-validation/jquery.validate.min.js"></script>
     <script src="/plugins/jquery-validation/additional-methods.min.js"></script>
@@ -136,6 +200,7 @@
     <!-- page script -->
     <script>
         let tblMain;
+        let memberData = [];
         $(function () {
             tblMain = $("#tbl-main").DataTable({
                 responsive: true,
@@ -222,6 +287,7 @@
                 success: (respData) => {
                     console.log(respData);
                     let data = respData.data.list;
+                    memberData = data;
                     processData(data);
                 },
                 error: (data) => {
@@ -236,15 +302,20 @@
         function processData(data) {
             tblMain.clear();
             var btn = (id) =>
-                "<div class=\"dropdown\">" +
-                    "<button class=\"btn btn-primary dropdown-toggle btn-sm\"" +
-                        "type=\"button\" id=\"btn-dropdown\" data-toggle=\"dropdown\" aria-haspopup=\"true\" aria-expanded=\"false\">" +
-                        "<i class=\"fa fa-list\"></i>" +
-                    "</button>" +
-                    "<div class=\"dropdown-menu\" aria-labelledby=\"btn-dropdown\">" +
-                        "<a class=\"dropdown-item\" href=\"" + "#".replace('{id}', id) + "\"><i class=\"fa fa-info-circle dropdown-item-icon\"></i>Detail</a>" +
-                        "<button class=\"dropdown-item\" onclick=\"confirmRemove(" + id + ")\"><i class=\"fa fa-trash dropdown-item-icon\"></i>Remove</button>" +
+                "<div>" +
+                    "<div class=\"dropdown d-inline\">" +
+                        "<button class=\"btn btn-primary dropdown-toggle btn-sm\"" +
+                            "type=\"button\" id=\"btn-dropdown\" data-toggle=\"dropdown\" aria-haspopup=\"true\" aria-expanded=\"false\">" +
+                            "<i class=\"fa fa-list\"></i>" +
+                        "</button>" +
+                        "<div class=\"dropdown-menu\" aria-labelledby=\"btn-dropdown\">" +
+                            "<a class=\"dropdown-item\" href=\"" + "#".replace('{id}', id) + "\"><i class=\"fa fa-info-circle dropdown-item-icon\"></i>Detail</a>" +
+                            "<button class=\"dropdown-item\" onclick=\"confirmRemove(" + id + ")\"><i class=\"fa fa-trash dropdown-item-icon\"></i>Remove</button>" +
+                        "</div>" +
                     "</div>" +
+                    "<button class=\"btn btn-primary btn-sm ml-2\" type=\"button\" onclick=\"enableEdit(" + id + ")\">" +
+                            "<i class=\"fa fa-pen\"></i>" +
+                    "</button>" +
                 "</div>";
             for (var i = 0; i < data.length; i++) {
                 const obj = data[i];
@@ -309,8 +380,7 @@
         }
 
         function processDepartmentData(data) {
-            var form = $('#form-create-user');
-            var depSelect = form.find('select[name=department_code]');
+            var depSelect = $('select[name=department_code]');
             for (var i = 0; i < data.length; i++) {
                 const obj = data[i];
                 depSelect.append(
@@ -329,10 +399,11 @@
 
         function submitCreateUser() {
             const model = {};
-            model.full_name = $('[name=full_name]').val();
-            model.department_code = $('[name=department_code]').val();
-            model.is_manager = $('[name=is_manager]:checked').val();
-            model.email = $('[name=email]').val();
+            const form = $('#form-create-user');
+            model.full_name = form.find('[name=full_name]').val();
+            model.department_code = form.find('[name=department_code]').val();
+            model.is_manager = form.find('[name=is_manager]:checked').val();
+            model.email = form.find('[name=email]').val();
 
             changeLoading(true);
             $.ajax({
@@ -352,6 +423,80 @@
                     changeLoading(false);
                 }
             });
+        }
+
+        //edit
+        function enableEdit(id) {
+            var modal = $('#modal-edit');
+            var member = memberData.filter(o => o.user_id == id)[0];
+            var depMembers = member.departments;
+            var depMembersEles = depMembers.map(o =>
+                $('<div class="form-group dep-member">').append(
+                    $('<input type="hidden" name="dep_member_dep_code" value="' + o.code + '"/>')
+                ).append(
+                    '<span>'+o.name + '</span> - '
+                ).append(
+                    $('<span class="icheck-primary">').append(
+                        $('<label for="dep-member-' + o.id + '" class="pr-2" style="font-weight: normal">').append(
+                            'Is manager'
+                        )
+                    ).append(
+                        $('<input type="checkbox" id="dep-member-' + o.id +
+                            '" name="dep_member_' + o.id + '" value="true" ' + (o.is_manager ? 'checked="checked"' : '')
+                        + '/>')
+                    )
+                ).append(
+                    $('<span class="ml-3" onclick="removeDepMember(this)"><i class="fa fa-times-circle"></i></span>')
+                )
+            );
+            var container = modal.find('#dep-member-container');
+            container.html('');
+            depMembersEles.forEach(o =>
+                container.append(o));
+
+            modal.find('[name=user_id]').val(member.user_id);
+            modal.find('[name=full_name]').val(member.full_name);
+            modal.find('[name=email]').val(member.email);
+            modal.modal('show');
+        }
+
+        function confirmSubmitEdit() {
+            confirmAlert().then((result) => {
+                if (result.value)
+                    submitEdit();
+            });
+        }
+
+        function submitEdit() {
+            var modal = $('#modal-edit');
+            const model = {};
+            var userId = modal.find('[name=user_id]').val();
+            model.full_name = modal.find('[name=full_name]').val();
+            model.department_code = modal.find('[name=department_code]').val();
+            model.email = modal.find('[name=email]').val();
+            model.is_manager = modal.find('[name=is_manager]').val();
+            changeLoading(true);
+            $.ajax({
+                url: '/@ApiEndpoint.MEMBER_API/' + userId,
+                type: 'patch',
+                contentType: 'application/json',
+                data: JSON.stringify(model),
+                success: (data) => {
+                    successAlert("Update successfully").then(() => {
+                        getData();
+                    });
+                },
+                error: (data) => {
+                    handleGeneralError(data);
+                },
+                complete: () => {
+                    changeLoading(false);
+                }
+            });
+        }
+
+        function removeDepMember(btn) {
+            $(btn).parent().remove();
         }
     </script>
 }

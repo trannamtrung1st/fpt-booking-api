@@ -6,10 +6,10 @@
       "library": "jquery@2.2.0",
       "destination": "wwwroot/plugins/jquery/dist"
     },
-    //{
-    //  "library": "jquery-validate@1.14.0",
-    //  "destination": "wwwroot/plugins/jquery-validate"
-    //},
+    {
+      "library": "iCheck@1.0.2",
+      "destination": "wwwroot/plugins/icheck"
+    },
     {
       "library": "jquery-validation-unobtrusive@3.2.6",
       "destination": "wwwroot/plugins/jquery-validation-unobtrusive"
