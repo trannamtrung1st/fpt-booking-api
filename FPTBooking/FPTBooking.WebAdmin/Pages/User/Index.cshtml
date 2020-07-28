@@ -507,6 +507,7 @@
                 data: JSON.stringify(model),
                 success: (data) => {
                     successAlert("Update successfully").then(() => {
+                        modal.modal('hide');
                         getData();
                     });
                 },
