@@ -251,7 +251,7 @@
                 var deps = obj.departments.map(o => o.name + ' - ' + (o.is_manager ? 'Manager' : 'Member'))
                     .join('<br/>');
                 tblMain.row.add([
-                    btn(obj.id),
+                    btn("'" + obj.user_id + "'"),
                     null,
                     obj.full_name,
                     deps,
@@ -331,7 +331,7 @@
             const model = {};
             model.full_name = $('[name=full_name]').val();
             model.department_code = $('[name=department_code]').val();
-            model.is_manager = $('[name=is_manager]').val();
+            model.is_manager = $('[name=is_manager]:checked').val();
             model.email = $('[name=email]').val();
 
             changeLoading(true);

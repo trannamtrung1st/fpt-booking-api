@@ -234,7 +234,20 @@ namespace FPTBooking.Business.Services
         }
         #endregion
 
+        #region Delete Member
+        public Member DeleteMemberTransaction(Member entity)
+        {
+            return context.Member.Remove(entity).Entity;
+        }
+        #endregion
+
         #region Validation
+        public ValidationData ValidateDeleteMember(ClaimsPrincipal principal,
+            Member entity)
+        {
+            return new ValidationData();
+        }
+
         public ValidationData ValidateGetMembers(
             MemberQueryFilter filter,
             MemberQuerySort sort,

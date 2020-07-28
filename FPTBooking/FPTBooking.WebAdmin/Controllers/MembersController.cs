@@ -22,6 +22,7 @@ using FPTBooking.Business.Helpers;
 using FPTBooking.Data;
 using FPTBooking.Business.Queries;
 using FPTBooking.WebHelpers;
+using Microsoft.EntityFrameworkCore;
 
 namespace FPTBooking.WebAdmin.Controllers
 {
@@ -84,6 +85,37 @@ namespace FPTBooking.WebAdmin.Controllers
                 transaction.Commit();
             }
             return NoContent();
+        }
+
+#if !DEBUG
+        [Authorize(Roles = RoleName.ADMIN)]
+#else
+        [Authorize]
+#endif
+        [HttpDelete("{id}")]
+        public IActionResult Delete(string id)
+        {
+            try
+            {
+                var entity = _service.Members.IdOnly().Id(id).FirstOrDefault();
+                if (entity == null)
+                    return NotFound(AppResult.NotFound());
+                var validationData = _service.ValidateDeleteMember(User, entity);
+                if (!validationData.IsValid)
+                    return BadRequest(AppResult.FailValidation(data: validationData));
+                using (var trans = context.Database.BeginTransaction())
+                {
+                    _service.DeleteMemberTransaction(entity);
+                    context.SaveChanges();
+                    trans.Commit();
+                }
+                return NoContent();
+            }
+            catch (DbUpdateException e)
+            {
+                _logger.Error(e);
+                return BadRequest(AppResult.DependencyDeleteFail());
+            }
         }
 
 #if !DEBUG
