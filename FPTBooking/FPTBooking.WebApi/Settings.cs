@@ -1,15 +1,11 @@
-﻿using System;
+﻿using FPTBooking.Business.Models;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 
 namespace FPTBooking.WebApi
 {
-    public class Mocking
-    {
-        public bool Enabled { get; set; }
-        public string LoginRole { get; set; }
-    }
 
     public class Settings
     {

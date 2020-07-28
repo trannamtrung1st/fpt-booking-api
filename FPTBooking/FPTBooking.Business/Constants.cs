@@ -58,6 +58,7 @@ namespace FPTBooking.Business
     {
         public const string ROLE_API = "api/roles";
         public const string USER_API = "api/users";
+        public const string MEMBER_API = "api/members";
         public const string BOOKING_API = "api/bookings";
         public const string ROOM_API = "api/rooms";
         public const string ROOM_TYPE_API = "api/room-types";

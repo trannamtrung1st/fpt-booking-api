@@ -8,6 +8,11 @@ using TNT.Core.Helpers.General;
 
 namespace FPTBooking.Business.Models
 {
+    public class Mocking
+    {
+        public bool Enabled { get; set; }
+        public string LoginRole { get; set; }
+    }
 
     public class AppResult
     {

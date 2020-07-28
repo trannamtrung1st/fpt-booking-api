@@ -22,6 +22,11 @@ using TNT.Core.Helpers.DI;
 using System.IO;
 using FirebaseAdmin;
 using Google.Apis.Auth.OAuth2;
+using FPTBooking.Business.Helpers;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
+using Microsoft.IdentityModel.Tokens;
+using System.Text;
+using FPTBooking.Data;
 
 namespace FPTBooking.WebAdmin
 {
@@ -62,7 +67,6 @@ namespace FPTBooking.WebAdmin
             var fapSecret = File.ReadAllText(Settings.Instance.FapSecretFile);
             Business.Global.Init(services, fapSecret);
             #region OAuth
-            //for some default Identity configuration, include AddAuthentication (IdentityConstants)
             services.AddIdentity<AppUser, AppRole>(options =>
             {
                 options.SignIn.RequireConfirmedEmail = false;
@@ -85,6 +89,49 @@ namespace FPTBooking.WebAdmin
                 "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789-._@+";
                 options.User.RequireUniqueEmail = false;
             });
+            //required
+            services.AddAuthentication()
+                .AddJwtBearer(jwtBearerOptions =>
+                {
+                    jwtBearerOptions.TokenValidationParameters = new TokenValidationParameters()
+                    {
+                        ValidateAudience = true,
+                        ValidateLifetime = true,
+                        ValidateIssuerSigningKey = true,
+                        ValidIssuer = JWT.ISSUER,
+                        ValidAudience = JWT.AUDIENCE,
+                        IssuerSigningKey = new SymmetricSecurityKey(
+                            Encoding.Default.GetBytes(JWT.SECRET_KEY)),
+                        ClockSkew = TimeSpan.Zero
+                    };
+                    jwtBearerOptions.Events = new JwtBearerEvents
+                    {
+                        OnMessageReceived = (context) =>
+                        {
+                            if (Settings.Instance.Mocking.Enabled)
+                            {
+                                var identity = new ClaimsIdentity("Mocking");
+                                identity.AddClaim(new Claim(ClaimTypes.Name, "mockuser"));
+                                identity.AddClaims(new List<Claim>
+                                {
+                                    new Claim(ClaimTypes.Role, RoleName.ADMIN),
+                                    new Claim(ClaimTypes.Role, RoleName.MANAGER),
+                                    new Claim(ClaimTypes.Role, RoleName.ROOM_CHECKER),
+                                    new Claim(ClaimTypes.Role, RoleName.USER),
+                                });
+                                context.Principal = new ClaimsPrincipal(identity);
+                                context.Success();
+                            }
+                            return Task.CompletedTask;
+                            //StringValues values;
+                            //if (!context.Request.Query.TryGetValue("access_token", out values))
+                            //    return Task.CompletedTask;
+                            //var token = values.FirstOrDefault();
+                            //context.Token = token;
+                            //return Task.CompletedTask;
+                        }
+                    };
+                });
             #endregion
             services.ConfigureApplicationCookie(options =>
             {
@@ -112,8 +159,12 @@ namespace FPTBooking.WebAdmin
                 };
             });
             services.AddScoped<Layout>();
-            services.AddLocalization(options => options.ResourcesPath = "Resources");
-            services.AddControllers();
+
+            services.AddSingleton(new DefaultDateTimeModelBinder());
+            services.AddControllers(options =>
+            {
+                options.ModelBinderProviders.Insert(0, new QueryObjectModelBinderProvider());
+            }).AddNewtonsoftJson();
             services.AddRazorPages(options =>
             {
                 var allowAnnonymousPages = new[] {
@@ -123,8 +174,7 @@ namespace FPTBooking.WebAdmin
                     options.Conventions.AuthorizeFolder(f);
                 foreach (var p in allowAnnonymousPages)
                     options.Conventions.AllowAnonymousToPage(p);
-            }).AddViewLocalization(LanguageViewLocationExpanderFormat.Suffix)
-            .AddDataAnnotationsLocalization(); ;
+            });
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.

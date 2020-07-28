@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Http;
+﻿using FPTBooking.Business.Models;
+using Microsoft.AspNetCore.Http;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -8,6 +9,7 @@ namespace FPTBooking.WebAdmin
 {
     public class Settings
     {
+        public Mocking Mocking { get; set; }
         public double CookiePersistentHours { get; set; }
         public double TokenValidHours { get; set; }
         public double RefreshTokenValidHours { get; set; }

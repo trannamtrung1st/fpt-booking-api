@@ -1,9 +1,4 @@
-﻿@inject IHtmlLocalizer<Layout> L
-@inject IHtmlLocalizer<Startup> SharedL
-@{
-    var apiUrl = WebAdmin.Settings.Instance.ApiUrl;
-}
-    <script>
+﻿<script>
     function appInit() {
         $.ajaxSetup({
             headers: { 'Authorization': 'Bearer ' + localStorage.access_token }
@@ -54,26 +49,7 @@
             if (localStorage.refresh_token) {
                 setTimeout(() => {
                     if (localStorage.expires_utc == curExpStr) {
-                        var formData = new FormData();
-                        formData.append('grant_type', 'refresh_token');
-                        formData.append('refresh_token', localStorage.refresh_token);
-                        $.ajax({
-                            url: "@apiUrl/@ApiEndpoint.USER_API/login",
-                            type: 'post',
-                            contentType: false,
-                            processData: false,
-                            cache: false,
-                            data: formData,
-                            success: (data) => {
-                                saveToken(data);
-                                checkToken();
-                                if (minRefDiff == 0)
-                                    location.reload();
-                            },
-                            error: (e) => {
-                                location.href = '@Routing.LOGOUT';
-                            }
-                        });
+                        location.href = "@Routing.LOGOUT";
                     }
                 }, minRefDiff * 60 * 1000);
             } else
@@ -91,24 +67,24 @@
         }
     }
 
-    function confirmAlert(html = '@SharedL["mess.are_u_sure"]') {
+    function confirmAlert(html = 'Are you sure?') {
         return Swal.fire({
             heightAuto: false,
-            title: '@SharedL["mess.confirm"]',
+            title: 'Confirm',
             text: html,
             icon: 'warning',
             showCancelButton: true,
             confirmButtonColor: '#3085d6',
             cancelButtonColor: '#d33',
-            confirmButtonText: '@SharedL["btn.yes"]'
+            confirmButtonText: 'Yes'
         });
     }
 
-    function errorAlert(html = "@SharedL["mess.error"]") {
+    function errorAlert(html = "Something's wrong") {
         return Swal.fire({
             heightAuto: false,
             icon: 'error',
-            title: '@SharedL["mess.sorry"]',
+            title: 'Sorry',
             html: html,
         });
     }
@@ -117,7 +93,7 @@
         return Swal.fire({
             heightAuto: false,
             icon: 'success',
-            title: '@SharedL["mess.success"]',
+            title: 'Success',
             text: html,
         })
     }
@@ -126,16 +102,16 @@
         return Swal.fire({
             heightAuto: false,
             icon: 'info',
-            title: '@SharedL["mess.sorry"]',
+            title: 'Sorry',
             html: html,
         });
     }
 
-    function notFoundAlert(html = "@SharedL["mess.not_found"]") {
+    function notFoundAlert(html = "Not found") {
         return Swal.fire({
             heightAuto: false,
             icon: 'info',
-            title: '@SharedL["mess.sorry"]',
+            title: 'Sorry',
             html: html,
         });
     }
@@ -150,7 +126,7 @@
             let html = '';
             let json = resp.responseJSON;
             if (json.code == @((int)AppResultCode.FailValidation)) {
-                html = '@SharedL["mess.some_inp_not_valid"]';
+                html = 'Some inputs are not valid';
                 let data = json.data;
                 for (var i = 0; i < data.length; i++) {
                     var result = data[i];
@@ -162,4 +138,4 @@
         } else
             errorAlert();
     }
-    </script>
+</script>

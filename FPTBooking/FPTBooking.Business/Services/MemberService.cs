@@ -64,6 +64,110 @@ namespace FPTBooking.Business.Services
                 .IsManager().Select(o => o.Member);
         }
 
+        public IDictionary<string, object> GetMemberDynamic(
+            Member row, MemberQueryProjection projection,
+            MemberQueryOptions options)
+        {
+            var obj = new Dictionary<string, object>();
+            foreach (var f in projection.GetFieldsArr())
+            {
+                switch (f)
+                {
+                    case MemberQueryProjection.INFO:
+                        {
+                            var entity = row;
+                            obj["code"] = entity.Code;
+                            obj["email"] = entity.Email;
+                            obj["first_name"] = entity.FirstName;
+                            obj["full_name"] = entity.FullName;
+                            obj["last_name"] = entity.LastName;
+                            obj["middle_name"] = entity.MiddleName;
+                            obj["phone"] = entity.Phone;
+                            obj["user_id"] = entity.UserId;
+                        }
+                        break;
+                    case MemberQueryProjection.SELECT:
+                        {
+                            var entity = row;
+                            obj["code"] = entity.Code;
+                            obj["name"] = entity.FullName;
+                        }
+                        break;
+                    case MemberQueryProjection.DEPARTMENT:
+                        {
+                            var entities = row.DepartmentMember
+                                .Select(o => new
+                                {
+                                    name = o.Department.Name,
+                                    code = o.DepartmentCode,
+                                    is_manager = o.IsManager
+                                }).ToList();
+                            obj["departments"] = entities;
+                        }
+                        break;
+                }
+            }
+            return obj;
+        }
+
+        public List<IDictionary<string, object>> GetMemberDynamic(
+            IEnumerable<Member> rows, MemberQueryProjection projection,
+            MemberQueryOptions options)
+        {
+            var list = new List<IDictionary<string, object>>();
+            foreach (var o in rows)
+            {
+                var obj = GetMemberDynamic(o, projection, options);
+                list.Add(obj);
+            }
+            return list;
+        }
+
+        public async Task<QueryResult<IDictionary<string, object>>> QueryMembersDynamic(
+            MemberQueryProjection projection,
+            IDictionary<string, object> tempData = null,
+            MemberQueryFilter filter = null,
+            MemberQuerySort sort = null,
+            MemberQueryPaging paging = null,
+            MemberQueryOptions options = null)
+        {
+            var query = Members.AsNoTracking();
+            if (filter != null)
+                query = query.Filter(filter, tempData);
+            int? totalCount = null; Task<int> countTask = null;
+            var countQuery = query;
+            query = query.Project(projection);
+            if (options != null && !options.single_only)
+            {
+                #region List query
+                if (sort != null) query = query.Sort(sort);
+                if (paging != null && (!options.load_all || !MemberQueryOptions.IsLoadAllAllowed))
+                    query = query.SelectPage(paging.page, paging.limit);
+                #endregion
+                #region Count query
+                if (options.count_total)
+                    countTask = countQuery.CountAsync();
+                #endregion
+            }
+            if (options != null && options.count_total) totalCount = await countTask;
+            var queryResult = await query.ToListAsync();
+            if (options != null && options.single_only)
+            {
+                var single = queryResult.FirstOrDefault();
+                if (single == null) return null;
+                var singleResult = GetMemberDynamic(single, projection, options);
+                return new QueryResult<IDictionary<string, object>>()
+                {
+                    SingleResult = singleResult
+                };
+            }
+            var results = GetMemberDynamic(queryResult, projection, options);
+            return new QueryResult<IDictionary<string, object>>()
+            {
+                Results = results,
+                TotalCount = totalCount
+            };
+        }
         #endregion
 
         #region Create Member
@@ -129,6 +233,17 @@ namespace FPTBooking.Business.Services
         #endregion
 
         #region Validation
+        public ValidationData ValidateGetMembers(
+            MemberQueryFilter filter,
+            MemberQuerySort sort,
+            MemberQueryProjection projection,
+            MemberQueryPaging paging,
+            MemberQueryOptions options)
+        {
+            var validationData = new ValidationData();
+            return validationData;
+        }
+
         #endregion
 
     }

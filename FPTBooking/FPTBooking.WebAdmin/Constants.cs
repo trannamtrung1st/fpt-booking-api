@@ -8,6 +8,7 @@ namespace FPTBooking.WebAdmin
 {
     public static class Routing
     {
+        public const string USER = "/user";
         public const string DASHBOARD = "/dashboard";
         public const string LOGIN = "/identity/login";
         public const string LOGOUT = "/identity/logout";
@@ -33,6 +34,7 @@ namespace FPTBooking.WebAdmin
     public static class Menu
     {
         public const string DASHBOARD = "dashboard";
+        public const string USER = "user";
     }
 
 }
