@@ -8,28 +8,8 @@ using System.Threading.Tasks;
 namespace FPTBooking.Business.Models
 {
 
-    public class CreateMemberModel : MappingModel<Member>
-    {
-        [JsonProperty("is_manager")]
-        public bool IsManager { get; set; }
-        [JsonProperty("department_code")]
-        public string DepartmentCode { get; set; }
-        [JsonProperty("email")]
-        public string Email { get; set; }
-        [JsonProperty("full_name")]
-        public string FullName { get; set; }
-      
-        public CreateMemberModel()
-        {
-        }
-
-        public CreateMemberModel(Member src) : base(src)
-        {
-        }
-    }
-
     #region Query
-    public class MemberQueryProjection
+    public class DepartmentQueryProjection
     {
         private const string DEFAULT = INFO;
         private string _fields = DEFAULT;
@@ -59,15 +39,12 @@ namespace FPTBooking.Business.Models
 
         public const string INFO = "info";
         public const string SELECT = "select";
-        public const string DEPARTMENT = "department";
-        private const string T = AppUser.TBL_NAME;
     }
 
-    public class MemberQuerySort
+    public class DepartmentQuerySort
     {
         public const string NAME = "name";
-        public const string EMAIL = "email";
-        private const string DEFAULT = "a" + EMAIL;
+        private const string DEFAULT = "a" + NAME;
         private string _sorts = DEFAULT;
         public string sorts
         {
@@ -93,12 +70,12 @@ namespace FPTBooking.Business.Models
 
     }
 
-    public class MemberQueryFilter
+    public class DepartmentQueryFilter
     {
         public string search { get; set; }
     }
 
-    public class MemberQueryPaging
+    public class DepartmentQueryPaging
     {
         private int _page = 1;
         public int page
@@ -128,7 +105,7 @@ namespace FPTBooking.Business.Models
         }
     }
 
-    public class MemberQueryOptions
+    public class DepartmentQueryOptions
     {
         public bool count_total { get; set; }
         public string date_format { get; set; }

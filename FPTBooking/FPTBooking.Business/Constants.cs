@@ -56,6 +56,7 @@ namespace FPTBooking.Business
 
     public static class ApiEndpoint
     {
+        public const string DEPARTMENT_API = "api/departments";
         public const string ROLE_API = "api/roles";
         public const string USER_API = "api/users";
         public const string MEMBER_API = "api/members";

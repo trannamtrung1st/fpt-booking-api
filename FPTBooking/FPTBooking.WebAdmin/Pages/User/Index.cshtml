@@ -4,12 +4,20 @@
 }
 
 @section head {
+
+    <!-- icheck bootstrap -->
+    <link rel="stylesheet" href="/plugins/icheck-bootstrap/icheck-bootstrap.min.css">
     <!-- Select2 -->
     <link rel="stylesheet" href="/plugins/select2/css/select2.min.css">
     <link rel="stylesheet" href="/plugins/select2-bootstrap4-theme/select2-bootstrap4.min.css">
     <!-- DataTables -->
     <link rel="stylesheet" href="/plugins/datatables-bs4/css/dataTables.bootstrap4.min.css">
     <link rel="stylesheet" href="/plugins/datatables-responsive/css/responsive.bootstrap4.min.css">
+    <style>
+        [class*=icheck-] > label {
+            padding-left: 0 !important;
+        }
+    </style>
 }
 
 <!-- Content Header (Page header) -->
@@ -33,13 +41,52 @@
 <section class="content">
     <div class="row">
         <div class="col-12">
-            <div class="card">
-                <div class="card-header">
-                    <a href="#" class="btn btn-primary float-right">
-                        <i class="fa fa-plus"></i>
-                    </a>
+            <form id="form-create-user">
+                <div class="card card-default collapsed collapsed-card">
+                    <div class="card-header clickable" data-card-widget="collapse">
+                        <h3 class="card-title">
+                            <i class="fa fa-user-circle text-black-50 mr-1"></i>
+                            Create user
+                        </h3>
+                        <div class="card-tools">
+                            <button type="button" class="btn btn-tool" data-card-widget="collapse"><i class="fas fa-plus"></i></button>
+                        </div>
+                    </div>
+                    <!-- /.card-header -->
+                    <div class="card-body">
+                        <div class="form-group w-50">
+                            <label>Full name</label>
+                            <input type="text" name="full_name" class="form-control" placeholder="Enter user full name">
+                        </div>
+                        <div class="form-group w-50">
+                            <label>Department</label>
+                            <select class="form-control select2" name="department_code">
+                                <option value="">--- Not selected ---</option>
+                            </select>
+                        </div>
+                        <div class="form-group w-50">
+                            <div class="icheck-primary">
+                                <label for="is-manager" class="pr-2">
+                                    Is manager
+                                </label>
+                                <input type="checkbox" id="is-manager" name="is_manager" value="true">
+                            </div>
+                        </div>
+                        <div class="form-group w-50">
+                            <label>Email</label>
+                            <input type="text" name="email" class="form-control" placeholder="Enter user email">
+                        </div>
+                    </div>
+                    <div class="card-footer">
+                        <button class="btn btn-primary float-right">
+                            <i class="fa fa-plus mr-2"></i>SUBMIT
+                        </button>
+                    </div>
                 </div>
-                <!-- /.card-header -->
+            </form>
+            <!-- /.card -->
+
+            <div class="card">
                 <div class="card-body">
                     <table id="tbl-main" class="table table-bordered table-striped">
                         <thead>
@@ -76,6 +123,9 @@
 
 @section scripts {
 
+    <!-- jquery-validation -->
+    <script src="/plugins/jquery-validation/jquery.validate.min.js"></script>
+    <script src="/plugins/jquery-validation/additional-methods.min.js"></script>
     <!-- DataTables -->
     <script src="/plugins/datatables/jquery.dataTables.min.js"></script>
     <script src="/plugins/datatables-bs4/js/dataTables.bootstrap4.min.js"></script>
@@ -104,7 +154,46 @@
             tblMain.on('page', onTableChange);
             tblMain.on('search', onTableChange);
             tblMain.on('order', onTableChange);
+
+            $('#form-create-user').validate({
+                submitHandler: confirmSubmitCreateUser,
+                rules: {
+                    full_name: {
+                        required: true,
+                    },
+                    department_code: {
+                        required: true,
+                    },
+                    email: {
+                        required: true,
+                    }
+                },
+                messages: {
+                    full_name: {
+                        required: "Please enter user full name",
+                    },
+                    department_code: {
+                        required: "Please choose a department",
+                    },
+                    email: {
+                        required: "Please enter user email",
+                    },
+                },
+                errorElement: 'span',
+                errorPlacement: function (error, element) {
+                    error.addClass('invalid-feedback');
+                    element.closest('.form-group').append(error);
+                },
+                highlight: function (element, errorClass, validClass) {
+                    $(element).addClass('is-invalid');
+                },
+                unhighlight: function (element, errorClass, validClass) {
+                    $(element).removeClass('is-invalid');
+                }
+            });
+
             getData();
+            getDepartment();
             $('.select2').select2();
         });
 
@@ -196,6 +285,74 @@
             });
         }
 
+        //get department
+        function getDepartment() {
+            const data = {};
+            data.culture = '@CultureHelper.CurrentLang';
+            data.load_all = true;
+            $.ajax({
+                url: '/@ApiEndpoint.DEPARTMENT_API',
+                type: 'get',
+                data: data,
+                success: (respData) => {
+                    console.log(respData);
+                    let data = respData.data.list;
+                    processDepartmentData(data);
+                },
+                error: (data) => {
+                    handleGeneralError(data);
+                },
+                complete: () => {
+                    changeLoading(false);
+                }
+            });
+        }
+
+        function processDepartmentData(data) {
+            var form = $('#form-create-user');
+            var depSelect = form.find('select[name=department_code]');
+            for (var i = 0; i < data.length; i++) {
+                const obj = data[i];
+                depSelect.append(
+                    $('<option value="' + obj.code + '">').append(obj.name)
+                );
+            }
+            depSelect.select2();
+        }
+
+        function confirmSubmitCreateUser() {
+            confirmAlert().then((result) => {
+                if (result.value)
+                    submitCreateUser();
+            });
+        }
+
+        function submitCreateUser() {
+            const model = {};
+            model.full_name = $('[name=full_name]').val();
+            model.department_code = $('[name=department_code]').val();
+            model.is_manager = $('[name=is_manager]').val();
+            model.email = $('[name=email]').val();
+
+            changeLoading(true);
+            $.ajax({
+                url: '/@ApiEndpoint.MEMBER_API',
+                type: 'post',
+                contentType: 'application/json',
+                data: JSON.stringify(model),
+                success: (respData) => {
+                    successAlert("Create successfully").then(() => {
+                        getData();
+                    });
+                },
+                error: (resp) => {
+                    handleGeneralError(resp);
+                },
+                complete: () => {
+                    changeLoading(false);
+                }
+            });
+        }
     </script>
 }
 

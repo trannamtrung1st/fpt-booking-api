@@ -168,6 +168,20 @@ namespace FPTBooking.Business.Services
             return entity;
         }
 
+        public AppUser ConvertToUser(CreateMemberModel model, string code)
+        {
+            var entity = new AppUser
+            {
+                Id = model.Email.Replace('@', '_'),
+                UserName = model.Email,
+                Email = model.Email,
+                MemberCode = code,
+                FullName = model.FullName,
+                LoggedIn = false
+            };
+            return entity;
+        }
+
         public async Task SignOutAsync()
         {
             await _signInManager.SignOutAsync();

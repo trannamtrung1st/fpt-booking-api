@@ -199,17 +199,6 @@ namespace FPTBooking.Business.Services
                 Phone = user.PhoneNumber,
                 Code = code,
             };
-            //Dev only
-            if (Settings.Instance.DevMode)
-                entity.DepartmentMember = code == null ? null : new List<DepartmentMember>
-                {
-                    new DepartmentMember
-                    {
-                        DepartmentCode = DeparmentValues.ADMIN.Code,
-                        IsManager = false,
-                        MemberId = entity.UserId
-                    }
-                };
             return entity;
         }
 

@@ -1,4 +1,5 @@
-﻿using FPTBooking.Data.Models;
+﻿using FPTBooking.Business.Models;
+using FPTBooking.Data.Models;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -43,6 +44,39 @@ namespace FPTBooking.Business.Queries
         {
             return query.Where(o => o.Archived == val);
         }
+
+
+        #region Query
+        public static IQueryable<Department> Filter(this IQueryable<Department> query, DepartmentQueryFilter model,
+            IDictionary<string, object> tempData)
+        {
+            return query;
+        }
+
+        public static IQueryable<Department> Sort(this IQueryable<Department> query, DepartmentQuerySort model)
+        {
+            foreach (var s in model._sortsArr)
+            {
+                var asc = s[0] == 'a';
+                var fieldName = s.Remove(0, 1);
+                switch (fieldName)
+                {
+                    case DepartmentQuerySort.NAME:
+                        {
+                            if (asc) query = query.OrderBy(o => o.Name);
+                            else query = query.OrderByDescending(o => o.Name);
+                        }
+                        break;
+                }
+            }
+            return query;
+        }
+
+        public static IQueryable<Department> Project(this IQueryable<Department> query, Models.DepartmentQueryProjection model)
+        {
+            return query;
+        }
+        #endregion
 
     }
 }
