@@ -109,9 +109,10 @@ namespace FPTBooking.WebAdmin.Pages.Identity
             }
             #region Custom Signin for extra claims store
             var principal = await identityService.GetApplicationPrincipalAsync(entity);
-            if (!principal.IsInRole(RoleName.ADMIN) && !Business.Settings.Instance.DevMode)
+            var validationData = identityService.ValidateLoginAdmin(principal, entity);
+            if (!validationData.IsValid)
             {
-                Message = "Access denied";
+                Message = string.Join("<br/>", validationData.Results.Select(o => o.Message));
                 return Page();
             }
             var utcNow = DateTime.UtcNow;

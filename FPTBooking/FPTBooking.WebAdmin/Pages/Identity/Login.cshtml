@@ -32,7 +32,7 @@
         <!-- /.login-logo -->
         <div class="card">
             <div class="card-body login-card-body">
-                <div class="text-center text-danger">@Model.Message</div>
+                <div class="text-center text-danger">@Html.Raw(Model.Message)</div>
                 <form id="form-main" method="post">
                     <div class="row">
                         <div class="col-12">

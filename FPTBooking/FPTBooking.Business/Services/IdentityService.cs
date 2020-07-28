@@ -482,6 +482,14 @@ namespace FPTBooking.Business.Services
             if (Settings.Instance.DevMode) return true;
             return email.IsFptEmail() && !email.IsStudent();
         }
+
+        public ValidationData ValidateLoginAdmin(ClaimsPrincipal principal, AppUser entity)
+        {
+            var validationData = new ValidationData();
+            if (!principal.IsInRole(RoleName.ADMIN) && !Business.Settings.Instance.DevMode)
+                validationData = validationData.Fail(code: AppResultCode.AccessDenied);
+            return validationData;
+        }
         #endregion
 
     }
