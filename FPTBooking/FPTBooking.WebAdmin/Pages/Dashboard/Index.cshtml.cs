@@ -14,6 +14,7 @@ namespace FPTBooking.WebAdmin.Pages.Dashboard
     {
         public void OnGet()
         {
+            throw new Exception("test");
             SetPageInfo();
         }
 

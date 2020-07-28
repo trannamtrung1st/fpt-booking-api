@@ -188,6 +188,25 @@ namespace FPTBooking.Business.Services
             return entity;
         }
 
+        public Member UpdateMember(Member entity, UpdateMemberModel model)
+        {
+            model.CopyTo(entity);
+            DeleteAllDepartmentMemberOf(entity);
+            var depMembers = model.UpdateDepartmentMembers.Select(o =>
+            {
+                var dm = o.ToDest();
+                dm.MemberId = entity.UserId;
+                return dm;
+            }).ToList();
+            context.DepartmentMember.AddRange(depMembers);
+            return entity;
+        }
+
+        public void DeleteAllDepartmentMemberOf(Member entity)
+        {
+            context.DepartmentMember.RemoveRange(entity.DepartmentMember);
+        }
+
         public Member ConvertToMember(AppUser user, string code)
         {
             var entity = new Member()
@@ -260,6 +279,14 @@ namespace FPTBooking.Business.Services
             return validationData;
         }
 
+        public ValidationData ValidateUpdateMember(ClaimsPrincipal principal,
+            Member entity, UpdateMemberModel model)
+        {
+            var validationData = new ValidationData();
+            if (string.IsNullOrWhiteSpace(entity.Email))
+                validationData = validationData.Fail(mess: "Email required", code: AppResultCode.FailValidation);
+            return validationData;
+        }
         #endregion
 
     }

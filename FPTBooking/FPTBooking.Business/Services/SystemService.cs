@@ -61,5 +61,35 @@ namespace FPTBooking.Business.Services
             };
         }
 
+        public AppEvent GetEventForUpdateUser(string displayContent,
+            string userId,
+            object data = null)
+        {
+            return new AppEvent
+            {
+                Id = Guid.NewGuid().ToString(),
+                DisplayContent = displayContent,
+                Data = JsonConvert.SerializeObject(data),
+                HappenedTime = DateTime.UtcNow,
+                Type = "UpdateUser",
+                UserId = userId,
+            };
+        }
+
+        public AppEvent GetEventForDeleteMember(string displayContent,
+            string userId,
+            object data = null)
+        {
+            return new AppEvent
+            {
+                Id = Guid.NewGuid().ToString(),
+                DisplayContent = displayContent,
+                Data = JsonConvert.SerializeObject(data),
+                HappenedTime = DateTime.UtcNow,
+                Type = "DeleteUser",
+                UserId = userId,
+            };
+        }
+
     }
 }

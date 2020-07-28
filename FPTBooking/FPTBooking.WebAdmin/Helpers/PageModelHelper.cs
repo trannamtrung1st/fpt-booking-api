@@ -32,5 +32,14 @@ namespace FPTBooking.WebAdmin.Helpers
                 ViewName = AppView.STATUS
             };
         }
+
+        public static IActionResult ErrorView<T>(this T model)
+            where T : IErrorModel
+        {
+            return new ViewResult()
+            {
+                ViewName = AppView.ERROR
+            };
+        }
     }
 }

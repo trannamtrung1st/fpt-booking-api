@@ -1,6 +1,9 @@
-﻿@page
-@model ErrorModel
+﻿@model FPTBooking.WebAdmin.Models.IErrorModel
+@*
+    For more information on enabling MVC for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
+*@
 @{
+    var errorModel = Context.Items["model"] as FPTBooking.WebAdmin.Models.IErrorModel;
     Layout = null;
 }
 <!DOCTYPE html>
@@ -8,7 +11,7 @@
 <head>
     <meta charset="utf-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <title>@Model.Info.Title</title>
+    <title>@errorModel.Info.Title</title>
     <!-- Tell the browser to be responsive to screen width -->
     <meta name="viewport" content="width=device-width, initial-scale=1">
 
@@ -32,11 +35,11 @@
                 <h3><i class="fas fa-exclamation-triangle text-danger"></i> Something's wrong</h3>
 
                 <p>
-                    @Model.Message
+                    @errorModel.Message
                     <br />
-                    @if (Model.ShowRequestId)
+                    @if (errorModel.ShowRequestId)
                     {
-                        <strong>Request ID:</strong> <code>@Model.RequestId</code>
+                        <strong>Request ID:</strong> <code>@errorModel.RequestId</code>
                     }
                     <br />
                     <a href="@Routing.DASHBOARD">Return to dashboard</a>
@@ -69,4 +72,3 @@
     <script src="/dist/js/adminlte.min.js"></script>
 </body>
 </html>
-

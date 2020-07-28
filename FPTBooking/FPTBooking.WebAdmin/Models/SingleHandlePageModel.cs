@@ -14,8 +14,23 @@ namespace FPTBooking.WebAdmin.Models
         {
             return OnAllMethod();
         }
-
         public IActionResult OnPost()
+        {
+            return OnAllMethod();
+        }
+        public IActionResult OnPatch()
+        {
+            return OnAllMethod();
+        }
+        public Task<IActionResult> OnPatchAsync()
+        {
+            return Task.FromResult(OnAllMethod());
+        }
+        public IActionResult OnDelete()
+        {
+            return OnAllMethod();
+        }
+        public IActionResult OnPut()
         {
             return OnAllMethod();
         }

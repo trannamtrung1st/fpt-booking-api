@@ -118,6 +118,11 @@ namespace FPTBooking.Business.Services
         #endregion
 
         #region User
+        public async Task<IdentityResult> DeleteUserAsync(AppUser entity)
+        {
+            return await _userManager.DeleteAsync(entity);
+        }
+
         public AppUser Attach(AppUser entity)
         {
             return context.Attach(entity).Entity;
@@ -135,6 +140,12 @@ namespace FPTBooking.Business.Services
             entity.PhoneNumber = firebaseUser.PhoneNumber;
             entity.PhotoUrl = firebaseUser.PhotoUrl;
             entity.LoggedIn = true;
+            return entity;
+        }
+
+        public AppUser UpdateUser(AppUser entity, UpdateMemberModel model)
+        {
+            entity.FullName = model.FullName;
             return entity;
         }
 

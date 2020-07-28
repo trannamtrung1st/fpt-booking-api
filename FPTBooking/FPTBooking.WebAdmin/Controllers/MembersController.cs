@@ -93,7 +93,7 @@ namespace FPTBooking.WebAdmin.Controllers
         [Authorize]
 #endif
         [HttpDelete("{id}")]
-        public IActionResult Delete(string id)
+        public async Task<IActionResult> Delete(string id)
         {
             try
             {
@@ -105,7 +105,22 @@ namespace FPTBooking.WebAdmin.Controllers
                     return BadRequest(AppResult.FailValidation(data: validationData));
                 using (var trans = context.Database.BeginTransaction())
                 {
+                    var user = entity.User;
                     _service.DeleteMemberTransaction(entity);
+                    var result = await _identityService.DeleteUserAsync(user);
+                    if (!result.Succeeded)
+                    {
+                        foreach (var err in result.Errors)
+                            ModelState.AddModelError(err.Code, err.Description);
+                        var builder = ResultHelper.MakeInvalidAccountRegistrationResults(ModelState);
+                        return BadRequest(builder);
+                    }
+                    //log event
+                    var ev = _sysService.GetEventForDeleteMember(
+                        $"Admin has remove a user with email {entity.Email}",
+                        entity.UserId);
+                    _sysService.CreateAppEvent(ev);
+                    //end log event
                     context.SaveChanges();
                     trans.Commit();
                 }
@@ -116,6 +131,46 @@ namespace FPTBooking.WebAdmin.Controllers
                 _logger.Error(e);
                 return BadRequest(AppResult.DependencyDeleteFail());
             }
+        }
+
+#if !DEBUG
+        [Authorize(Roles = RoleName.ADMIN)]
+#else
+        [Authorize]
+#endif
+        [HttpPatch("{id}")]
+        public async Task<IActionResult> Update(string id, UpdateMemberModel model)
+        {
+            var entity = _service.Members.Id(id).FirstOrDefault();
+            if (entity == null)
+                return NotFound(AppResult.NotFound());
+            var validationData = _service.ValidateUpdateMember(User, entity, model);
+            if (!validationData.IsValid)
+                return BadRequest(AppResult.FailValidation(data: validationData));
+            using (var transaction = context.Database.BeginTransaction())
+            {
+                var user = entity.User;
+                _service.UpdateMember(entity, model);
+                user = _identityService.UpdateUser(user, model);
+                var result = await _identityService.UpdateUserAsync(user);
+                if (!result.Succeeded)
+                {
+                    foreach (var err in result.Errors)
+                        ModelState.AddModelError(err.Code, err.Description);
+                    var builder = ResultHelper.MakeInvalidAccountRegistrationResults(ModelState);
+                    return BadRequest(builder);
+                }
+                _logger.CustomProperties(User).Info("Update user");
+                //log event
+                var ev = _sysService.GetEventForUpdateUser(
+                    $"Admin has updated a user information",
+                    entity.UserId);
+                _sysService.CreateAppEvent(ev);
+                //end log event
+                context.SaveChanges();
+                transaction.Commit();
+            }
+            return NoContent();
         }
 
 #if !DEBUG

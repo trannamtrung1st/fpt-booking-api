@@ -7,6 +7,38 @@ using System.Threading.Tasks;
 
 namespace FPTBooking.Business.Models
 {
+    public class UpdateMemberModel : MappingModel<Member>
+    {
+        [JsonProperty("full_name")]
+        public string FullName { get; set; }
+        [JsonProperty("departments")]
+        public List<UpdateDepartmentMemberModel> UpdateDepartmentMembers { get; set; }
+
+        public UpdateMemberModel()
+        {
+        }
+
+        public UpdateMemberModel(Member src) : base(src)
+        {
+        }
+    }
+
+    public class UpdateDepartmentMemberModel : MappingModel<DepartmentMember>
+    {
+
+        [JsonProperty("department_code")]
+        public string DepartmentCode { get; set; }
+        [JsonProperty("is_manager")]
+        public bool? IsManager { get; set; }
+
+        public UpdateDepartmentMemberModel()
+        {
+        }
+
+        public UpdateDepartmentMemberModel(DepartmentMember src) : base(src)
+        {
+        }
+    }
 
     public class CreateMemberModel : MappingModel<Member>
     {

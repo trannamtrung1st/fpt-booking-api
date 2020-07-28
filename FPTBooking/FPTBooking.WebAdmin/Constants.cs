@@ -17,6 +17,7 @@ namespace FPTBooking.WebAdmin
         public const string ACCESS_DENIED = "/accessdenied";
         public const string STATUS = "/status";
         public const string ERROR = "/error";
+        public const string ERROR_CONTROLLER = "error";
         public const string INDEX = "/";
     }
 
@@ -29,6 +30,7 @@ namespace FPTBooking.WebAdmin
     {
         public const string MESSAGE = "MessageView";
         public const string STATUS = "StatusView";
+        public const string ERROR = "ErrorView";
     }
 
     public static class Menu
