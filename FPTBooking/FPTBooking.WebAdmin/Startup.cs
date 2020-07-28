@@ -60,9 +60,7 @@ namespace FPTBooking.WebAdmin
             connStr = connStr.Replace("{envConfig}", "");
 #endif
             services.AddDbContext<DataContext>(options =>
-            {
-                options.UseSqlServer(connStr);
-            });
+                options.UseSqlServer(connStr).UseLazyLoadingProxies());
             Data.Global.Init(services);
             var fapSecret = File.ReadAllText(Settings.Instance.FapSecretFile);
             Business.Global.Init(services, fapSecret);

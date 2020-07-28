@@ -78,7 +78,7 @@ namespace FPTBooking.WebAdmin.Controllers
                 //log event
                 var ev = _sysService.GetEventForNewUser(
                     $"Admin has created a user with email {model.Email}",
-                    memberEntity.UserId);
+                    UserId);
                 _sysService.CreateAppEvent(ev);
                 //end log event
                 context.SaveChanges();
@@ -97,7 +97,7 @@ namespace FPTBooking.WebAdmin.Controllers
         {
             try
             {
-                var entity = _service.Members.IdOnly().Id(id).FirstOrDefault();
+                var entity = _service.Members.Id(id).FirstOrDefault();
                 if (entity == null)
                     return NotFound(AppResult.NotFound());
                 var validationData = _service.ValidateDeleteMember(User, entity);
@@ -118,7 +118,7 @@ namespace FPTBooking.WebAdmin.Controllers
                     //log event
                     var ev = _sysService.GetEventForDeleteMember(
                         $"Admin has remove a user with email {entity.Email}",
-                        entity.UserId);
+                        UserId);
                     _sysService.CreateAppEvent(ev);
                     //end log event
                     context.SaveChanges();
@@ -129,7 +129,8 @@ namespace FPTBooking.WebAdmin.Controllers
             catch (DbUpdateException e)
             {
                 _logger.Error(e);
-                return BadRequest(AppResult.DependencyDeleteFail());
+                return BadRequest(AppResult.FailValidation(data: new ValidationData()
+                    .Fail(code: AppResultCode.DependencyDeleteFail)));
             }
         }
 
@@ -164,7 +165,7 @@ namespace FPTBooking.WebAdmin.Controllers
                 //log event
                 var ev = _sysService.GetEventForUpdateUser(
                     $"Admin has updated a user information",
-                    entity.UserId);
+                    UserId);
                 _sysService.CreateAppEvent(ev);
                 //end log event
                 context.SaveChanges();

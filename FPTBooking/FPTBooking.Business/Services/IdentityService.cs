@@ -447,6 +447,7 @@ namespace FPTBooking.Business.Services
         {
             var principal = await _signInManager.CreateUserPrincipalAsync(entity);
             var identity = principal.Identity as ClaimsIdentity;
+            identity.TryRemoveClaim(identity.FindFirst(ClaimTypes.Name));
             identity.AddClaim(new Claim(ClaimTypes.Name, entity.Id));
             var claims = GetExtraClaims(entity);
             var roles = await _userManager.GetRolesAsync(entity);

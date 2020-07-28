@@ -206,6 +206,15 @@ namespace FPTBooking.Business.Services
         {
             context.DepartmentMember.RemoveRange(entity.DepartmentMember);
         }
+        public void DeleteAllAreaMemberOf(Member entity)
+        {
+            context.AreaMember.RemoveRange(entity.AreaMember);
+        }
+        public void DeleteAllAppEventsOf(Member entity)
+        {
+            context.AppEvent.RemoveRange(entity.AppEvent);
+        }
+
 
         public Member ConvertToMember(AppUser user, string code)
         {
@@ -257,7 +266,11 @@ namespace FPTBooking.Business.Services
         #region Delete Member
         public Member DeleteMemberTransaction(Member entity)
         {
-            return context.Member.Remove(entity).Entity;
+            entity = context.Member.Remove(entity).Entity;
+            DeleteAllDepartmentMemberOf(entity);
+            DeleteAllAreaMemberOf(entity);
+            DeleteAllAppEventsOf(entity);
+            return entity;
         }
         #endregion
 
