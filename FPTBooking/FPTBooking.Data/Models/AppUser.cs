@@ -15,5 +15,6 @@ namespace FPTBooking.Data.Models
         public bool LoggedIn { get; set; }
 
         public virtual Member Member { get; set; }
+        public virtual ICollection<AppUserRole> UserRoles { get; set; }
     }
 }

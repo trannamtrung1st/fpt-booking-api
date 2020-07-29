@@ -106,6 +106,13 @@ namespace FPTBooking.Business.Services
                             obj["departments"] = entities;
                         }
                         break;
+                    case MemberQueryProjection.ROLES:
+                        {
+                            var entities = row.User.UserRoles
+                                .Select(o => o.Role.Name).ToList();
+                            obj["roles"] = entities;
+                        }
+                        break;
                 }
             }
             return obj;
@@ -198,13 +205,14 @@ namespace FPTBooking.Business.Services
                 dm.MemberId = entity.UserId;
                 return dm;
             }).ToList();
-            context.DepartmentMember.AddRange(depMembers);
+            entity.DepartmentMember = depMembers;
             return entity;
         }
 
         public void DeleteAllDepartmentMemberOf(Member entity)
         {
-            context.DepartmentMember.RemoveRange(entity.DepartmentMember);
+            var depMembers = context.DepartmentMember.OfMember(entity.UserId).ToList();
+            context.DepartmentMember.RemoveRange(depMembers);
         }
         public void DeleteAllAreaMemberOf(Member entity)
         {

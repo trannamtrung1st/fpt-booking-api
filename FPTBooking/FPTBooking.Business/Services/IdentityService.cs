@@ -278,6 +278,11 @@ namespace FPTBooking.Business.Services
             return await _userManager.UpdateAsync(entity);
         }
 
+        public async Task<IEnumerable<string>> GetRolesOfUserAsync(AppUser entity)
+        {
+            return await _userManager.GetRolesAsync(entity);
+        }
+
         public async Task<IdentityResult> AddRolesForUserAsync(AppUser entity, IEnumerable<string> roles)
         {
             return await _userManager.AddToRolesAsync(entity, roles);

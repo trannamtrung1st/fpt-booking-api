@@ -13,6 +13,8 @@ namespace FPTBooking.Business.Models
         public string FullName { get; set; }
         [JsonProperty("departments")]
         public List<UpdateDepartmentMemberModel> UpdateDepartmentMembers { get; set; }
+        [JsonProperty("roles")]
+        public HashSet<string> Roles { get; set; }
 
         public UpdateMemberModel()
         {
@@ -50,7 +52,9 @@ namespace FPTBooking.Business.Models
         public string Email { get; set; }
         [JsonProperty("full_name")]
         public string FullName { get; set; }
-      
+        [JsonProperty("roles")]
+        public HashSet<string> Roles { get; set; }
+
         public CreateMemberModel()
         {
         }
@@ -92,6 +96,7 @@ namespace FPTBooking.Business.Models
         public const string INFO = "info";
         public const string SELECT = "select";
         public const string DEPARTMENT = "department";
+        public const string ROLES = "roles";
         private const string T = AppUser.TBL_NAME;
     }
 

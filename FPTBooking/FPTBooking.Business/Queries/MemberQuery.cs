@@ -104,12 +104,13 @@ namespace FPTBooking.Business.Queries
 
         public static IQueryable<Member> Project(this IQueryable<Member> query, Models.MemberQueryProjection model)
         {
-            bool dep = false;
+            bool dep = false, roles = false;
             foreach (var f in model.GetFieldsArr())
             {
                 switch (f)
                 {
                     case Models.MemberQueryProjection.DEPARTMENT: dep = true; break;
+                    case Models.MemberQueryProjection.ROLES: roles = true; break;
                 }
             }
             query = query.Select(o => new Member
@@ -136,7 +137,15 @@ namespace FPTBooking.Business.Queries
                 LastName = o.LastName,
                 MiddleName = o.MiddleName,
                 Phone = o.Phone,
-                UserId = o.UserId
+                UserId = o.UserId,
+                User = roles ? new AppUser
+                {
+                    UserRoles = o.User.UserRoles.Select(ur => new AppUserRole
+                    {
+                        RoleId = ur.RoleId,
+                        Role = ur.Role
+                    }).ToList(),
+                } : null
             });
             return query;
         }

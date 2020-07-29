@@ -9,7 +9,9 @@ using Microsoft.EntityFrameworkCore.Metadata;
 
 namespace FPTBooking.Data.Models
 {
-    public partial class DataContext : IdentityDbContext<AppUser, AppRole, string>
+    public partial class DataContext : IdentityDbContext<AppUser, AppRole, string, IdentityUserClaim<string>,
+        AppUserRole, IdentityUserLogin<string>,
+        IdentityRoleClaim<string>, IdentityUserToken<string>>
     {
         public DataContext()
         {
@@ -62,6 +64,9 @@ namespace FPTBooking.Data.Models
                 entity.HasOne(d => d.Member)
                     .WithOne(p => p.User)
                     .HasForeignKey<Member>(d => d.UserId);
+                entity.HasMany(d => d.UserRoles)
+                    .WithOne(p => p.User)
+                    .HasForeignKey(p => p.UserId);
 
                 entity.HasData(new[]
                 {
@@ -97,6 +102,9 @@ namespace FPTBooking.Data.Models
                 entity.Property(e => e.Id)
                     .IsUnicode(false)
                     .HasMaxLength(100);
+                entity.HasMany(e => e.UserRoles)
+                    .WithOne(e => e.Role)
+                    .HasForeignKey(e => e.RoleId);
 
                 entity.HasData(new AppRole[]
                 {
@@ -132,26 +140,26 @@ namespace FPTBooking.Data.Models
 
             });
 
-            modelBuilder.Entity<IdentityUserRole<string>>(entity =>
+            modelBuilder.Entity<AppUserRole>(entity =>
             {
                 entity.HasData(new[]
                 {
-                    new IdentityUserRole<string>
+                    new AppUserRole
                     {
                         RoleId = RoleName.MANAGER,
                         UserId = UserValues.LIB_EMAIL.Replace('@', '_'),
                     },
-                    new IdentityUserRole<string>
+                    new AppUserRole
                     {
                         RoleId = RoleName.MANAGER,
                         UserId = UserValues.ADMIN_EMAIL.Replace('@', '_'),
                     },
-                    new IdentityUserRole<string>
+                    new AppUserRole
                     {
                         RoleId = RoleName.ROOM_CHECKER,
                         UserId = UserValues.LIB_EMAIL.Replace('@', '_'),
                     },
-                    new IdentityUserRole<string>
+                    new AppUserRole
                     {
                         RoleId = RoleName.ROOM_CHECKER,
                         UserId = UserValues.ADMIN_EMAIL.Replace('@', '_'),

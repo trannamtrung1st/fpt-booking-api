@@ -63,9 +63,11 @@ namespace FPTBooking.WebAdmin.Controllers
             entity = _identityService.ConvertToUser(model, emailInfo.Item3);
             using (var transaction = context.Database.BeginTransaction())
             {
+                model.Roles = model.Roles ?? new HashSet<string>();
+                if (model.IsManager)
+                    model.Roles.Add(RoleName.MANAGER);
                 var result = await _identityService
-                        .CreateUserWithoutPassAsync(entity,
-                        model.IsManager ? new List<string> { RoleName.MANAGER } : null);
+                    .CreateUserWithoutPassAsync(entity, model.Roles);
                 if (!result.Succeeded)
                 {
                     foreach (var err in result.Errors)
@@ -153,7 +155,19 @@ namespace FPTBooking.WebAdmin.Controllers
                 var user = entity.User;
                 _service.UpdateMember(entity, model);
                 user = _identityService.UpdateUser(user, model);
+                if (model.UpdateDepartmentMembers.Any(o => o.IsManager == true))
+                {
+                    model.Roles = model.Roles ?? new HashSet<string>();
+                    model.Roles.Add(RoleName.MANAGER);
+                }
                 var result = await _identityService.UpdateUserAsync(user);
+                if (result.Succeeded && model.Roles != null && model.Roles.Count() > 0)
+                {
+                    var oldRoles = await _identityService.GetRolesOfUserAsync(user);
+                    result = await _identityService.RemoveUserFromRolesAsync(user, oldRoles);
+                    if (result.Succeeded)
+                        result = await _identityService.AddRolesForUserAsync(user, model.Roles);
+                }
                 if (!result.Succeeded)
                 {
                     foreach (var err in result.Errors)

@@ -7,6 +7,8 @@ namespace FPTBooking.Data.Models
 {
     public class AppRole : IdentityRole<string>
     {
+        public virtual ICollection<AppUserRole> UserRoles { get; set; }
+
         public AppRole()
         {
 

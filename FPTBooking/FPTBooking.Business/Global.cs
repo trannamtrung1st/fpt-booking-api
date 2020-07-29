@@ -60,9 +60,12 @@ namespace FPTBooking.Business
         public static void Init(IServiceCollection services, string fapSecret)
         {
             Random = new Random();
-            FapClient = new FptFapClient(Settings.Instance.FapApiUrl, fapSecret);
-            FapClient.CacheData().Wait();
-            services.AddSingleton(FapClient);
+            if (fapSecret != null)
+            {
+                FapClient = new FptFapClient(Settings.Instance.FapApiUrl, fapSecret);
+                FapClient.CacheData().Wait();
+                services.AddSingleton(FapClient);
+            }
             InitAutoMapper();
             InitDI(services);
         }

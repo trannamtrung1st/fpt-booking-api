@@ -77,6 +77,17 @@
                             <label>Email</label>
                             <input type="text" name="email" class="form-control" placeholder="Enter user email">
                         </div>
+                        <div class="form-group w-50">
+                            <label>Roles</label>
+                            <select class="select2" multiple="multiple"
+                                    name="roles"
+                                    data-placeholder="Select roles" style="width: 100%;">
+                                <!option value="@FPTBooking.Data.RoleName.USER" selected>User</!option>
+                                <!option value="@FPTBooking.Data.RoleName.ADMIN">Administrator</!option>
+                                <!option value="@FPTBooking.Data.RoleName.MANAGER">Manager</!option>
+                                <!option value="@FPTBooking.Data.RoleName.ROOM_CHECKER">Room checker</!option>
+                            </select>
+                        </div>
                     </div>
                     <div class="card-footer">
                         <button class="btn btn-primary float-right">
@@ -97,6 +108,7 @@
                                 <th class="sortable">Full name</th>
                                 <th class="sortable">Department</th>
                                 <th class="sortable">Email</th>
+                                <th class="sortable">Roles</th>
                             </tr>
                         </thead>
                         <tbody>
@@ -108,6 +120,7 @@
                                 <th>Full name</th>
                                 <th>Department</th>
                                 <th>Email</th>
+                                <th>Roles</th>
                             </tr>
                         </tfoot>
                     </table>
@@ -155,6 +168,18 @@
                     </div>
                     <div id="dep-member-container">
 
+                    </div>
+
+                    <div class="form-group w-50">
+                        <label>Roles</label>
+                        <select class="select2" multiple="multiple" 
+                                name="roles"
+                                data-placeholder="Select roles" style="width: 100%;">
+                            <!option value="@FPTBooking.Data.RoleName.USER">User</!option>
+                            <!option value="@FPTBooking.Data.RoleName.ADMIN">Administrator</!option>
+                            <!option value="@FPTBooking.Data.RoleName.MANAGER">Manager</!option>
+                            <!option value="@FPTBooking.Data.RoleName.ROOM_CHECKER">Room checker</!option>
+                        </select>
                     </div>
                     <!-- /.card -->
                 </div>
@@ -291,7 +316,7 @@
             const data = {};
             data.culture = '@CultureHelper.CurrentLang';
             data.load_all = true;
-            data.fields = '@MemberQueryProjection.INFO,@MemberQueryProjection.DEPARTMENT';
+            data.fields = '@MemberQueryProjection.INFO,@MemberQueryProjection.DEPARTMENT,@MemberQueryProjection.ROLES';
             $.ajax({
                 url: '/@ApiEndpoint.MEMBER_API',
                 type: 'get',
@@ -338,7 +363,8 @@
                     null,
                     obj.full_name,
                     deps,
-                    obj.email
+                    obj.email,
+                    obj.roles ? obj.roles.join(', ') : ""
                 ]);
             }
             tblMain.draw();
@@ -417,7 +443,7 @@
             model.department_code = form.find('[name=department_code]').val();
             model.is_manager = form.find('[name=is_manager]:checked').val();
             model.email = form.find('[name=email]').val();
-
+            model.roles = form.find('[name=roles]').val();
             changeLoading(true);
             $.ajax({
                 url: '/@ApiEndpoint.MEMBER_API',
@@ -445,32 +471,15 @@
             var member = memberData.filter(o => o.user_id == id)[0];
             var depMembers = member.departments;
             var depMembersEles = depMembers.map(o =>
-                $('<div class="form-group dep-member">').append(
-                    $('<input type="hidden" name="dep_member_dep_code" value="' + o.code + '"/>')
-                ).append(
-                    '<span>'+o.name + '</span> - '
-                ).append(
-                    $('<span class="icheck-primary">').append(
-                        $('<label for="dep-member-' + o.code + '" class="pr-2" style="font-weight: normal">').append(
-                            'Is manager'
-                        )
-                    ).append(
-                        $('<input type="checkbox" id="dep-member-' + o.code +
-                            '" name="dep_member" value="true" ' + (o.is_manager ? 'checked="checked"' : '')
-                        + '/>')
-                    )
-                ).append(
-                    $('<span class="ml-3" onclick="removeDepMember(this)"><i class="fa fa-times-circle"></i></span>')
-                )
+                createDepMemberElement(o)
             );
             var container = modal.find('#dep-member-container');
             container.html('');
             depMembersEles.forEach(o =>
                 container.append(o));
-
+            modal.find('[name=roles]').select2().val(member.roles).trigger('change');
             modal.find('[name=user_id]').val(member.user_id);
             modal.find('[name=full_name]').val(member.full_name);
-            modal.find('[name=email]').val(member.email);
             modal.modal('show');
         }
 
@@ -486,6 +495,7 @@
             const model = {};
             var userId = modal.find('[name=user_id]').val();
             model.full_name = modal.find('[name=full_name]').val();
+            model.roles = modal.find('[name=roles]').val();
 
             var allDepMembers = modal.find('.dep-member').toArray();
             var departments = allDepMembers.map((o) => {
@@ -529,7 +539,12 @@
             var currentDepCode = modal.find('[name=department_code]').val();
             if (!currentDepCode) return;
             var dep = departmentData.filter(o => o.code == currentDepCode)[0];
-            var newDepEle = $('<div class="form-group dep-member">').append(
+            var newDepEle = createDepMemberElement(dep);
+            $('#dep-member-container').prepend(newDepEle);
+        }
+
+        function createDepMemberElement(dep) {
+            return $('<div class="form-group dep-member">').append(
                 $('<input type="hidden" name="dep_member_dep_code" value="' + dep.code + '"/>')
             ).append(
                 '<span>' + dep.name + '</span> - '
@@ -540,12 +555,12 @@
                     )
                 ).append(
                     $('<input type="checkbox" id="dep-member-' + dep.code +
-                        '" name="dep_member" value="true"/>')
+                        '" name="dep_member" value="true" ' + (dep.is_manager ? 'checked="checked"' : '')
+                        + '/>')
                 )
             ).append(
                 $('<span class="ml-3" onclick="removeDepMember(this)"><i class="fa fa-times-circle"></i></span>')
             );
-            $('#dep-member-container').prepend(newDepEle);
         }
     </script>
 }

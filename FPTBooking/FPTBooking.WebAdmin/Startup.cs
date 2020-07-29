@@ -62,8 +62,9 @@ namespace FPTBooking.WebAdmin
             services.AddDbContext<DataContext>(options =>
                 options.UseSqlServer(connStr).UseLazyLoadingProxies());
             Data.Global.Init(services);
-            var fapSecret = File.ReadAllText(Settings.Instance.FapSecretFile);
-            Business.Global.Init(services, fapSecret);
+            //var fapSecret = File.ReadAllText(Settings.Instance.FapSecretFile);
+            //Business.Global.Init(services, fapSecret);
+            Business.Global.Init(services, null);
             #region OAuth
             services.AddIdentity<AppUser, AppRole>(options =>
             {
@@ -148,9 +149,9 @@ namespace FPTBooking.WebAdmin
                     if (identity.FindFirst(AppClaimType.UserName)?.Value == null)
                     {
                         var identityService = c.HttpContext.RequestServices.GetRequiredService<IdentityService>();
-                        var entity = await identityService.GetUserByUserNameAsync(identity.Name);
-                        var extraClaims = identityService.GetExtraClaims(entity);
-                        identity.AddClaims(extraClaims);
+                        var entity = await identityService.GetUserByIdAsync(identity.Name);
+                        var principal = await identityService.GetApplicationPrincipalAsync(entity);
+                        c.ReplacePrincipal(principal);
                         c.ShouldRenew = true;
                     }
                     await SecurityStampValidator.ValidatePrincipalAsync(c);
