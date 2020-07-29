@@ -64,7 +64,7 @@ namespace FPTBooking.WebAdmin.Controllers
             using (var transaction = context.Database.BeginTransaction())
             {
                 model.Roles = model.Roles ?? new HashSet<string>();
-                if (model.IsManager)
+                if (model.CreateDepartmentMembers.Any(o => o.IsManager == true))
                     model.Roles.Add(RoleName.MANAGER);
                 var result = await _identityService
                     .CreateUserWithoutPassAsync(entity, model.Roles);

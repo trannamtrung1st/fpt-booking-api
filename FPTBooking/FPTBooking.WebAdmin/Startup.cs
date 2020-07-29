@@ -149,7 +149,7 @@ namespace FPTBooking.WebAdmin
                     if (identity.FindFirst(AppClaimType.UserName)?.Value == null)
                     {
                         var identityService = c.HttpContext.RequestServices.GetRequiredService<IdentityService>();
-                        var entity = await identityService.GetUserByIdAsync(identity.Name);
+                        var entity = await identityService.GetUserByUserNameAsync(identity.Name);
                         var principal = await identityService.GetApplicationPrincipalAsync(entity);
                         c.ReplacePrincipal(principal);
                         c.ShouldRenew = true;

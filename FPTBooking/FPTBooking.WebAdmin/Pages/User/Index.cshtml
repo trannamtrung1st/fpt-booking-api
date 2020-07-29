@@ -60,18 +60,22 @@
                             <input type="text" name="full_name" class="form-control" placeholder="Enter user full name">
                         </div>
                         <div class="form-group w-50">
-                            <label>Department</label>
-                            <select class="form-control select2" name="department_code">
-                                <option value="">--- Not selected ---</option>
-                            </select>
-                        </div>
-                        <div class="form-group w-50">
-                            <div class="icheck-primary">
-                                <label for="is-manager" class="pr-2">
-                                    Is manager
-                                </label>
-                                <input type="checkbox" id="is-manager" name="is_manager" value="true">
+                            <label>Department(s)</label>
+                            <div class="row">
+                                <div class="col-10">
+                                    <select class="form-control select2" name="department_code">
+                                        <option value="">--- Not selected ---</option>
+                                    </select>
+                                </div>
+                                <div class="col-2">
+                                    <button class="btn btn-default w-100" onclick="addDepMember('#form-create-user')" type="button">
+                                        <i class="fa fa-plus"></i>
+                                    </button>
+                                </div>
                             </div>
+                        </div>
+                        <div class="dep-member-container">
+
                         </div>
                         <div class="form-group w-50">
                             <label>Email</label>
@@ -160,13 +164,13 @@
                                 </select>
                             </div>
                             <div class="col-2">
-                                <button class="btn btn-default w-100" onclick="addDepMember()" type="button">
+                                <button class="btn btn-default w-100" onclick="addDepMember('#form-edit-user')" type="button">
                                     <i class="fa fa-plus"></i>
                                 </button>
                             </div>
                         </div>
                     </div>
-                    <div id="dep-member-container">
+                    <div class="dep-member-container">
 
                     </div>
 
@@ -238,9 +242,6 @@
                     full_name: {
                         required: true,
                     },
-                    department_code: {
-                        required: true,
-                    },
                     email: {
                         required: true,
                     }
@@ -248,9 +249,6 @@
                 messages: {
                     full_name: {
                         required: "Please enter user full name",
-                    },
-                    department_code: {
-                        required: "Please choose a department",
                     },
                     email: {
                         required: "Please enter user email",
@@ -440,10 +438,20 @@
             const model = {};
             const form = $('#form-create-user');
             model.full_name = form.find('[name=full_name]').val();
-            model.department_code = form.find('[name=department_code]').val();
-            model.is_manager = form.find('[name=is_manager]:checked').val();
             model.email = form.find('[name=email]').val();
             model.roles = form.find('[name=roles]').val();
+            var allDepMembers = form.find('.dep-member').toArray();
+            var departments = allDepMembers.map((o) => {
+                o = $(o);
+                var depCode = o.find('[name=dep_member_dep_code]').val();
+                var isManager = o.find('[name=dep_member]:checked').val();
+                return {
+                    department_code: depCode,
+                    is_manager: isManager
+                };
+            });
+            model.departments = departments;
+
             changeLoading(true);
             $.ajax({
                 url: '/@ApiEndpoint.MEMBER_API',
@@ -473,7 +481,7 @@
             var depMembersEles = depMembers.map(o =>
                 createDepMemberElement(o)
             );
-            var container = modal.find('#dep-member-container');
+            var container = modal.find('.dep-member-container');
             container.html('');
             depMembersEles.forEach(o =>
                 container.append(o));
@@ -534,13 +542,13 @@
             $(btn).parent().remove();
         }
 
-        function addDepMember() {
-            var modal = $('#modal-edit');
-            var currentDepCode = modal.find('[name=department_code]').val();
+        function addDepMember(formSelector) {
+            var form = $(formSelector);
+            var currentDepCode = form.find('[name=department_code]').val();
             if (!currentDepCode) return;
             var dep = departmentData.filter(o => o.code == currentDepCode)[0];
             var newDepEle = createDepMemberElement(dep);
-            $('#dep-member-container').prepend(newDepEle);
+            form.find('.dep-member-container').prepend(newDepEle);
         }
 
         function createDepMemberElement(dep) {

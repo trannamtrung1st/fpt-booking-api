@@ -7,80 +7,9 @@ using System.Threading.Tasks;
 
 namespace FPTBooking.Business.Models
 {
-    public class UpdateMemberModel : MappingModel<Member>
-    {
-        [JsonProperty("full_name")]
-        public string FullName { get; set; }
-        [JsonProperty("departments")]
-        public List<UpdateDepartmentMemberModel> UpdateDepartmentMembers { get; set; }
-        [JsonProperty("roles")]
-        public HashSet<string> Roles { get; set; }
-
-        public UpdateMemberModel()
-        {
-        }
-
-        public UpdateMemberModel(Member src) : base(src)
-        {
-        }
-    }
-
-    public class UpdateDepartmentMemberModel : MappingModel<DepartmentMember>
-    {
-
-        [JsonProperty("department_code")]
-        public string DepartmentCode { get; set; }
-        [JsonProperty("is_manager")]
-        public bool? IsManager { get; set; }
-
-        public UpdateDepartmentMemberModel()
-        {
-        }
-
-        public UpdateDepartmentMemberModel(DepartmentMember src) : base(src)
-        {
-        }
-    }
-
-    public class CreateMemberModel : MappingModel<Member>
-    {
-        [JsonProperty("email")]
-        public string Email { get; set; }
-        [JsonProperty("full_name")]
-        public string FullName { get; set; }
-        [JsonProperty("departments")]
-        public List<CreateDepartmentMemberModel> CreateDepartmentMembers { get; set; }
-        [JsonProperty("roles")]
-        public HashSet<string> Roles { get; set; }
-
-        public CreateMemberModel()
-        {
-        }
-
-        public CreateMemberModel(Member src) : base(src)
-        {
-        }
-    }
-
-    public class CreateDepartmentMemberModel : MappingModel<DepartmentMember>
-    {
-
-        [JsonProperty("department_code")]
-        public string DepartmentCode { get; set; }
-        [JsonProperty("is_manager")]
-        public bool? IsManager { get; set; }
-
-        public CreateDepartmentMemberModel()
-        {
-        }
-
-        public CreateDepartmentMemberModel(DepartmentMember src) : base(src)
-        {
-        }
-    }
 
     #region Query
-    public class MemberQueryProjection
+    public class AreaQueryProjection
     {
         private const string DEFAULT = INFO;
         private string _fields = DEFAULT;
@@ -110,16 +39,12 @@ namespace FPTBooking.Business.Models
 
         public const string INFO = "info";
         public const string SELECT = "select";
-        public const string DEPARTMENT = "department";
-        public const string ROLES = "roles";
-        private const string T = AppUser.TBL_NAME;
     }
 
-    public class MemberQuerySort
+    public class AreaQuerySort
     {
         public const string NAME = "name";
-        public const string EMAIL = "email";
-        private const string DEFAULT = "a" + EMAIL;
+        private const string DEFAULT = "a" + NAME;
         private string _sorts = DEFAULT;
         public string sorts
         {
@@ -145,12 +70,12 @@ namespace FPTBooking.Business.Models
 
     }
 
-    public class MemberQueryFilter
+    public class AreaQueryFilter
     {
         public string search { get; set; }
     }
 
-    public class MemberQueryPaging
+    public class AreaQueryPaging
     {
         private int _page = 1;
         public int page
@@ -180,7 +105,7 @@ namespace FPTBooking.Business.Models
         }
     }
 
-    public class MemberQueryOptions
+    public class AreaQueryOptions
     {
         public bool count_total { get; set; }
         public string date_format { get; set; }

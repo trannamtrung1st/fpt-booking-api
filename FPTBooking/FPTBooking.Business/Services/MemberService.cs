@@ -249,12 +249,12 @@ namespace FPTBooking.Business.Services
         {
             var entity = ConvertToMember(userEntity, emailInfo.Item3);
             PrepareCreate(entity);
-            entity.DepartmentMember.Add(new DepartmentMember
+            entity.DepartmentMember = model.CreateDepartmentMembers.Select(o =>
             {
-                DepartmentCode = model.DepartmentCode,
-                IsManager = model.IsManager,
-                MemberId = entity.UserId
-            });
+                var dm = o.ToDest();
+                dm.MemberId = entity.UserId;
+                return dm;
+            }).ToList();
             return context.Member.Add(entity).Entity;
         }
         #endregion
