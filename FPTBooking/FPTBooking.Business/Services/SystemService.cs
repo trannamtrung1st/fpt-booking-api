@@ -1,4 +1,5 @@
-﻿using FPTBooking.Data.Models;
+﻿using FPTBooking.Business.Models;
+using FPTBooking.Data.Models;
 using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
@@ -49,6 +50,19 @@ namespace FPTBooking.Business.Services
                 }),
                 HappenedTime = DateTime.UtcNow,
                 Type = "DeleteDepartment",
+                UserId = principal.Identity.Name
+            };
+        }
+
+        public AppEvent GetEventForUpdateDepartment(string display, ClaimsPrincipal principal, UpdateDepartmentModel model)
+        {
+            return new AppEvent
+            {
+                Id = Guid.NewGuid().ToString(),
+                DisplayContent = display,
+                Data = JsonConvert.SerializeObject(model),
+                HappenedTime = DateTime.UtcNow,
+                Type = "UpdateDepartment",
                 UserId = principal.Identity.Name
             };
         }

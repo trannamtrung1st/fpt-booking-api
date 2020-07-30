@@ -46,7 +46,7 @@
                 <div class="card card-default collapsed collapsed-card">
                     <div class="card-header clickable" data-card-widget="collapse">
                         <h3 class="card-title">
-                            <i class="fa fa-user-circle text-black-50 mr-1"></i>
+                            <i class="fa fa-business-time text-black-50 mr-1"></i>
                             Create department
                         </h3>
                         <div class="card-tools">
@@ -108,6 +108,36 @@
 </section>
 <!-- /.content -->
 
+<div class="modal fade" id="modal-edit">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 class="card-title">Edit department</h3>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <form id="form-edit-dep">
+                <div class="modal-body">
+                    <input type="hidden" name="code"/>
+                    <div class="form-group">
+                        <label>Department name</label>
+                        <input type="text" name="name" class="form-control" placeholder="Enter department name">
+                    </div>
+                    <!-- /.card -->
+                </div>
+                <div class="modal-footer">
+                    <button type="submit" class="btn btn-primary">
+                        <i class="fa fa-pen mr-2"></i>SUBMIT
+                    </button>
+                </div>
+            </form>
+        </div>
+        <!-- /.modal-content -->
+    </div>
+    <!-- /.modal-dialog -->
+</div>
+
 @section scripts {
 
     <!-- iCheck -->
@@ -159,6 +189,31 @@
                     code: {
                         required: "Please enter department code",
                     },
+                    name: {
+                        required: "Please enter department name",
+                    },
+                },
+                errorElement: 'span',
+                errorPlacement: function (error, element) {
+                    error.addClass('invalid-feedback');
+                    element.closest('.form-group').append(error);
+                },
+                highlight: function (element, errorClass, validClass) {
+                    $(element).addClass('is-invalid');
+                },
+                unhighlight: function (element, errorClass, validClass) {
+                    $(element).removeClass('is-invalid');
+                }
+            });
+
+            $('#form-edit-dep').validate({
+                submitHandler: confirmSubmitEdit,
+                rules: {
+                    name: {
+                        required: true,
+                    }
+                },
+                messages: {
                     name: {
                         required: "Please enter department name",
                     },
@@ -274,7 +329,7 @@
             const form = $('#form-create-dep');
             model.name = form.find('[name=name]').val();
             model.code = form.find('[name=code]').val();
-            
+
             changeLoading(true);
             $.ajax({
                 url: '/@ApiEndpoint.DEPARTMENT_API',
@@ -288,6 +343,49 @@
                 },
                 error: (resp) => {
                     handleGeneralError(resp);
+                },
+                complete: () => {
+                    changeLoading(false);
+                }
+            });
+        }
+
+        //edit
+        function showEditModal(code) {
+            var modal = $('#modal-edit');
+            var department = departmentData.filter(o => o.code == code)[0];
+            modal.find('[name=code]').val(department.code);
+            modal.find('[name=name]').val(department.name);
+            modal.modal('show');
+        }
+
+        function confirmSubmitEdit() {
+            confirmAlert().then((result) => {
+                if (result.value)
+                    submitEdit();
+            });
+        }
+
+        function submitEdit() {
+            var modal = $('#modal-edit');
+            const model = {};
+            var code = modal.find('[name=code]').val();
+            model.name = modal.find('[name=name]').val();
+            console.log(model);
+            changeLoading(true);
+            $.ajax({
+                url: '/@ApiEndpoint.DEPARTMENT_API/' + code,
+                type: 'patch',
+                contentType: 'application/json',
+                data: JSON.stringify(model),
+                success: (data) => {
+                    successAlert("Update successfully").then(() => {
+                        modal.modal('hide');
+                        getData();
+                    });
+                },
+                error: (data) => {
+                    handleGeneralError(data);
                 },
                 complete: () => {
                     changeLoading(false);

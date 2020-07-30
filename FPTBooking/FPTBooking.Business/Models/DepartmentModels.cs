@@ -7,6 +7,19 @@ using System.Threading.Tasks;
 
 namespace FPTBooking.Business.Models
 {
+    public class UpdateDepartmentModel : MappingModel<Department>
+    {
+        [JsonProperty("name")]
+        public string Name { get; set; }
+
+        public UpdateDepartmentModel()
+        {
+        }
+
+        public UpdateDepartmentModel(Department src) : base(src)
+        {
+        }
+    }
 
     public class CreateDepartmentModel : MappingModel<Department>
     {

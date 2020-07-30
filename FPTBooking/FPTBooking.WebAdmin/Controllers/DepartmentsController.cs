@@ -124,5 +124,34 @@ namespace FPTBooking.WebAdmin.Controllers
             return NoContent();
         }
 
+#if !DEBUG
+        [Authorize(Roles = RoleName.ADMIN)]
+#else
+        [Authorize]
+#endif
+        [HttpPatch("{code}")]
+        public IActionResult Update(string code, UpdateDepartmentModel model)
+        {
+            var entity = _service.Departments.Code(code).FirstOrDefault();
+            if (entity == null)
+                return NotFound(AppResult.NotFound());
+            var validationData = _service.ValidateUpdateDepartment(User, entity, model);
+            if (!validationData.IsValid)
+                return BadRequest(AppResult.FailValidation(data: validationData));
+            using (var transaction = context.Database.BeginTransaction())
+            {
+                _service.UpdateDepartment(entity, model);
+                //log event
+                var ev = _sysService.GetEventForUpdateDepartment(
+                    $"Admin {UserEmail} updated department {entity.Name}",
+                    User, model);
+                _sysService.CreateAppEvent(ev);
+                //end log event
+                context.SaveChanges();
+                transaction.Commit();
+            }
+            return NoContent();
+        }
+
     }
 }

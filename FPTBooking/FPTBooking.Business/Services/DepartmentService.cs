@@ -17,6 +17,14 @@ namespace FPTBooking.Business.Services
         {
         }
 
+        #region Update Department
+        public Department UpdateDepartment(Department entity, UpdateDepartmentModel model)
+        {
+            model.CopyTo(entity);
+            return entity;
+        }
+        #endregion
+
         #region Delete Department
         public Department DeleteDepartment(Department entity)
         {
@@ -137,6 +145,14 @@ namespace FPTBooking.Business.Services
         #endregion
 
         #region Validation
+        public ValidationData ValidateUpdateDepartment(ClaimsPrincipal principal,
+            Department entity, UpdateDepartmentModel model)
+        {
+            var validationData = new ValidationData();
+            if (string.IsNullOrWhiteSpace(model.Name))
+                validationData = validationData.Fail(mess: "Name required", code: AppResultCode.FailValidation);
+            return validationData;
+        }
 
         public ValidationData ValidateDeleteDepartment(ClaimsPrincipal principal,
             Department entity)
