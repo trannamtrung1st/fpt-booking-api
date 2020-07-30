@@ -1,4 +1,5 @@
-﻿using FPTBooking.Data.Models;
+﻿using FPTBooking.Data;
+using FPTBooking.Data.Models;
 using System;
 using System.Collections.Generic;
 using System.Diagnostics.CodeAnalysis;
@@ -16,31 +17,41 @@ namespace FPTBooking.Business.Clients.Models
         public string Description { get; set; }
         public bool IsDisable { get; set; }
 
+        protected RoomResource GetNewRoomResForRoom(string code, string name, string roomCode)
+        {
+            return new RoomResource
+            {
+                Code = code,
+                Name = name,
+                RoomCode = roomCode,
+                IsAvailable = true
+            };
+        }
+
         public Room ToRoom()
         {
+            if (AreaId != 3)
+                throw new Exception("Only area 3 supported");
             var entity = new Room
             {
                 Archived = false,
                 AreaSize = null,
-                BuildingAreaCode = AreaId == 4 ? "LUK" : "CR",
+                BuildingAreaCode = BuildingAreaValues.ADMIN.Code,
                 Code = RoomNo,
-                DepartmentCode = "DOE",
+                DepartmentCode = DeparmentValues.ADMIN.Code,
                 Description = Description,
                 Name = RoomNo,
                 IsAvailable = !IsDisable,
                 Note = null,
-                RoomTypeCode = "CR",
+                RoomTypeCode = RoomTypeValues.ADMIN.Code,
                 PeopleCapacity = Capacity,
+                ActiveFromTime = new TimeSpan(7, 0, 0),
+                ActiveToTime = new TimeSpan(18, 0, 0),
             };
             entity.RoomResource = new List<RoomResource>
             {
-                new RoomResource
-                {
-                    Code = "display-screen",
-                    IsAvailable =true,
-                    Name = "Display screen",
-                    Room = entity,
-                }
+                GetNewRoomResForRoom("AC", "Air-conditioner", RoomNo),
+                GetNewRoomResForRoom("FURNITURE", "Furniture", RoomNo)
             };
             return entity;
         }

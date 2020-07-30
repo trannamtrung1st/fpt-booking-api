@@ -21,6 +21,19 @@ namespace FPTBooking.Business.Services
             return context.AppEvent.Add(ev).Entity;
         }
 
+        public AppEvent GetEventForSyncRoomWithFap(string display, ClaimsPrincipal principal)
+        {
+            return new AppEvent
+            {
+                Id = Guid.NewGuid().ToString(),
+                DisplayContent = display,
+                Data = null,
+                HappenedTime = DateTime.UtcNow,
+                Type = "SyncRoomWithFap",
+                UserId = principal.Identity.Name
+            };
+        }
+
         public AppEvent GetEventForCreateBuildingArea(string display, ClaimsPrincipal principal, BuildingArea entity)
         {
             return new AppEvent

@@ -41,6 +41,34 @@ namespace FPTBooking.WebAdmin.Controllers
         private readonly SystemService _sysService;
 
 #if !DEBUG
+        [Authorize(Roles = RoleName.ADMIN)]
+#else
+        [Authorize]
+#endif
+        [HttpPost("fap-sync")]
+        public async Task<IActionResult> SyncRoomWithFAP()
+        {
+            var validationData = _service.ValidateSyncRoomWithFap(User);
+            if (!validationData.IsValid)
+                return BadRequest(AppResult.FailValidation(data: validationData));
+            int updated;
+            using (var trans = context.Database.BeginTransaction())
+            {
+                updated = await _service.SyncRoomWithFapAsync();
+                //log event
+                var ev = _sysService.GetEventForSyncRoomWithFap(
+                    $"Admin {UserEmail} synced rooms information with FAP", User);
+                _sysService.CreateAppEvent(ev);
+                //end log event
+                context.SaveChanges();
+                trans.Commit();
+            }
+            return Ok(AppResult.Success(data: updated));
+        }
+
+#if !DEBUG
+        [Authorize(Roles = RoleName.ADMIN)]
+#else
         [Authorize]
 #endif
         [HttpGet("")]

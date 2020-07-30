@@ -1,4 +1,5 @@
-﻿using FPTBooking.Business.Helpers;
+﻿using FPTBooking.Business.Clients;
+using FPTBooking.Business.Helpers;
 using FPTBooking.Business.Models;
 using FPTBooking.Business.Queries;
 using FPTBooking.Data.Models;
@@ -20,6 +21,26 @@ namespace FPTBooking.Business.Services
 
         [Inject]
         protected readonly MemberService _memberService;
+        [Inject]
+        protected readonly FptFapClient _fapClient;
+
+        #region Create Room
+        public async Task<int> SyncRoomWithFapAsync()
+        {
+            var rooms = await _fapClient.GetAllRooms();
+            var area3Rooms = rooms.Where(o => o.AreaId == 3).ToList();
+            foreach (var r in area3Rooms)
+            {
+                var existed = Rooms.Code(r.RoomNo).Any();
+                Room entity = r.ToRoom();
+                if (existed)
+                    context.Room.Update(entity);
+                else
+                    context.Room.Add(entity);
+            }
+            return area3Rooms.Count;
+        }
+        #endregion
 
         #region Query Room
         public IQueryable<Room> Rooms
@@ -332,6 +353,13 @@ namespace FPTBooking.Business.Services
                 .Select(o => o.MemberId).ToList();
             if (!roomValidCheckers.Contains(userId))
                 validationData.Fail(code: AppResultCode.AccessDenied);
+            return validationData;
+        }
+
+        public ValidationData ValidateSyncRoomWithFap(
+            ClaimsPrincipal principal)
+        {
+            var validationData = new ValidationData();
             return validationData;
         }
         #endregion

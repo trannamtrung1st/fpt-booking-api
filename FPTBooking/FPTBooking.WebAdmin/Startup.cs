@@ -62,9 +62,8 @@ namespace FPTBooking.WebAdmin
             services.AddDbContext<DataContext>(options =>
                 options.UseSqlServer(connStr).UseLazyLoadingProxies());
             Data.Global.Init(services);
-            //var fapSecret = File.ReadAllText(Settings.Instance.FapSecretFile);
-            //Business.Global.Init(services, fapSecret);
-            Business.Global.Init(services, null);
+            var fapSecret = File.ReadAllText(Settings.Instance.FapSecretFile);
+            Business.Global.Init(services, fapSecret);
             #region OAuth
             services.AddIdentity<AppUser, AppRole>(options =>
             {

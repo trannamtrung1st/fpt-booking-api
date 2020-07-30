@@ -42,8 +42,13 @@
 <section class="content">
     <div class="row">
         <div class="col-12">
-
             <div class="card">
+                <div class="card-header">
+                    <button class="btn btn-primary float-right" onclick="syncWithFap()">
+                        <i class="fa fa-download mr-1"></i> Sync with FAP
+                    </button>
+                </div>
+                <!-- /.card-header -->
                 <div class="card-body">
                     <table id="tbl-main" class="table table-bordered table-striped">
                         <thead>
@@ -198,6 +203,23 @@
                 type: 'delete',
                 success: (data) => {
                     successAlert("Delete successfully").then(getData);
+                },
+                error: (data) => {
+                    handleGeneralError(data);
+                },
+                complete: () => {
+                    changeLoading(false);
+                }
+            });
+        }
+
+        function syncWithFap() {
+            changeLoading(true);
+            $.ajax({
+                url: '/@ApiEndpoint.ROOM_API/fap-sync',
+                type: 'post',
+                success: (data) => {
+                    successAlert("Sync successfully").then(getData);
                 },
                 error: (data) => {
                     handleGeneralError(data);

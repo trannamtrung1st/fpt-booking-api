@@ -94,7 +94,7 @@ namespace FPTBooking.Data
         public static readonly Department ADMIN = new Department
         {
             Archived = false,
-            Code = "ADMIN",
+            Code = "Administrative",
             Description = "Administrative",
             Name = "Administrative",
         };
