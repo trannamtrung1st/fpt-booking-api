@@ -50,7 +50,7 @@ namespace FPTBooking.WebAdmin.Controllers
 #if !RELEASE
             Message = exception.Message;
 #else
-            Message = L["mess.main"].Value;
+            Message = "Something's wrong. Contact admin for more information";
 #endif
             _logger.Error(exception);
             RequestId = Activity.Current?.Id ?? HttpContext.TraceIdentifier;
