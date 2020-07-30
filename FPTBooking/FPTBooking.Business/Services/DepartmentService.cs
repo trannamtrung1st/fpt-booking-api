@@ -5,6 +5,7 @@ using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Security.Claims;
 using System.Threading.Tasks;
 using TNT.Core.Helpers.DI;
 
@@ -15,6 +16,18 @@ namespace FPTBooking.Business.Services
         public DepartmentService(ServiceInjection inj) : base(inj)
         {
         }
+
+        #region Create Department
+        protected void PrepareCreate(Department entity)
+        {
+        }
+        public Department CreateDepartment(CreateDepartmentModel model)
+        {
+            var entity = model.ToDest();
+            PrepareCreate(entity);
+            return context.Department.Add(entity).Entity;
+        }
+        #endregion
 
         #region Query Department
         public IQueryable<Department> Departments
@@ -124,6 +137,17 @@ namespace FPTBooking.Business.Services
             DepartmentQueryOptions options)
         {
             var validationData = new ValidationData();
+            return validationData;
+        }
+
+        public ValidationData ValidateCreateDepartment(ClaimsPrincipal principal,
+            CreateDepartmentModel model)
+        {
+            var validationData = new ValidationData();
+            if (string.IsNullOrWhiteSpace(model.Code))
+                validationData.Fail(mess: "Code required", code: AppResultCode.FailValidation);
+            if (string.IsNullOrWhiteSpace(model.Name))
+                validationData.Fail(mess: "Name required", code: AppResultCode.FailValidation);
             return validationData;
         }
 

@@ -8,6 +8,22 @@ using System.Threading.Tasks;
 namespace FPTBooking.Business.Models
 {
 
+    public class CreateDepartmentModel : MappingModel<Department>
+    {
+        [JsonProperty("name")]
+        public string Name { get; set; }
+        [JsonProperty("code")]
+        public string Code { get; set; }
+
+        public CreateDepartmentModel()
+        {
+        }
+
+        public CreateDepartmentModel(Department src) : base(src)
+        {
+        }
+    }
+
     #region Query
     public class DepartmentQueryProjection
     {

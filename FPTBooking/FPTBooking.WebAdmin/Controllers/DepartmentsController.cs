@@ -60,5 +60,22 @@ namespace FPTBooking.WebAdmin.Controllers
             return Ok(AppResult.Success(data: result));
         }
 
+
+#if !DEBUG
+        [Authorize(Roles = RoleName.ADMIN)]
+#else
+        [Authorize]
+#endif
+        [HttpPost("")]
+        public IActionResult CreateDepartment(CreateDepartmentModel model)
+        {
+            var validationData = _service.ValidateCreateDepartment(User, model);
+            if (!validationData.IsValid)
+                return BadRequest(AppResult.FailValidation(data: validationData));
+            var entity = _service.CreateDepartment(model);
+            context.SaveChanges();
+            return NoContent();
+        }
+
     }
 }
