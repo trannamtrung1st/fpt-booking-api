@@ -78,6 +78,24 @@
 
                         </div>
                         <div class="form-group w-50">
+                            <label>Area(s)</label>
+                            <div class="row">
+                                <div class="col-10">
+                                    <select class="form-control select2" name="area_code">
+                                        <option value="">--- Not selected ---</option>
+                                    </select>
+                                </div>
+                                <div class="col-2">
+                                    <button class="btn btn-default w-100" onclick="addAreaMember('#form-create-user')" type="button">
+                                        <i class="fa fa-plus"></i>
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="area-member-container">
+
+                        </div>
+                        <div class="form-group w-50">
                             <label>Email</label>
                             <input type="text" name="email" class="form-control" placeholder="Enter user email">
                         </div>
@@ -173,10 +191,27 @@
                     <div class="dep-member-container">
 
                     </div>
+                    <div class="form-group">
+                        <label>Area(s)</label>
+                        <div class="row">
+                            <div class="col-10">
+                                <select class="form-control select2" name="area_code">
+                                    <option value="">--- Not selected ---</option>
+                                </select>
+                            </div>
+                            <div class="col-2">
+                                <button class="btn btn-default w-100" onclick="addAreaMember('#form-edit-user')" type="button">
+                                    <i class="fa fa-plus"></i>
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="area-member-container">
 
+                    </div>
                     <div class="form-group w-50">
                         <label>Roles</label>
-                        <select class="select2" multiple="multiple" 
+                        <select class="select2" multiple="multiple"
                                 name="roles"
                                 data-placeholder="Select roles" style="width: 100%;">
                             <!option value="@FPTBooking.Data.RoleName.USER">User</!option>
@@ -216,7 +251,7 @@
     <!-- page script -->
     <script>
         let tblMain;
-        let memberData = [], departmentData = [];
+        let memberData = [], departmentData = [], areaData = [];
         $(function () {
             tblMain = $("#tbl-main").DataTable({
                 responsive: true,
@@ -294,6 +329,7 @@
 
             getData();
             getDepartment();
+            getArea();
             $('.select2').select2();
         });
 
@@ -314,7 +350,8 @@
             const data = {};
             data.culture = '@CultureHelper.CurrentLang';
             data.load_all = true;
-            data.fields = '@MemberQueryProjection.INFO,@MemberQueryProjection.DEPARTMENT,@MemberQueryProjection.ROLES';
+            data.fields = '@MemberQueryProjection.INFO,@MemberQueryProjection.DEPARTMENT,' +
+                '@MemberQueryProjection.ROLES,@MemberQueryProjection.AREA';
             $.ajax({
                 url: '/@ApiEndpoint.MEMBER_API',
                 type: 'get',
@@ -392,7 +429,7 @@
             });
         }
 
-        //get department
+        //get extra data
         function getDepartment() {
             const data = {};
             data.culture = '@CultureHelper.CurrentLang';
@@ -416,6 +453,30 @@
             });
         }
 
+        //get department
+        function getArea() {
+            const data = {};
+            data.culture = '@CultureHelper.CurrentLang';
+            data.load_all = true;
+            $.ajax({
+                url: '/@ApiEndpoint.AREA_API',
+                type: 'get',
+                data: data,
+                success: (respData) => {
+                    console.log(respData);
+                    let data = respData.data.list;
+                    areaData = data;
+                    processAreaData(data);
+                },
+                error: (data) => {
+                    handleGeneralError(data);
+                },
+                complete: () => {
+                    changeLoading(false);
+                }
+            });
+        }
+
         function processDepartmentData(data) {
             var depSelect = $('select[name=department_code]');
             for (var i = 0; i < data.length; i++) {
@@ -425,6 +486,17 @@
                 );
             }
             depSelect.select2();
+        }
+
+        function processAreaData(data) {
+            var areaSelect = $('select[name=area_code]');
+            for (var i = 0; i < data.length; i++) {
+                const obj = data[i];
+                areaSelect.append(
+                    $('<option value="' + obj.code + '">').append(obj.name)
+                );
+            }
+            areaSelect.select2();
         }
 
         function confirmSubmitCreateUser() {
@@ -451,6 +523,18 @@
                 };
             });
             model.departments = departments;
+
+            var allAreaMembers = form.find('.area-member').toArray();
+            var areas = allAreaMembers.map((o) => {
+                o = $(o);
+                var areaCode = o.find('[name=area_member_area_code]').val();
+                var isManager = o.find('[name=area_member]:checked').val();
+                return {
+                    area_code: areaCode,
+                    is_manager: isManager
+                };
+            });
+            model.areas = areas;
 
             changeLoading(true);
             $.ajax({
@@ -485,6 +569,17 @@
             container.html('');
             depMembersEles.forEach(o =>
                 container.append(o));
+
+            modal.find('[name=area_code]').val('').trigger('change');
+            var areaMembers = member.areas;
+            var areaMembersEles = areaMembers.map(o =>
+                createAreaMemberElement(o)
+            );
+            container = modal.find('.area-member-container');
+            container.html('');
+            areaMembersEles.forEach(o =>
+                container.append(o));
+
             modal.find('[name=roles]').select2().val(member.roles).trigger('change');
             modal.find('[name=user_id]').val(member.user_id);
             modal.find('[name=full_name]').val(member.full_name);
@@ -516,6 +611,19 @@
                 };
             });
             model.departments = departments;
+
+            var allAreaMembers = modal.find('.area-member').toArray();
+            var areas = allAreaMembers.map((o) => {
+                o = $(o);
+                var areaCode = o.find('[name=area_member_area_code]').val();
+                var isManager = o.find('[name=area_member]:checked').val();
+                return {
+                    area_code: areaCode,
+                    is_manager: isManager
+                };
+            });
+            model.areas = areas;
+
             console.log(model);
             changeLoading(true);
             $.ajax({
@@ -542,13 +650,26 @@
             $(btn).parent().remove();
         }
 
+        function removeAreaMember(btn) {
+            $(btn).parent().remove();
+        }
+
         function addDepMember(formSelector) {
             var form = $(formSelector);
             var currentDepCode = form.find('[name=department_code]').val();
-            if (!currentDepCode) return;
+            if (!currentDepCode || form.find('[name=dep_member_dep_code][value=' + currentDepCode + ']').length) return;
             var dep = departmentData.filter(o => o.code == currentDepCode)[0];
             var newDepEle = createDepMemberElement(dep);
             form.find('.dep-member-container').prepend(newDepEle);
+        }
+
+        function addAreaMember(formSelector) {
+            var form = $(formSelector);
+            var currentAreaCode = form.find('[name=area_code]').val();
+            if (!currentAreaCode || form.find('[name=area_member_area_code][value=' + currentAreaCode + ']').length) return;
+            var area = areaData.filter(o => o.code == currentAreaCode)[0];
+            var newAreaEle = createAreaMemberElement(area);
+            form.find('.area-member-container').prepend(newAreaEle);
         }
 
         function createDepMemberElement(dep) {
@@ -568,6 +689,26 @@
                 )
             ).append(
                 $('<span class="ml-3" onclick="removeDepMember(this)"><i class="fa fa-times-circle"></i></span>')
+            );
+        }
+
+        function createAreaMemberElement(area) {
+            return $('<div class="form-group area-member">').append(
+                $('<input type="hidden" name="area_member_area_code" value="' + area.code + '"/>')
+            ).append(
+                '<span>' + area.name + '</span> - '
+            ).append(
+                $('<span class="icheck-primary">').append(
+                    $('<label for="area-member-' + area.code + '" class="pr-2" style="font-weight: normal">').append(
+                        'Is manager'
+                    )
+                ).append(
+                    $('<input type="checkbox" id="area-member-' + area.code +
+                        '" name="area_member" value="true" ' + (area.is_manager ? 'checked="checked"' : '')
+                        + '/>')
+                )
+            ).append(
+                $('<span class="ml-3" onclick="removeAreaMember(this)"><i class="fa fa-times-circle"></i></span>')
             );
         }
     </script>

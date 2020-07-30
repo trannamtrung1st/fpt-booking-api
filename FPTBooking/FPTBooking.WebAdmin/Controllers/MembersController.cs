@@ -64,7 +64,8 @@ namespace FPTBooking.WebAdmin.Controllers
             using (var transaction = context.Database.BeginTransaction())
             {
                 model.Roles = model.Roles ?? new HashSet<string>();
-                if (model.CreateDepartmentMembers.Any(o => o.IsManager == true))
+                if (model.CreateDepartmentMembers.Any(o => o.IsManager == true)
+                    || model.CreateAreaMembers.Any(o => o.IsManager == true))
                     model.Roles.Add(RoleName.MANAGER);
                 var result = await _identityService
                     .CreateUserWithoutPassAsync(entity, model.Roles);
@@ -155,7 +156,8 @@ namespace FPTBooking.WebAdmin.Controllers
                 var user = entity.User;
                 _service.UpdateMember(entity, model);
                 user = _identityService.UpdateUser(user, model);
-                if (model.UpdateDepartmentMembers.Any(o => o.IsManager == true))
+                if (model.UpdateDepartmentMembers.Any(o => o.IsManager == true)
+                    || model.UpdateAreaMembers.Any(o => o.IsManager == true))
                 {
                     model.Roles = model.Roles ?? new HashSet<string>();
                     model.Roles.Add(RoleName.MANAGER);

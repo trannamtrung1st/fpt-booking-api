@@ -104,19 +104,30 @@ namespace FPTBooking.Business.Queries
 
         public static IQueryable<Member> Project(this IQueryable<Member> query, Models.MemberQueryProjection model)
         {
-            bool dep = false, roles = false;
+            bool dep = false, roles = false, area = false;
             foreach (var f in model.GetFieldsArr())
             {
                 switch (f)
                 {
                     case Models.MemberQueryProjection.DEPARTMENT: dep = true; break;
                     case Models.MemberQueryProjection.ROLES: roles = true; break;
+                    case Models.MemberQueryProjection.AREA: area = true; break;
                 }
             }
             query = query.Select(o => new Member
             {
                 AppEvent = null,
-                AreaMember = null,
+                AreaMember = area ? o.AreaMember.Select(am => new AreaMember
+                {
+                    AreaCode = am.AreaCode,
+                    Area = new BuildingArea
+                    {
+                        Name = am.Area.Name,
+                        Code = am.AreaCode
+                    },
+                    Id = am.Id,
+                    IsManager = am.IsManager,
+                }).ToList() : null,
                 Booking = null,
                 BookingHistory = null,
                 Code = o.Code,

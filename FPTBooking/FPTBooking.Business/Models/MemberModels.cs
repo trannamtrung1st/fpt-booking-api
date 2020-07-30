@@ -13,6 +13,8 @@ namespace FPTBooking.Business.Models
         public string FullName { get; set; }
         [JsonProperty("departments")]
         public List<UpdateDepartmentMemberModel> UpdateDepartmentMembers { get; set; }
+        [JsonProperty("areas")]
+        public List<UpdateAreaMemberModel> UpdateAreaMembers { get; set; }
         [JsonProperty("roles")]
         public HashSet<string> Roles { get; set; }
 
@@ -42,6 +44,23 @@ namespace FPTBooking.Business.Models
         }
     }
 
+    public class UpdateAreaMemberModel : MappingModel<AreaMember>
+    {
+
+        [JsonProperty("area_code")]
+        public string AreaCode { get; set; }
+        [JsonProperty("is_manager")]
+        public bool? IsManager { get; set; }
+
+        public UpdateAreaMemberModel()
+        {
+        }
+
+        public UpdateAreaMemberModel(AreaMember src) : base(src)
+        {
+        }
+    }
+
     public class CreateMemberModel : MappingModel<Member>
     {
         [JsonProperty("email")]
@@ -50,6 +69,8 @@ namespace FPTBooking.Business.Models
         public string FullName { get; set; }
         [JsonProperty("departments")]
         public List<CreateDepartmentMemberModel> CreateDepartmentMembers { get; set; }
+        [JsonProperty("areas")]
+        public List<CreateAreaMemberModel> CreateAreaMembers { get; set; }
         [JsonProperty("roles")]
         public HashSet<string> Roles { get; set; }
 
@@ -75,6 +96,23 @@ namespace FPTBooking.Business.Models
         }
 
         public CreateDepartmentMemberModel(DepartmentMember src) : base(src)
+        {
+        }
+    }
+
+    public class CreateAreaMemberModel : MappingModel<AreaMember>
+    {
+
+        [JsonProperty("area_code")]
+        public string AreaCode { get; set; }
+        [JsonProperty("is_manager")]
+        public bool? IsManager { get; set; }
+
+        public CreateAreaMemberModel()
+        {
+        }
+
+        public CreateAreaMemberModel(AreaMember src) : base(src)
         {
         }
     }
@@ -111,6 +149,7 @@ namespace FPTBooking.Business.Models
         public const string INFO = "info";
         public const string SELECT = "select";
         public const string DEPARTMENT = "department";
+        public const string AREA = "area";
         public const string ROLES = "roles";
         private const string T = AppUser.TBL_NAME;
     }

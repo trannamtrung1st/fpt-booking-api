@@ -106,6 +106,19 @@ namespace FPTBooking.Business.Services
                             obj["departments"] = entities;
                         }
                         break;
+                    case MemberQueryProjection.AREA:
+                        {
+                            var entities = row.AreaMember
+                                .Select(o => new
+                                {
+                                    id = o.Id,
+                                    name = o.Area.Name,
+                                    code = o.AreaCode,
+                                    is_manager = o.IsManager
+                                }).ToList();
+                            obj["areas"] = entities;
+                        }
+                        break;
                     case MemberQueryProjection.ROLES:
                         {
                             var entities = row.User.UserRoles
@@ -205,7 +218,15 @@ namespace FPTBooking.Business.Services
                 dm.MemberId = entity.UserId;
                 return dm;
             }).ToList();
+            DeleteAllAreaMemberOf(entity);
+            var areaMembers = model.UpdateAreaMembers.Select(o =>
+            {
+                var am = o.ToDest();
+                am.MemberId = entity.UserId;
+                return am;
+            }).ToList();
             entity.DepartmentMember = depMembers;
+            entity.AreaMember = areaMembers;
             return entity;
         }
 
@@ -254,6 +275,12 @@ namespace FPTBooking.Business.Services
                 var dm = o.ToDest();
                 dm.MemberId = entity.UserId;
                 return dm;
+            }).ToList();
+            entity.AreaMember = model.CreateAreaMembers.Select(o =>
+            {
+                var am = o.ToDest();
+                am.MemberId = entity.UserId;
+                return am;
             }).ToList();
             return context.Member.Add(entity).Entity;
         }
