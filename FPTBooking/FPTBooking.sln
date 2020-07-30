@@ -15,7 +15,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "FPTBooking.WebHelpers", "FP
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "FPTBooking.ConsoleClient", "FPTBooking.ConsoleClient\FPTBooking.ConsoleClient.csproj", "{6D868CCA-26F2-440E-B389-3A64987CB99F}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FPTBooking.WebAdmin", "FPTBooking.WebAdmin\FPTBooking.WebAdmin.csproj", "{EAE7F688-52DA-4159-B814-B30A25A4BA71}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "FPTBooking.WebAdmin", "FPTBooking.WebAdmin\FPTBooking.WebAdmin.csproj", "{EAE7F688-52DA-4159-B814-B30A25A4BA71}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
