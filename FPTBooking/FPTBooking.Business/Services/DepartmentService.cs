@@ -17,6 +17,14 @@ namespace FPTBooking.Business.Services
         {
         }
 
+        #region Delete Department
+        public Department DeleteDepartment(Department entity)
+        {
+            entity = context.Department.Remove(entity).Entity;
+            return entity;
+        }
+        #endregion
+
         #region Create Department
         protected void PrepareCreate(Department entity)
         {
@@ -129,6 +137,13 @@ namespace FPTBooking.Business.Services
         #endregion
 
         #region Validation
+
+        public ValidationData ValidateDeleteDepartment(ClaimsPrincipal principal,
+            Department entity)
+        {
+            return new ValidationData();
+        }
+
         public ValidationData ValidateGetDepartments(
             DepartmentQueryFilter filter,
             DepartmentQuerySort sort,

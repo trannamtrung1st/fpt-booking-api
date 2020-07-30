@@ -22,6 +22,7 @@ using FPTBooking.Business.Helpers;
 using FPTBooking.Data;
 using FPTBooking.Business.Queries;
 using FPTBooking.WebHelpers;
+using Microsoft.EntityFrameworkCore;
 
 namespace FPTBooking.WebAdmin.Controllers
 {
@@ -60,6 +61,43 @@ namespace FPTBooking.WebAdmin.Controllers
             return Ok(AppResult.Success(data: result));
         }
 
+#if !DEBUG
+        [Authorize(Roles = RoleName.ADMIN)]
+#else
+        [Authorize]
+#endif
+        [HttpDelete("{code}")]
+        public IActionResult Delete(string code)
+        {
+            try
+            {
+                var entity = _service.Departments.Code(code).FirstOrDefault();
+                if (entity == null)
+                    return NotFound(AppResult.NotFound());
+                var validationData = _service.ValidateDeleteDepartment(User, entity);
+                if (!validationData.IsValid)
+                    return BadRequest(AppResult.FailValidation(data: validationData));
+                using (var trans = context.Database.BeginTransaction())
+                {
+                    _service.DeleteDepartment(entity);
+                    //log event
+                    var ev = _sysService.GetEventForDeleteDepartment(
+                        $"Admin {UserEmail} deleted department {entity.Name}", User,
+                        entity);
+                    _sysService.CreateAppEvent(ev);
+                    //end log event
+                    context.SaveChanges();
+                    trans.Commit();
+                }
+                return NoContent();
+            }
+            catch (DbUpdateException e)
+            {
+                _logger.Error(e);
+                return BadRequest(AppResult.FailValidation(data: new ValidationData()
+                    .Fail(code: AppResultCode.DependencyDeleteFail)));
+            }
+        }
 
 #if !DEBUG
         [Authorize(Roles = RoleName.ADMIN)]
@@ -72,8 +110,17 @@ namespace FPTBooking.WebAdmin.Controllers
             var validationData = _service.ValidateCreateDepartment(User, model);
             if (!validationData.IsValid)
                 return BadRequest(AppResult.FailValidation(data: validationData));
-            var entity = _service.CreateDepartment(model);
-            context.SaveChanges();
+            using (var trans = context.Database.BeginTransaction())
+            {
+                var entity = _service.CreateDepartment(model);
+                //log event
+                var ev = _sysService.GetEventForCreateDepartment(
+                    $"Admin {UserEmail} created a new department", User, entity);
+                _sysService.CreateAppEvent(ev);
+                //end log event
+                context.SaveChanges();
+                trans.Commit();
+            }
             return NoContent();
         }
 

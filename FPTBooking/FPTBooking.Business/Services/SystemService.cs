@@ -3,6 +3,7 @@ using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Security.Claims;
 using System.Threading.Tasks;
 using TNT.Core.Helpers.DI;
 
@@ -17,6 +18,39 @@ namespace FPTBooking.Business.Services
         public AppEvent CreateAppEvent(AppEvent ev)
         {
             return context.AppEvent.Add(ev).Entity;
+        }
+
+        public AppEvent GetEventForCreateDepartment(string display, ClaimsPrincipal principal, Department department)
+        {
+            return new AppEvent
+            {
+                Id = Guid.NewGuid().ToString(),
+                DisplayContent = display,
+                Data = JsonConvert.SerializeObject(new
+                {
+                    department.Name,
+                    department.Code
+                }),
+                HappenedTime = DateTime.UtcNow,
+                Type = "CreateDepartment",
+                UserId = principal.Identity.Name
+            };
+        }
+
+        public AppEvent GetEventForDeleteDepartment(string display, ClaimsPrincipal principal, Department department)
+        {
+            return new AppEvent
+            {
+                Id = Guid.NewGuid().ToString(),
+                DisplayContent = display,
+                Data = JsonConvert.SerializeObject(new
+                {
+                    department.Code
+                }),
+                HappenedTime = DateTime.UtcNow,
+                Type = "DeleteDepartment",
+                UserId = principal.Identity.Name
+            };
         }
 
         public AppEvent GetEventForBookingProcessing(BookingHistory history)
