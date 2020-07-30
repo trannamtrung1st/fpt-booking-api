@@ -22,6 +22,7 @@ using FPTBooking.Business.Helpers;
 using FPTBooking.Data;
 using FPTBooking.Business.Queries;
 using FPTBooking.WebHelpers;
+using Microsoft.EntityFrameworkCore;
 
 namespace FPTBooking.WebAdmin.Controllers
 {
@@ -60,5 +61,97 @@ namespace FPTBooking.WebAdmin.Controllers
             return Ok(AppResult.Success(data: result));
         }
 
+
+#if !DEBUG
+        [Authorize(Roles = RoleName.ADMIN)]
+#else
+        [Authorize]
+#endif
+        [HttpDelete("{code}")]
+        public IActionResult Delete(string code)
+        {
+            try
+            {
+                var entity = _service.BuildingAreas.Code(code).FirstOrDefault();
+                if (entity == null)
+                    return NotFound(AppResult.NotFound());
+                var validationData = _service.ValidateDeleteBuildingArea(User, entity);
+                if (!validationData.IsValid)
+                    return BadRequest(AppResult.FailValidation(data: validationData));
+                using (var trans = context.Database.BeginTransaction())
+                {
+                    _service.DeleteBuildingArea(entity);
+                    //log event
+                    var ev = _sysService.GetEventForDeleteBuildingArea(
+                        $"Admin {UserEmail} deleted area {entity.Name}", User,
+                        entity);
+                    _sysService.CreateAppEvent(ev);
+                    //end log event
+                    context.SaveChanges();
+                    trans.Commit();
+                }
+                return NoContent();
+            }
+            catch (DbUpdateException e)
+            {
+                _logger.Error(e);
+                return BadRequest(AppResult.FailValidation(data: new ValidationData()
+                    .Fail(code: AppResultCode.DependencyDeleteFail)));
+            }
+        }
+
+#if !DEBUG
+        [Authorize(Roles = RoleName.ADMIN)]
+#else
+        [Authorize]
+#endif
+        [HttpPost("")]
+        public IActionResult CreateBuildingArea(CreateBuildingAreaModel model)
+        {
+            var validationData = _service.ValidateCreateBuildingArea(User, model);
+            if (!validationData.IsValid)
+                return BadRequest(AppResult.FailValidation(data: validationData));
+            using (var trans = context.Database.BeginTransaction())
+            {
+                var entity = _service.CreateBuildingArea(model);
+                //log event
+                var ev = _sysService.GetEventForCreateBuildingArea(
+                    $"Admin {UserEmail} created a new area", User, entity);
+                _sysService.CreateAppEvent(ev);
+                //end log event
+                context.SaveChanges();
+                trans.Commit();
+            }
+            return NoContent();
+        }
+
+#if !DEBUG
+        [Authorize(Roles = RoleName.ADMIN)]
+#else
+        [Authorize]
+#endif
+        [HttpPatch("{code}")]
+        public IActionResult Update(string code, UpdateBuildingAreaModel model)
+        {
+            var entity = _service.BuildingAreas.Code(code).FirstOrDefault();
+            if (entity == null)
+                return NotFound(AppResult.NotFound());
+            var validationData = _service.ValidateUpdateBuildingArea(User, entity, model);
+            if (!validationData.IsValid)
+                return BadRequest(AppResult.FailValidation(data: validationData));
+            using (var transaction = context.Database.BeginTransaction())
+            {
+                _service.UpdateBuildingArea(entity, model);
+                //log event
+                var ev = _sysService.GetEventForUpdateBuildingArea(
+                    $"Admin {UserEmail} updated area {entity.Name}",
+                    User, model);
+                _sysService.CreateAppEvent(ev);
+                //end log event
+                context.SaveChanges();
+                transaction.Commit();
+            }
+            return NoContent();
+        }
     }
 }

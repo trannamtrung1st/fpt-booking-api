@@ -5,6 +5,7 @@ using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Security.Claims;
 using System.Threading.Tasks;
 using TNT.Core.Helpers.DI;
 
@@ -15,6 +16,36 @@ namespace FPTBooking.Business.Services
         public AreaService(ServiceInjection inj) : base(inj)
         {
         }
+
+
+
+        #region Update BuildingArea
+        public BuildingArea UpdateBuildingArea(BuildingArea entity, UpdateBuildingAreaModel model)
+        {
+            model.CopyTo(entity);
+            return entity;
+        }
+        #endregion
+
+        #region Delete BuildingArea
+        public BuildingArea DeleteBuildingArea(BuildingArea entity)
+        {
+            entity = context.BuildingArea.Remove(entity).Entity;
+            return entity;
+        }
+        #endregion
+
+        #region Create BuildingArea
+        protected void PrepareCreate(BuildingArea entity)
+        {
+        }
+        public BuildingArea CreateBuildingArea(CreateBuildingAreaModel model)
+        {
+            var entity = model.ToDest();
+            PrepareCreate(entity);
+            return context.BuildingArea.Add(entity).Entity;
+        }
+        #endregion
 
         #region Query BuildingArea
         public IQueryable<BuildingArea> BuildingAreas
@@ -124,6 +155,31 @@ namespace FPTBooking.Business.Services
             AreaQueryOptions options)
         {
             var validationData = new ValidationData();
+            return validationData;
+        }
+        public ValidationData ValidateUpdateBuildingArea(ClaimsPrincipal principal,
+            BuildingArea entity, UpdateBuildingAreaModel model)
+        {
+            var validationData = new ValidationData();
+            if (string.IsNullOrWhiteSpace(model.Name))
+                validationData = validationData.Fail(mess: "Name required", code: AppResultCode.FailValidation);
+            return validationData;
+        }
+
+        public ValidationData ValidateDeleteBuildingArea(ClaimsPrincipal principal,
+            BuildingArea entity)
+        {
+            return new ValidationData();
+        }
+
+        public ValidationData ValidateCreateBuildingArea(ClaimsPrincipal principal,
+            CreateBuildingAreaModel model)
+        {
+            var validationData = new ValidationData();
+            if (string.IsNullOrWhiteSpace(model.Code))
+                validationData.Fail(mess: "Code required", code: AppResultCode.FailValidation);
+            if (string.IsNullOrWhiteSpace(model.Name))
+                validationData.Fail(mess: "Name required", code: AppResultCode.FailValidation);
             return validationData;
         }
 

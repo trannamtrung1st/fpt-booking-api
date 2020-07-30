@@ -1,0 +1,398 @@
+﻿@page
+@model FPTBooking.WebAdmin.Pages.BuildingArea.IndexModel
+@{
+}
+
+@section head {
+
+    <!-- icheck bootstrap -->
+    <link rel="stylesheet" href="/plugins/icheck-bootstrap/icheck-bootstrap.min.css">
+    <!-- Select2 -->
+    <link rel="stylesheet" href="/plugins/select2/css/select2.min.css">
+    <link rel="stylesheet" href="/plugins/select2-bootstrap4-theme/select2-bootstrap4.min.css">
+    <!-- DataTables -->
+    <link rel="stylesheet" href="/plugins/datatables-bs4/css/dataTables.bootstrap4.min.css">
+    <link rel="stylesheet" href="/plugins/datatables-responsive/css/responsive.bootstrap4.min.css">
+    <style>
+        [class*=icheck-] > label {
+            padding-left: 0 !important;
+            line-height: unset !important;
+        }
+    </style>
+}
+
+<!-- Content Header (Page header) -->
+<section class="content-header">
+    <div class="container-fluid">
+        <div class="row mb-2">
+            <div class="col-sm-6">
+                <h1>@Model.Info.Title</h1>
+            </div>
+            <div class="col-sm-6">
+                <ol class="breadcrumb float-sm-right">
+                    <li class="breadcrumb-item"><a href="@Routing.DASHBOARD">Dashboard</a></li>
+                    <li class="breadcrumb-item active">@Model.Info.Title</li>
+                </ol>
+            </div>
+        </div>
+    </div><!-- /.container-fluid -->
+</section>
+
+<!-- Main content -->
+<section class="content">
+    <div class="row">
+        <div class="col-12">
+            <form id="form-create-area">
+                <div class="card card-default collapsed collapsed-card">
+                    <div class="card-header clickable" data-card-widget="collapse">
+                        <h3 class="card-title">
+                            <i class="fa fa-layer-group text-black-50 mr-1"></i>
+                            Create area
+                        </h3>
+                        <div class="card-tools">
+                            <button type="button" class="btn btn-tool" data-card-widget="collapse"><i class="fas fa-plus"></i></button>
+                        </div>
+                    </div>
+                    <!-- /.card-header -->
+                    <div class="card-body">
+                        <div class="form-group w-50">
+                            <label>Area code</label>
+                            <input type="text" name="code" class="form-control" placeholder="Enter area code">
+                        </div>
+                        <div class="form-group w-50">
+                            <label>Area name</label>
+                            <input type="text" name="name" class="form-control" placeholder="Enter area name">
+                        </div>
+                    </div>
+                    <div class="card-footer">
+                        <button class="btn btn-primary float-right">
+                            <i class="fa fa-plus mr-2"></i>SUBMIT
+                        </button>
+                    </div>
+                </div>
+            </form>
+            <!-- /.card -->
+
+            <div class="card">
+                <div class="card-body">
+                    <table id="tbl-main" class="table table-bordered table-striped">
+                        <thead>
+                            <tr>
+                                <th></th>
+                                <th>No</th>
+                                <th class="sortable">Name</th>
+                                <th class="sortable">Code</th>
+                                <th class="sortable">Active</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                        </tbody>
+                        <tfoot>
+                            <tr>
+                                <th></th>
+                                <th>No</th>
+                                <th>Name</th>
+                                <th>Code</th>
+                                <th>Active</th>
+                            </tr>
+                        </tfoot>
+                    </table>
+                </div>
+                <!-- /.card-body -->
+            </div>
+            <!-- /.card -->
+        </div>
+        <!-- /.col -->
+    </div>
+    <!-- /.row -->
+</section>
+<!-- /.content -->
+
+<div class="modal fade" id="modal-edit">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 class="card-title">Edit area</h3>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <form id="form-edit-area">
+                <div class="modal-body">
+                    <input type="hidden" name="code" />
+                    <div class="form-group">
+                        <label>Area name</label>
+                        <input type="text" name="name" class="form-control" placeholder="Enter area name">
+                    </div>
+                    <!-- /.card -->
+                </div>
+                <div class="modal-footer">
+                    <button type="submit" class="btn btn-primary">
+                        <i class="fa fa-pen mr-2"></i>SUBMIT
+                    </button>
+                </div>
+            </form>
+        </div>
+        <!-- /.modal-content -->
+    </div>
+    <!-- /.modal-dialog -->
+</div>
+
+@section scripts {
+
+    <!-- iCheck -->
+    <script src="~/plugins/icheck/icheck.min.js"></script>
+    <!-- jquery-validation -->
+    <script src="/plugins/jquery-validation/jquery.validate.min.js"></script>
+    <script src="/plugins/jquery-validation/additional-methods.min.js"></script>
+    <!-- DataTables -->
+    <script src="/plugins/datatables/jquery.dataTables.min.js"></script>
+    <script src="/plugins/datatables-bs4/js/dataTables.bootstrap4.min.js"></script>
+    <script src="/plugins/datatables-responsive/js/dataTables.responsive.min.js"></script>
+    <script src="/plugins/datatables-responsive/js/responsive.bootstrap4.min.js"></script>
+    <!-- Select2 -->
+    <script src="/plugins/select2/js/select2.full.min.js"></script>
+    <!-- page script -->
+    <script>
+        let tblMain;
+        let areaData = [];
+        $(function () {
+            tblMain = $("#tbl-main").DataTable({
+                responsive: true,
+                autoWidth: false,
+                columnDefs: [
+                    {
+                        targets: [2, 3, 4], orderable: true, searchable: true
+                    },
+                    { targets: "_all", orderable: false, searchable: false },
+                ],
+                order: [[2, 'asc']]
+            });
+            tblMain._mustDrawNo = true;
+            tblMain.on('draw', onTableChange);
+            tblMain.on('length', onTableChange);
+            tblMain.on('page', onTableChange);
+            tblMain.on('search', onTableChange);
+            tblMain.on('order', onTableChange);
+
+            $('#form-create-area').validate({
+                submitHandler: confirmSubmitCreate,
+                rules: {
+                    code: {
+                        required: true,
+                    },
+                    name: {
+                        required: true,
+                    }
+                },
+                messages: {
+                    code: {
+                        required: "Please enter area code",
+                    },
+                    name: {
+                        required: "Please enter area name",
+                    },
+                },
+                errorElement: 'span',
+                errorPlacement: function (error, element) {
+                    error.addClass('invalid-feedback');
+                    element.closest('.form-group').append(error);
+                },
+                highlight: function (element, errorClass, validClass) {
+                    $(element).addClass('is-invalid');
+                },
+                unhighlight: function (element, errorClass, validClass) {
+                    $(element).removeClass('is-invalid');
+                }
+            });
+
+            $('#form-edit-area').validate({
+                submitHandler: confirmSubmitEdit,
+                rules: {
+                    name: {
+                        required: true,
+                    }
+                },
+                messages: {
+                    name: {
+                        required: "Please enter area name",
+                    },
+                },
+                errorElement: 'span',
+                errorPlacement: function (error, element) {
+                    error.addClass('invalid-feedback');
+                    element.closest('.form-group').append(error);
+                },
+                highlight: function (element, errorClass, validClass) {
+                    $(element).addClass('is-invalid');
+                },
+                unhighlight: function (element, errorClass, validClass) {
+                    $(element).removeClass('is-invalid');
+                }
+            });
+
+            getData();
+            $('.select2').select2();
+        });
+
+        function onTableChange() {
+            if (tblMain._mustDrawNo) {
+                tblMain._mustDrawNo = false;
+                let no = 1;
+                tblMain.rows().every((r) => {
+                    const data = tblMain.row(r).data();
+                    data[1] = no++;
+                    tblMain.row(r).data(data);
+                });
+            } else tblMain._mustDrawNo = true;
+        }
+
+        function getData() {
+            changeLoading(true);
+            const data = {};
+            data.culture = '@CultureHelper.CurrentLang';
+            data.load_all = true;
+            $.ajax({
+                url: '/@ApiEndpoint.AREA_API',
+                type: 'get',
+                data: data,
+                success: (respData) => {
+                    console.log(respData);
+                    let data = respData.data.list;
+                    areaData = data;
+                    processData(data);
+                },
+                error: (data) => {
+                    handleGeneralError(data);
+                },
+                complete: () => {
+                    changeLoading(false);
+                }
+            });
+        }
+
+        function processData(data) {
+            tblMain.clear();
+            var btn = (code) =>
+                "<div>" +
+                    "<button class=\"btn btn-primary btn-sm\" type=\"button\" onclick=\"showEditModal(" + code + ")\">" +
+                        "<i class=\"fa fa-pen mr-1\"></i> Edit" +
+                    "</button>" +
+                    "<button class=\"btn btn-danger btn-sm ml-2\" type=\"button\" onclick=\"confirmRemove(" + code + ")\"><i class=\"fa fa-trash\"></i></button>" +
+                "</div>";
+            for (var i = 0; i < data.length; i++) {
+                const obj = data[i];
+                tblMain.row.add([
+                    btn("'" + obj.code + "'"),
+                    null,
+                    obj.name,
+                    obj.code,
+                    obj.archived ? 'No' : 'Yes'
+                ]);
+            }
+            tblMain.draw();
+        }
+
+        function confirmRemove(code) {
+            confirmAlert().then((result) => {
+                if (result.value)
+                    submitRemove(code);
+            });
+        }
+
+        function submitRemove(code) {
+            changeLoading(true);
+            $.ajax({
+                url: '/@ApiEndpoint.AREA_API/' + code,
+                type: 'delete',
+                success: (data) => {
+                    successAlert("Delete successfully").then(getData);
+                },
+                error: (data) => {
+                    handleGeneralError(data);
+                },
+                complete: () => {
+                    changeLoading(false);
+                }
+            });
+        }
+
+        function confirmSubmitCreate() {
+            confirmAlert().then((result) => {
+                if (result.value)
+                    submitCreate();
+            });
+        }
+
+        function submitCreate() {
+            const model = {};
+            const form = $('#form-create-area');
+            model.name = form.find('[name=name]').val();
+            model.code = form.find('[name=code]').val();
+
+            changeLoading(true);
+            $.ajax({
+                url: '/@ApiEndpoint.AREA_API',
+                type: 'post',
+                contentType: 'application/json',
+                data: JSON.stringify(model),
+                success: (respData) => {
+                    successAlert("Create successfully").then(() => {
+                        getData();
+                    });
+                },
+                error: (resp) => {
+                    handleGeneralError(resp);
+                },
+                complete: () => {
+                    changeLoading(false);
+                }
+            });
+        }
+
+        //edit
+        function showEditModal(code) {
+            var modal = $('#modal-edit');
+            var area = areaData.filter(o => o.code == code)[0];
+            modal.find('[name=code]').val(area.code);
+            modal.find('[name=name]').val(area.name);
+            modal.modal('show');
+        }
+
+        function confirmSubmitEdit() {
+            confirmAlert().then((result) => {
+                if (result.value)
+                    submitEdit();
+            });
+        }
+
+        function submitEdit() {
+            var modal = $('#modal-edit');
+            const model = {};
+            var code = modal.find('[name=code]').val();
+            model.name = modal.find('[name=name]').val();
+            console.log(model);
+            changeLoading(true);
+            $.ajax({
+                url: '/@ApiEndpoint.AREA_API/' + code,
+                type: 'patch',
+                contentType: 'application/json',
+                data: JSON.stringify(model),
+                success: (data) => {
+                    successAlert("Update successfully").then(() => {
+                        modal.modal('hide');
+                        getData();
+                    });
+                },
+                error: (data) => {
+                    handleGeneralError(data);
+                },
+                complete: () => {
+                    changeLoading(false);
+                }
+            });
+        }
+
+    </script>
+}
+

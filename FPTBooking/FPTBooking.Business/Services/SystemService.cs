@@ -21,7 +21,7 @@ namespace FPTBooking.Business.Services
             return context.AppEvent.Add(ev).Entity;
         }
 
-        public AppEvent GetEventForCreateDepartment(string display, ClaimsPrincipal principal, Department department)
+        public AppEvent GetEventForCreateBuildingArea(string display, ClaimsPrincipal principal, BuildingArea entity)
         {
             return new AppEvent
             {
@@ -29,8 +29,54 @@ namespace FPTBooking.Business.Services
                 DisplayContent = display,
                 Data = JsonConvert.SerializeObject(new
                 {
-                    department.Name,
-                    department.Code
+                    entity.Name,
+                    entity.Code
+                }),
+                HappenedTime = DateTime.UtcNow,
+                Type = "CreateBuildingArea",
+                UserId = principal.Identity.Name
+            };
+        }
+
+        public AppEvent GetEventForDeleteBuildingArea(string display, ClaimsPrincipal principal, BuildingArea entity)
+        {
+            return new AppEvent
+            {
+                Id = Guid.NewGuid().ToString(),
+                DisplayContent = display,
+                Data = JsonConvert.SerializeObject(new
+                {
+                    entity.Code
+                }),
+                HappenedTime = DateTime.UtcNow,
+                Type = "DeleteBuildingArea",
+                UserId = principal.Identity.Name
+            };
+        }
+
+        public AppEvent GetEventForUpdateBuildingArea(string display, ClaimsPrincipal principal, UpdateBuildingAreaModel model)
+        {
+            return new AppEvent
+            {
+                Id = Guid.NewGuid().ToString(),
+                DisplayContent = display,
+                Data = JsonConvert.SerializeObject(model),
+                HappenedTime = DateTime.UtcNow,
+                Type = "UpdateBuildingArea",
+                UserId = principal.Identity.Name
+            };
+        }
+
+        public AppEvent GetEventForCreateDepartment(string display, ClaimsPrincipal principal, Department entity)
+        {
+            return new AppEvent
+            {
+                Id = Guid.NewGuid().ToString(),
+                DisplayContent = display,
+                Data = JsonConvert.SerializeObject(new
+                {
+                    entity.Name,
+                    entity.Code
                 }),
                 HappenedTime = DateTime.UtcNow,
                 Type = "CreateDepartment",
@@ -38,7 +84,7 @@ namespace FPTBooking.Business.Services
             };
         }
 
-        public AppEvent GetEventForDeleteDepartment(string display, ClaimsPrincipal principal, Department department)
+        public AppEvent GetEventForDeleteDepartment(string display, ClaimsPrincipal principal, Department entity)
         {
             return new AppEvent
             {
@@ -46,7 +92,7 @@ namespace FPTBooking.Business.Services
                 DisplayContent = display,
                 Data = JsonConvert.SerializeObject(new
                 {
-                    department.Code
+                    entity.Code
                 }),
                 HappenedTime = DateTime.UtcNow,
                 Type = "DeleteDepartment",

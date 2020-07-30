@@ -7,6 +7,36 @@ using System.Threading.Tasks;
 
 namespace FPTBooking.Business.Models
 {
+    public class UpdateBuildingAreaModel : MappingModel<BuildingArea>
+    {
+        [JsonProperty("name")]
+        public string Name { get; set; }
+
+        public UpdateBuildingAreaModel()
+        {
+        }
+
+        public UpdateBuildingAreaModel(BuildingArea src) : base(src)
+        {
+        }
+    }
+
+    public class CreateBuildingAreaModel : MappingModel<BuildingArea>
+    {
+        [JsonProperty("name")]
+        public string Name { get; set; }
+        [JsonProperty("code")]
+        public string Code { get; set; }
+
+        public CreateBuildingAreaModel()
+        {
+        }
+
+        public CreateBuildingAreaModel(BuildingArea src) : base(src)
+        {
+        }
+    }
+
 
     #region Query
     public class AreaQueryProjection
