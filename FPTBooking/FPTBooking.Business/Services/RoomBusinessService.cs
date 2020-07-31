@@ -32,7 +32,11 @@ namespace FPTBooking.Business.Services
                 var existed = Rooms.Code(r.RoomNo).Any();
                 Room entity = r.ToRoom();
                 if (existed)
+                {
+                    var oldRes = RoomResources.OfRoom(entity.Code).ToList();
+                    DeleteRoomServices(oldRes);
                     context.Room.Update(entity);
+                }
                 else
                     context.Room.Add(entity);
             }
@@ -57,6 +61,14 @@ namespace FPTBooking.Business.Services
             get
             {
                 return context.Room;
+            }
+        }
+
+        public IQueryable<RoomResource> RoomResources
+        {
+            get
+            {
+                return context.RoomResource;
             }
         }
 
@@ -303,6 +315,11 @@ namespace FPTBooking.Business.Services
             DeleteAllRoomServiceOfRoom(entity);
             entity = context.Room.Remove(entity).Entity;
             return entity;
+        }
+
+        public void DeleteRoomServices(IEnumerable<RoomResource> entities)
+        {
+            context.RoomResource.RemoveRange(entities);
         }
 
         public void DeleteAllRoomServiceOfRoom(Room entity)
