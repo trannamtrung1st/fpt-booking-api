@@ -38,6 +38,17 @@ namespace FPTBooking.Business.Services
             }
             return area3Rooms.Count;
         }
+
+        protected void PrepareCreate(Room entity)
+        {
+        }
+
+        public Room CreateRoom(CreateRoomModel model)
+        {
+            var entity = model.ToDest();
+            PrepareCreate(entity);
+            return context.Room.Add(entity).Entity;
+        }
         #endregion
 
         #region Query Room
@@ -379,6 +390,17 @@ namespace FPTBooking.Business.Services
             Room entity)
         {
             return new ValidationData();
+        }
+
+        public ValidationData ValidateCreateRoom(ClaimsPrincipal principal,
+            CreateRoomModel model)
+        {
+            var validationData = new ValidationData();
+            if (string.IsNullOrWhiteSpace(model.Code))
+                validationData.Fail(mess: "Code required", code: AppResultCode.FailValidation);
+            if (string.IsNullOrWhiteSpace(model.Name))
+                validationData.Fail(mess: "Name required", code: AppResultCode.FailValidation);
+            return validationData;
         }
         #endregion
     }

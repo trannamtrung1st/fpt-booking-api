@@ -113,6 +113,31 @@ namespace FPTBooking.WebAdmin.Controllers
 #else
         [Authorize]
 #endif
+        [HttpPost("")]
+        public IActionResult CreateRoom(CreateRoomModel model)
+        {
+            var validationData = _service.ValidateCreateRoom(User, model);
+            if (!validationData.IsValid)
+                return BadRequest(AppResult.FailValidation(data: validationData));
+            using (var trans = context.Database.BeginTransaction())
+            {
+                var entity = _service.CreateRoom(model);
+                //log event
+                var ev = _sysService.GetEventForCreateRoom(
+                    $"Admin {UserEmail} created a new room", User, entity);
+                _sysService.CreateAppEvent(ev);
+                //end log event
+                context.SaveChanges();
+                trans.Commit();
+            }
+            return NoContent();
+        }
+
+#if !DEBUG
+        [Authorize(Roles = RoleName.ADMIN)]
+#else
+        [Authorize]
+#endif
         [HttpGet("")]
         public async Task<IActionResult> Get([FromQuery][QueryObject]RoomQueryFilter filter,
             [FromQuery]RoomQuerySort sort,

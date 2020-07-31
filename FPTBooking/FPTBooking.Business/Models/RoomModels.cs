@@ -8,6 +8,40 @@ using System.Threading.Tasks;
 
 namespace FPTBooking.Business.Models
 {
+    public class CreateRoomModel : MappingModel<Room>
+    {
+        [JsonProperty("name")]
+        public string Name { get; set; }
+        [JsonProperty("code")]
+        public string Code { get; set; }
+        [JsonProperty("department_code")]
+        public string DepartmentCode { get; set; }
+        [JsonProperty("area_code")]
+        public string BuildingAreaCode { get; set; }
+        [JsonProperty("people_capacity")]
+        public int PeopleCapacity { get; set; }
+        [JsonProperty("description")]
+        public string Description { get; set; }
+        [JsonProperty("is_available")]
+        public bool IsAvailable { get; set; }
+        [JsonProperty("room_type_code")]
+        public string RoomTypeCode { get; set; }
+        [JsonProperty("note")]
+        public string Note { get; set; }
+        [JsonProperty("active_from_time")]
+        public TimeSpan ActiveFromTime { get; set; }
+        [JsonProperty("active_to_time")]
+        public TimeSpan ActiveToTime { get; set; }
+
+        public CreateRoomModel()
+        {
+        }
+
+        public CreateRoomModel(Room src) : base(src)
+        {
+        }
+    }
+
     public class CheckRoomStatusModel : MappingModel<Room>
     {
         public CheckRoomStatusModel()

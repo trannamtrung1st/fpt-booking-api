@@ -42,6 +42,82 @@
 <section class="content">
     <div class="row">
         <div class="col-12">
+            <form id="form-create-room">
+                <div class="card card-default collapsed collapsed-card">
+                    <div class="card-header clickable" data-card-widget="collapse">
+                        <h3 class="card-title">
+                            <i class="fa fa-home text-black-50 mr-1"></i>
+                            Add new room
+                        </h3>
+                        <div class="card-tools">
+                            <button type="button" class="btn btn-tool" data-card-widget="collapse"><i class="fas fa-plus"></i></button>
+                        </div>
+                    </div>
+                    <!-- /.card-header -->
+                    <div class="card-body">
+                        <div class="form-group w-50">
+                            <label>Room code</label>
+                            <input type="text" name="code" class="form-control" placeholder="Enter room code">
+                        </div>
+                        <div class="form-group w-50">
+                            <label>Room name</label>
+                            <input type="text" name="name" class="form-control" placeholder="Enter room name">
+                        </div>
+                        <div class="form-group w-50">
+                            <label>Department</label>
+                            <select class="form-control select2" name="department_code">
+                                <option value="">--- Not selected ---</option>
+                            </select>
+                        </div>
+                        <div class="form-group w-50">
+                            <label>Area</label>
+                            <select class="form-control select2" name="area_code">
+                                <option value="">--- Not selected ---</option>
+                            </select>
+                        </div>
+                        <div class="form-group w-50">
+                            <label>Capacity</label>
+                            <input type="number" name="people_capacity" class="form-control" min="1" placeholder="Enter a number">
+                        </div>
+                        <div class="form-group w-50">
+                            <label>Description</label>
+                            <textarea class="form-control" name="description"></textarea>
+                        </div>
+                        <div class="form-group w-50">
+                            <span class="icheck-primary">
+                                <label for="create-is-available" class="pr-2">Available</label>
+                                <input type="checkbox" id="create-is-available" name="is_available" checked value="true">
+                            </span>
+                        </div>
+                        <div class="form-group w-50">
+                            <label>Note</label>
+                            <textarea class="form-control" name="note"></textarea>
+                        </div>
+                        <div class="form-group w-50">
+                            <label>Room type</label>
+                            <select class="form-control select2" name="room_type_code">
+                                <option value="">--- Not selected ---</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label>Active time</label><br/>
+                            From 
+                            <input type="time" value="07:00:00" 
+                                   name="active_from_time" class="mx-2 form-control w-25 d-inline" />
+                            To
+                            <input type="time" value="22:00:00" 
+                                   name="active_to_time" class="ml-2 form-control w-25 d-inline" />
+                        </div>
+                    </div>
+                    <div class="card-footer">
+                        <button class="btn btn-primary float-right">
+                            <i class="fa fa-plus mr-2"></i>SUBMIT
+                        </button>
+                    </div>
+                </div>
+            </form>
+            <!-- /.card -->
+
             <div class="card">
                 <div class="card-header">
                     <button class="btn btn-primary float-right" onclick="syncWithFap()">
@@ -100,7 +176,7 @@
     <!-- page script -->
     <script>
         let tblMain;
-        let roomData = [];
+        let roomData = [], departmentData = [], areaData = [], roomTypeData = [];
         $(function () {
             tblMain = $("#tbl-main").DataTable({
                 responsive: true,
@@ -113,7 +189,121 @@
                 ],
                 order: [[1, 'asc']]
             });
+
+            $('#form-create-room').validate({
+                submitHandler: confirmSubmitCreateRoom,
+                rules: {
+                    code: {
+                        required: true,
+                    },
+                    name: {
+                        required: true,
+                    },
+                    department_code: {
+                        required: true,
+                    },
+                    area_code: {
+                        required: true,
+                    },
+                    people_capacity: {
+                        required: true,
+                    },
+                    room_type_code: {
+                        required: true,
+                    },
+                },
+                messages: {
+                    code: {
+                        required: "Required",
+                    },
+                    name: {
+                        required: "Required",
+                    },
+                    department_code: {
+                        required: "Required",
+                    },
+                    area_code: {
+                        required: "Required",
+                    },
+                    people_capacity: {
+                        required: "Required",
+                    },
+                    room_type_code: {
+                        required: "Required",
+                    },
+                },
+                errorElement: 'span',
+                errorPlacement: function (error, element) {
+                    error.addClass('invalid-feedback');
+                    element.closest('.form-group').append(error);
+                },
+                highlight: function (element, errorClass, validClass) {
+                    $(element).addClass('is-invalid');
+                },
+                unhighlight: function (element, errorClass, validClass) {
+                    $(element).removeClass('is-invalid');
+                }
+            });
+
+            $('#form-edit-room').validate({
+                submitHandler: confirmSubmitEdit,
+                rules: {
+                    code: {
+                        required: true,
+                    },
+                    name: {
+                        required: true,
+                    },
+                    department_code: {
+                        required: true,
+                    },
+                    area_code: {
+                        required: true,
+                    },
+                    people_capacity: {
+                        required: true,
+                    },
+                    room_type_code: {
+                        required: true,
+                    },
+                },
+                messages: {
+                    code: {
+                        required: "Required",
+                    },
+                    name: {
+                        required: "Required",
+                    },
+                    department_code: {
+                        required: "Required",
+                    },
+                    area_code: {
+                        required: "Required",
+                    },
+                    people_capacity: {
+                        required: "Required",
+                    },
+                    room_type_code: {
+                        required: "Required",
+                    },
+                },
+                errorElement: 'span',
+                errorPlacement: function (error, element) {
+                    error.addClass('invalid-feedback');
+                    element.closest('.form-group').append(error);
+                },
+                highlight: function (element, errorClass, validClass) {
+                    $(element).addClass('is-invalid');
+                },
+                unhighlight: function (element, errorClass, validClass) {
+                    $(element).removeClass('is-invalid');
+                }
+            });
+
             getData();
+            getDepartment();
+            getArea();
+            getRoomType();
             $('.select2').select2();
         });
 
@@ -204,6 +394,156 @@
                     changeLoading(false);
                 }
             });
+        }
+
+        //get extra data
+        function getDepartment() {
+            const data = {};
+            data.culture = '@CultureHelper.CurrentLang';
+            data.load_all = true;
+            $.ajax({
+                url: '/@ApiEndpoint.DEPARTMENT_API',
+                type: 'get',
+                data: data,
+                success: (respData) => {
+                    console.log(respData);
+                    let data = respData.data.list;
+                    departmentData = data;
+                    processDepartmentData(data);
+                },
+                error: (data) => {
+                    handleGeneralError(data);
+                },
+                complete: () => {
+                    changeLoading(false);
+                }
+            });
+        }
+
+        function getArea() {
+            const data = {};
+            data.culture = '@CultureHelper.CurrentLang';
+            data.load_all = true;
+            $.ajax({
+                url: '/@ApiEndpoint.AREA_API',
+                type: 'get',
+                data: data,
+                success: (respData) => {
+                    console.log(respData);
+                    let data = respData.data.list;
+                    areaData = data;
+                    processAreaData(data);
+                },
+                error: (data) => {
+                    handleGeneralError(data);
+                },
+                complete: () => {
+                    changeLoading(false);
+                }
+            });
+        }
+
+        function processDepartmentData(data) {
+            var depSelect = $('select[name=department_code]');
+            for (var i = 0; i < data.length; i++) {
+                const obj = data[i];
+                depSelect.append(
+                    $('<option value="' + obj.code + '">').append(obj.name)
+                );
+            }
+            depSelect.select2();
+        }
+
+        function processAreaData(data) {
+            var areaSelect = $('select[name=area_code]');
+            for (var i = 0; i < data.length; i++) {
+                const obj = data[i];
+                areaSelect.append(
+                    $('<option value="' + obj.code + '">').append(obj.name)
+                );
+            }
+            areaSelect.select2();
+        }
+
+        function getRoomType() {
+            const data = {};
+            data.culture = '@CultureHelper.CurrentLang';
+            data.load_all = true;
+            $.ajax({
+                url: '/@ApiEndpoint.ROOM_TYPE_API',
+                type: 'get',
+                data: data,
+                success: (respData) => {
+                    console.log(respData);
+                    let data = respData.data.list;
+                    roomTypeData = data;
+                    processRoomTypeData(data);
+                },
+                error: (data) => {
+                    handleGeneralError(data);
+                },
+                complete: () => {
+                    changeLoading(false);
+                }
+            });
+        }
+
+        function processRoomTypeData(data) {
+            var depSelect = $('select[name=room_type_code]');
+            for (var i = 0; i < data.length; i++) {
+                const obj = data[i];
+                depSelect.append(
+                    $('<option value="' + obj.code + '">').append(obj.name)
+                );
+            }
+            depSelect.select2();
+        }
+
+        function confirmSubmitCreateRoom() {
+            confirmAlert().then((result) => {
+                if (result.value)
+                    submitCreateRoom();
+            });
+        }
+
+        function submitCreateRoom() {
+            const model = {};
+            const form = $('#form-create-room');
+            model.code = form.find('[name=code]').val();
+            model.name = form.find('[name=name]').val();
+            model.department_code = form.find('[name=department_code]').val();
+            model.area_code = form.find('[name=area_code]').val();
+            model.people_capacity = parseInt(form.find('[name=people_capacity]').val());
+            model.description = form.find('[name=description]').val();
+            model.is_available = form.find('[name=is_available]:checked').val();
+            model.note = form.find('[name=note]').val();
+            model.room_type_code = form.find('[name=room_type_code]').val();
+            model.active_from_time = form.find('[name=active_from_time]').val();
+            model.active_to_time = form.find('[name=active_to_time]').val();
+            console.log(model);
+
+            changeLoading(true);
+            $.ajax({
+                url: '/@ApiEndpoint.ROOM_API',
+                type: 'post',
+                contentType: 'application/json',
+                data: JSON.stringify(model),
+                success: (respData) => {
+                    successAlert("Create successfully").then(() => {
+                        getData();
+                    });
+                },
+                error: (resp) => {
+                    handleGeneralError(resp);
+                },
+                complete: () => {
+                    changeLoading(false);
+                }
+            });
+        }
+
+        function confirmSubmitEdit() {
+
         }
 
     </script>

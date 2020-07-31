@@ -46,7 +46,7 @@ namespace FPTBooking.Business.Clients.Models
                 RoomTypeCode = RoomTypeValues.ADMIN.Code,
                 PeopleCapacity = Capacity,
                 ActiveFromTime = new TimeSpan(7, 0, 0),
-                ActiveToTime = new TimeSpan(18, 0, 0),
+                ActiveToTime = new TimeSpan(22, 0, 0),
             };
             entity.RoomResource = new List<RoomResource>
             {
