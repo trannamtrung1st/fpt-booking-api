@@ -81,6 +81,36 @@ namespace FPTBooking.WebAdmin.Controllers
             }
         }
 
+
+#if !DEBUG
+        [Authorize(Roles = RoleName.ADMIN)]
+#else
+        [Authorize]
+#endif
+        [HttpPatch("{code}")]
+        public IActionResult Update(string code, UpdateRoomModel model)
+        {
+            var entity = _service.Rooms.Code(code).FirstOrDefault();
+            if (entity == null)
+                return NotFound(AppResult.NotFound());
+            var validationData = _service.ValidateUpdateRoom(User, entity, model);
+            if (!validationData.IsValid)
+                return BadRequest(AppResult.FailValidation(data: validationData));
+            using (var transaction = context.Database.BeginTransaction())
+            {
+                _service.UpdateRoom(entity, model);
+                //log event
+                var ev = _sysService.GetEventForUpdateRoom(
+                    $"Admin {UserEmail} updated room {entity.Name}",
+                    User, model);
+                _sysService.CreateAppEvent(ev);
+                //end log event
+                context.SaveChanges();
+                transaction.Commit();
+            }
+            return NoContent();
+        }
+
 #if !DEBUG
         [Authorize(Roles = RoleName.ADMIN)]
 #else

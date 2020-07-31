@@ -309,6 +309,14 @@ namespace FPTBooking.Business.Services
         }
         #endregion
 
+        #region Update Room
+        public Room UpdateRoom(Room entity, UpdateRoomModel model)
+        {
+            model.CopyTo(entity);
+            return entity;
+        }
+        #endregion
+
         #region Delete Room
         public Room DeleteRoom(Room entity)
         {
@@ -329,6 +337,15 @@ namespace FPTBooking.Business.Services
         #endregion
 
         #region Validation
+        public ValidationData ValidateUpdateRoom(ClaimsPrincipal principal,
+            Room entity, UpdateRoomModel model)
+        {
+            var validationData = new ValidationData();
+            if (string.IsNullOrWhiteSpace(model.Name))
+                validationData = validationData.Fail(mess: "Name required", code: AppResultCode.FailValidation);
+            return validationData;
+        }
+
         public ValidationData ValidateGetRooms(
             RoomQueryFilter filter,
             RoomQuerySort sort,

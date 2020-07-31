@@ -100,12 +100,12 @@
                             </select>
                         </div>
                         <div class="form-group">
-                            <label>Active time</label><br/>
-                            From 
-                            <input type="time" value="07:00:00" 
+                            <label>Active time</label><br />
+                            From
+                            <input type="time" value="07:00:00"
                                    name="active_from_time" class="mx-2 form-control w-25 d-inline" />
                             To
-                            <input type="time" value="22:00:00" 
+                            <input type="time" value="22:00:00"
                                    name="active_to_time" class="ml-2 form-control w-25 d-inline" />
                         </div>
                     </div>
@@ -130,7 +130,8 @@
                         <thead>
                             <tr>
                                 <th></th>
-                                <th class="sortable">Code</th>
+                                <th class="sortable">Name</th>
+                                <th class="sortable">Capacity</th>
                                 <th class="sortable">Area</th>
                                 <th class="sortable">Room type</th>
                                 <th class="sortable">Available</th>
@@ -141,7 +142,8 @@
                         <tfoot>
                             <tr>
                                 <th></th>
-                                <th>Code</th>
+                                <th>Name</th>
+                                <th>Capacity</th>
                                 <th>Area</th>
                                 <th>Room type</th>
                                 <th>Available</th>
@@ -158,6 +160,82 @@
     <!-- /.row -->
 </section>
 <!-- /.content -->
+
+<div class="modal fade" id="modal-edit">
+    <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 class="card-title">Edit room</h3>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <span aria-hidden="true">&times;</span>
+                </button>
+            </div>
+            <form id="form-edit-room">
+                <div class="modal-body">
+                    <input type="hidden" name="code" />
+                    <div class="form-group">
+                        <label>Room name</label>
+                        <input type="text" name="name" class="form-control" placeholder="Enter room name">
+                    </div>
+                    <div class="form-group">
+                        <label>Department</label>
+                        <select class="form-control select2" name="department_code">
+                            <option value="">--- Not selected ---</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>Area</label>
+                        <select class="form-control select2" name="area_code">
+                            <option value="">--- Not selected ---</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>Capacity</label>
+                        <input type="number" name="people_capacity" class="form-control" min="1" placeholder="Enter a number">
+                    </div>
+                    <div class="form-group">
+                        <label>Description</label>
+                        <textarea class="form-control" name="description"></textarea>
+                    </div>
+                    <div class="form-group">
+                        <span class="icheck-primary">
+                            <label for="create-is-available" class="pr-2">Available</label>
+                            <input type="checkbox" id="create-is-available" name="is_available" checked value="true">
+                        </span>
+                    </div>
+                    <div class="form-group">
+                        <label>Note</label>
+                        <textarea class="form-control" name="note"></textarea>
+                    </div>
+                    <div class="form-group">
+                        <label>Room type</label>
+                        <select class="form-control select2" name="room_type_code">
+                            <option value="">--- Not selected ---</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <label>Active time</label><br />
+                        From
+                        <input type="time" value="07:00:00"
+                               name="active_from_time" class="w-50 ml-2 form-control d-inline" />
+                        <br/>
+                        To
+                        <input type="time" value="22:00:00"
+                               name="active_to_time" class="w-50 ml-2 form-control d-inline" />
+                    </div>
+                    <!-- /.card -->
+                </div>
+                <div class="modal-footer">
+                    <button type="submit" class="btn btn-primary">
+                        <i class="fa fa-pen mr-2"></i>SUBMIT
+                    </button>
+                </div>
+            </form>
+        </div>
+        <!-- /.modal-content -->
+    </div>
+    <!-- /.modal-dialog -->
+</div>
 
 @section scripts {
 
@@ -183,7 +261,7 @@
                 autoWidth: false,
                 columnDefs: [
                     {
-                        targets: [1, 2, 3, 4], orderable: true, searchable: true
+                        targets: [1, 2, 3, 4, 5], orderable: true, searchable: true
                     },
                     { targets: "_all", orderable: false, searchable: false },
                 ],
@@ -346,7 +424,8 @@
                 const obj = data[i];
                 tblMain.row.add([
                     btn("'" + obj.code + "'"),
-                    obj.code,
+                    obj.name,
+                    obj.people_capacity,
                     obj.area.name,
                     obj.room_type.name,
                     obj.is_available ? 'Yes' : 'No'
@@ -542,8 +621,66 @@
             });
         }
 
-        function confirmSubmitEdit() {
+        //edit
+        function showEditModal(code) {
+            var modal = $('#modal-edit');
+            var room = roomData.filter(o => o.code == code)[0];
+            modal.find('[name=code]').val(room.code);
+            modal.find('[name=name]').val(room.name);
+            modal.find('[name=department_code]').val(room.department_code).trigger('change');
+            modal.find('[name=area_code]').val(room.area_code).trigger('change');
+            modal.find('[name=people_capacity]').val(room.people_capacity);
+            modal.find('[name=description]').val(room.description);
+            modal.find('[name=is_available]').val(room.is_available);
+            modal.find('[name=note]').val(room.note);
+            modal.find('[name=room_type_code]').val(room.room_type_code).trigger('change');
+            modal.find('[name=active_from_time]').val(room.active_from_time);
+            modal.find('[name=active_to_time]').val(room.active_to_time);
+            modal.modal('show');
+        }
 
+        function confirmSubmitEdit() {
+            confirmAlert().then((result) => {
+                if (result.value)
+                    submitEdit();
+            });
+        }
+
+        function submitEdit() {
+            var modal = $('#modal-edit');
+            const form = $('#form-edit-room');
+            const model = {};
+            var code = form.find('[name=code]').val();
+            model.name = form.find('[name=name]').val();
+            model.department_code = form.find('[name=department_code]').val();
+            model.area_code = form.find('[name=area_code]').val();
+            model.people_capacity = parseInt(form.find('[name=people_capacity]').val());
+            model.description = form.find('[name=description]').val();
+            model.is_available = form.find('[name=is_available]:checked').val();
+            model.note = form.find('[name=note]').val();
+            model.room_type_code = form.find('[name=room_type_code]').val();
+            model.active_from_time = form.find('[name=active_from_time]').val();
+            model.active_to_time = form.find('[name=active_to_time]').val();
+            console.log(model);
+            changeLoading(true);
+            $.ajax({
+                url: '/@ApiEndpoint.ROOM_API/' + code,
+                type: 'patch',
+                contentType: 'application/json',
+                data: JSON.stringify(model),
+                success: (data) => {
+                    successAlert("Update successfully").then(() => {
+                        modal.modal('hide');
+                        getData();
+                    });
+                },
+                error: (data) => {
+                    handleGeneralError(data);
+                },
+                complete: () => {
+                    changeLoading(false);
+                }
+            });
         }
 
     </script>
