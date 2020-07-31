@@ -624,6 +624,10 @@
         //edit
         function showEditModal(code) {
             var modal = $('#modal-edit');
+            var form = $('#form-edit-room'); 
+            form.validate().resetForm();
+            form.find('.is-invalid').removeClass('is-invalid');
+
             var room = roomData.filter(o => o.code == code)[0];
             modal.find('[name=code]').val(room.code);
             modal.find('[name=name]').val(room.name);

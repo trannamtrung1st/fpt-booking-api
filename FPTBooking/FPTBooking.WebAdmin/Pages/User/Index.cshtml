@@ -549,6 +549,10 @@
         //edit
         function showEditModal(id) {
             var modal = $('#modal-edit');
+            var form = $('#form-edit-user');
+            form.validate().resetForm();
+            form.find('.is-invalid').removeClass('is-invalid');
+
             modal.find('[name=department_code]').val('').trigger('change');
             var member = memberData.filter(o => o.user_id == id)[0];
             var depMembers = member.departments;

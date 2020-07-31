@@ -353,6 +353,10 @@
         //edit
         function showEditModal(code) {
             var modal = $('#modal-edit');
+            var form = $('#form-edit-area');
+            form.validate().resetForm();
+            form.find('.is-invalid').removeClass('is-invalid');
+
             var area = areaData.filter(o => o.code == code)[0];
             modal.find('[name=code]').val(area.code);
             modal.find('[name=name]').val(area.name);
