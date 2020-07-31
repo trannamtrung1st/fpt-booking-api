@@ -21,6 +21,9 @@ using FPTBooking.Business.Helpers;
 using FPTBooking.Data;
 using FirebaseAdmin.Messaging;
 using FPTBooking.Data.Models;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.DependencyInjection;
+using FPTBooking.Business.Clients;
 
 namespace FPTBooking.WebAdmin.Controllers
 {
@@ -45,6 +48,44 @@ namespace FPTBooking.WebAdmin.Controllers
 #else
         [Authorize]
 #endif
+        [HttpDelete("{code}")]
+        public IActionResult Delete(string code)
+        {
+            try
+            {
+                var entity = _service.Rooms.Code(code).FirstOrDefault();
+                if (entity == null)
+                    return NotFound(AppResult.NotFound());
+                var validationData = _service.ValidateDeleteRoom(User, entity);
+                if (!validationData.IsValid)
+                    return BadRequest(AppResult.FailValidation(data: validationData));
+                using (var trans = context.Database.BeginTransaction())
+                {
+                    _service.DeleteRoom(entity);
+                    //log event
+                    var ev = _sysService.GetEventForDeleteRoom(
+                        $"Admin {UserEmail} deleted room {entity.Code}", User,
+                        entity);
+                    _sysService.CreateAppEvent(ev);
+                    //end log event
+                    context.SaveChanges();
+                    trans.Commit();
+                }
+                return NoContent();
+            }
+            catch (DbUpdateException e)
+            {
+                _logger.Error(e);
+                return BadRequest(AppResult.FailValidation(data: new ValidationData()
+                    .Fail(code: AppResultCode.DependencyDeleteFail)));
+            }
+        }
+
+#if !DEBUG
+        [Authorize(Roles = RoleName.ADMIN)]
+#else
+        [Authorize]
+#endif
         [HttpPost("fap-sync")]
         public async Task<IActionResult> SyncRoomWithFAP()
         {
@@ -54,7 +95,8 @@ namespace FPTBooking.WebAdmin.Controllers
             int updated;
             using (var trans = context.Database.BeginTransaction())
             {
-                updated = await _service.SyncRoomWithFapAsync();
+                var fapClient = HttpContext.RequestServices.GetRequiredService<FptFapClient>();
+                updated = await _service.SyncRoomWithFapAsync(fapClient);
                 //log event
                 var ev = _sysService.GetEventForSyncRoomWithFap(
                     $"Admin {UserEmail} synced rooms information with FAP", User);

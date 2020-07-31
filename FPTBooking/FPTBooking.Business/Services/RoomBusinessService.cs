@@ -21,13 +21,11 @@ namespace FPTBooking.Business.Services
 
         [Inject]
         protected readonly MemberService _memberService;
-        [Inject]
-        protected readonly FptFapClient _fapClient;
 
         #region Create Room
-        public async Task<int> SyncRoomWithFapAsync()
+        public async Task<int> SyncRoomWithFapAsync(FptFapClient fapClient)
         {
-            var rooms = await _fapClient.GetAllRooms();
+            var rooms = await fapClient.GetAllRooms();
             var area3Rooms = rooms.Where(o => o.AreaId == 3).ToList();
             foreach (var r in area3Rooms)
             {
@@ -288,6 +286,20 @@ namespace FPTBooking.Business.Services
         }
         #endregion
 
+        #region Delete Room
+        public Room DeleteRoom(Room entity)
+        {
+            DeleteAllRoomServiceOfRoom(entity);
+            entity = context.Room.Remove(entity).Entity;
+            return entity;
+        }
+
+        public void DeleteAllRoomServiceOfRoom(Room entity)
+        {
+            context.RoomResource.RemoveRange(entity.RoomResource);
+        }
+        #endregion
+
         #region Validation
         public ValidationData ValidateGetRooms(
             RoomQueryFilter filter,
@@ -361,6 +373,12 @@ namespace FPTBooking.Business.Services
         {
             var validationData = new ValidationData();
             return validationData;
+        }
+
+        public ValidationData ValidateDeleteRoom(ClaimsPrincipal principal,
+            Room entity)
+        {
+            return new ValidationData();
         }
         #endregion
     }

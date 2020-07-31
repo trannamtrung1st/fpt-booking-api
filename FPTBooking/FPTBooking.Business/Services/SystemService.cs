@@ -21,6 +21,22 @@ namespace FPTBooking.Business.Services
             return context.AppEvent.Add(ev).Entity;
         }
 
+        public AppEvent GetEventForDeleteRoom(string display, ClaimsPrincipal principal, Room entity)
+        {
+            return new AppEvent
+            {
+                Id = Guid.NewGuid().ToString(),
+                DisplayContent = display,
+                Data = JsonConvert.SerializeObject(new
+                {
+                    entity.Code
+                }),
+                HappenedTime = DateTime.UtcNow,
+                Type = "DeleteRoom",
+                UserId = principal.Identity.Name
+            };
+        }
+
         public AppEvent GetEventForSyncRoomWithFap(string display, ClaimsPrincipal principal)
         {
             return new AppEvent

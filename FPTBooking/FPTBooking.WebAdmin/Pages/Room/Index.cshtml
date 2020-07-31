@@ -54,12 +54,10 @@
                         <thead>
                             <tr>
                                 <th></th>
-                                <th>No</th>
-                                <th class="sortable">Name</th>
                                 <th class="sortable">Code</th>
-                                <th class="sortable">Department</th>
                                 <th class="sortable">Area</th>
                                 <th class="sortable">Room type</th>
+                                <th class="sortable">Available</th>
                             </tr>
                         </thead>
                         <tbody>
@@ -67,12 +65,10 @@
                         <tfoot>
                             <tr>
                                 <th></th>
-                                <th>No</th>
-                                <th>Name</th>
                                 <th>Code</th>
-                                <th>Department</th>
                                 <th>Area</th>
                                 <th>Room type</th>
+                                <th>Available</th>
                             </tr>
                         </tfoot>
                     </table>
@@ -111,33 +107,15 @@
                 autoWidth: false,
                 columnDefs: [
                     {
-                        targets: [2, 3, 4, 5, 6], orderable: true, searchable: true
+                        targets: [1, 2, 3, 4], orderable: true, searchable: true
                     },
                     { targets: "_all", orderable: false, searchable: false },
                 ],
-                order: [[2, 'asc']]
+                order: [[1, 'asc']]
             });
-            tblMain._mustDrawNo = true;
-            tblMain.on('draw', onTableChange);
-            tblMain.on('length', onTableChange);
-            tblMain.on('page', onTableChange);
-            tblMain.on('search', onTableChange);
-            tblMain.on('order', onTableChange);
             getData();
             $('.select2').select2();
         });
-
-        function onTableChange() {
-            if (tblMain._mustDrawNo) {
-                tblMain._mustDrawNo = false;
-                let no = 1;
-                tblMain.rows().every((r) => {
-                    const data = tblMain.row(r).data();
-                    data[1] = no++;
-                    tblMain.row(r).data(data);
-                });
-            } else tblMain._mustDrawNo = true;
-        }
 
         function getData() {
             changeLoading(true);
@@ -178,12 +156,10 @@
                 const obj = data[i];
                 tblMain.row.add([
                     btn("'" + obj.code + "'"),
-                    null,
-                    obj.name,
                     obj.code,
-                    obj.department.name,
                     obj.area.name,
                     obj.room_type.name,
+                    obj.is_available ? 'Yes' : 'No'
                 ]);
             }
             tblMain.draw();
