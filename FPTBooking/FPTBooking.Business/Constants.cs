@@ -64,6 +64,7 @@ namespace FPTBooking.Business
         public const string BOOKING_API = "api/bookings";
         public const string ROOM_API = "api/rooms";
         public const string ROOM_TYPE_API = "api/room-types";
+        public const string BOOKING_SERVICE_API = "api/booking-services";
         public const string DEV_API = "api/dev";
         public const string ERROR = "error";
     }
