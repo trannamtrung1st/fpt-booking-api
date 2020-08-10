@@ -23,7 +23,8 @@ namespace FPTBooking.Business.Queries
             IEnumerable<string> depCodes, IEnumerable<string> depStatuses,
             IEnumerable<string> areaCodes, IEnumerable<string> areaStatuses)
         {
-            return query.Where(o => (depCodes.Contains(o.Room.DepartmentCode)
+            return query.Where(o => (o.BookMember.DepartmentMember
+                        .Select(dm => dm.DepartmentCode).Any(dmCode => depCodes.Contains(dmCode))
                     && (depStatuses == null || !depStatuses.Contains(o.Status)))
                 || (areaCodes.Contains(o.Room.BuildingAreaCode) &&
                     (areaStatuses == null || !areaStatuses.Contains(o.Status)) && o.DepartmentAccepted));
