@@ -9,7 +9,6 @@ namespace FPTBooking.WebApi
 
     public class Settings
     {
-        public Mocking Mocking { get; set; }
         public string WebRootPath { get; set; }
         public double TokenValidHours { get; set; }
         public double RefreshTokenValidHours { get; set; }

@@ -9,7 +9,6 @@ namespace FPTBooking.WebAdmin
 {
     public class Settings
     {
-        public Mocking Mocking { get; set; }
         public double CookiePersistentHours { get; set; }
         public double TokenValidHours { get; set; }
         public double RefreshTokenValidHours { get; set; }

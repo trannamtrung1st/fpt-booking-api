@@ -1,4 +1,5 @@
-﻿using System;
+﻿using Newtonsoft.Json;
+using System;
 using System.Collections.Generic;
 using System.Globalization;
 using System.Linq;
@@ -23,10 +24,11 @@ namespace FPTBooking.Business
                     SupportedCultures = value.Select(c => new CultureInfo(c)).ToArray();
             }
         }
+        [JsonIgnore]
         public CultureInfo[] SupportedCultures { get; set; }
         public string Name { get; set; }
         public string FapApiUrl { get; set; }
-        public bool DevMode { get; set; }
+        public bool StudentAllowed { get; set; }
 
         private static Settings _instance;
         public static Settings Instance

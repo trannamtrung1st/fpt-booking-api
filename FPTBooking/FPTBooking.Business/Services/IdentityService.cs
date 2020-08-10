@@ -510,14 +510,14 @@ namespace FPTBooking.Business.Services
 
         public bool ValidateEmailDomain(string email)
         {
-            if (Settings.Instance.DevMode) return true;
-            return email.IsFptEmail() && !email.IsStudent();
+            return email.IsFptEmail() &&
+                (Settings.Instance.StudentAllowed || !email.IsStudent());
         }
 
         public ValidationData ValidateLoginAdmin(ClaimsPrincipal principal, AppUser entity)
         {
             var validationData = new ValidationData();
-            if (!principal.IsInRole(RoleName.ADMIN) && !Business.Settings.Instance.DevMode)
+            if (!principal.IsInRole(RoleName.ADMIN))
                 validationData = validationData.Fail(code: AppResultCode.AccessDenied);
             return validationData;
         }

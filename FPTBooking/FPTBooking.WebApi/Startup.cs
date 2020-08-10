@@ -119,33 +119,19 @@ namespace FPTBooking.WebApi
                             Encoding.Default.GetBytes(JWT.SECRET_KEY)),
                         ClockSkew = TimeSpan.Zero
                     };
-                    jwtBearerOptions.Events = new JwtBearerEvents
-                    {
-                        OnMessageReceived = (context) =>
-                        {
-                            if (Settings.Instance.Mocking.Enabled)
-                            {
-                                var identity = new ClaimsIdentity("Mocking");
-                                identity.AddClaim(new Claim(ClaimTypes.Name, "mockuser"));
-                                identity.AddClaims(new List<Claim>
-                                {
-                                    new Claim(ClaimTypes.Role, RoleName.ADMIN),
-                                    new Claim(ClaimTypes.Role, RoleName.MANAGER),
-                                    new Claim(ClaimTypes.Role, RoleName.ROOM_CHECKER),
-                                    new Claim(ClaimTypes.Role, RoleName.USER),
-                                });
-                                context.Principal = new ClaimsPrincipal(identity);
-                                context.Success();
-                            }
-                            return Task.CompletedTask;
-                            //StringValues values;
-                            //if (!context.Request.Query.TryGetValue("access_token", out values))
-                            //    return Task.CompletedTask;
-                            //var token = values.FirstOrDefault();
-                            //context.Token = token;
-                            //return Task.CompletedTask;
-                        }
-                    };
+                    //jwtBearerOptions.Events = new JwtBearerEvents
+                    //{
+                    //    OnMessageReceived = (context) =>
+                    //    {
+                    //        return Task.CompletedTask;
+                    //        //StringValues values;
+                    //        //if (!context.Request.Query.TryGetValue("access_token", out values))
+                    //        //    return Task.CompletedTask;
+                    //        //var token = values.FirstOrDefault();
+                    //        //context.Token = token;
+                    //        //return Task.CompletedTask;
+                    //    }
+                    //};
                 });
             #endregion
             services.AddSingleton(new DefaultDateTimeModelBinder());
