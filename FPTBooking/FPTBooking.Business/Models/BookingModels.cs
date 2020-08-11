@@ -194,6 +194,7 @@ namespace FPTBooking.Business.Models
         public DateTime? to_date { get; set; }
         public string status { get; set; }
         public string search { get; set; }
+        public string room_code { get; set; }
         public BoolOptions? archived { get; set; } //default: false
     }
 

@@ -19,6 +19,11 @@ namespace FPTBooking.Business.Queries
             return query.Where(o => roomCodes.Contains(o.RoomCode));
         }
 
+        public static IQueryable<Booking> OfRoom(this IQueryable<Booking> query, string roomCode)
+        {
+            return query.Where(o => o.RoomCode == roomCode);
+        }
+
         public static IQueryable<Booking> ManagedByDepsOrAreasExceptStatuses(this IQueryable<Booking> query,
             IEnumerable<string> depCodes, IEnumerable<string> depStatuses,
             IEnumerable<string> areaCodes, IEnumerable<string> areaStatuses)
@@ -180,6 +185,8 @@ namespace FPTBooking.Business.Queries
                 query = query.Status(model.status);
             if (model.search != null)
                 query = query.Search(model.search);
+            if (model.room_code != null)
+                query = query.OfRoom(model.room_code);
             return query;
         }
 
