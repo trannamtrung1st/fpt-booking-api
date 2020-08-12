@@ -61,6 +61,25 @@ namespace FPTBooking.WebApi.Controllers
         }
 
         [Authorize]
+        [HttpGet("room-bookings")]
+        public async Task<IActionResult> GetRoomBookings([FromQuery][QueryObject]BookingQueryFilter filter,
+            [FromQuery]BookingQuerySort sort,
+            [FromQuery]BookingQueryProjection projection,
+            [FromQuery]BookingQueryPaging paging,
+            [FromQuery]BookingQueryOptions options)
+        {
+            var validationData = _service.ValidateGetRoomBookings(
+                User, filter, sort, projection, paging, options);
+            if (!validationData.IsValid)
+                return BadRequest(AppResult.FailValidation(data: validationData));
+            var result = await _service.QueryBookingDynamic(
+                User, member: null, relationship: null,
+                projection, validationData.TempData, filter, sort, paging, options);
+            if (options.single_only && result == null) return NotFound(AppResult.NotFound());
+            return Ok(AppResult.Success(data: result));
+        }
+
+        [Authorize]
         [HttpGet("calendar")]
         public async Task<IActionResult> GetCalendar(
             [FromQuery][DefaultDateTimeModelBinder]DateTime date,

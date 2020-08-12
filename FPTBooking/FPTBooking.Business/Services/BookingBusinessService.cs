@@ -346,7 +346,7 @@ namespace FPTBooking.Business.Services
         public async Task<QueryResult<object>> QueryBookingDynamic(
             ClaimsPrincipal principal,
             Member member,
-            BookingPrincipalRelationship relationship,
+            BookingPrincipalRelationship? relationship,
             BookingQueryProjection projection,
             IDictionary<string, object> tempData = null,
             BookingQueryFilter filter = null,
@@ -424,6 +424,21 @@ namespace FPTBooking.Business.Services
         public ValidationData ValidateGetBookings(
             ClaimsPrincipal principal,
             BookingPrincipalRelationship relationship,
+            BookingQueryFilter filter,
+            BookingQuerySort sort,
+            BookingQueryProjection projection,
+            BookingQueryPaging paging,
+            BookingQueryOptions options)
+        {
+            var validationData = new ValidationData();
+            if (filter.to_date != null && filter.from_date != null &&
+                filter.to_date.Value.Subtract(filter.from_date.Value).TotalDays > 31)
+                validationData.Fail(mess: "Only 1 month range is allowed", code: AppResultCode.FailValidation);
+            return validationData;
+        }
+
+        public ValidationData ValidateGetRoomBookings(
+            ClaimsPrincipal principal,
             BookingQueryFilter filter,
             BookingQuerySort sort,
             BookingQueryProjection projection,
