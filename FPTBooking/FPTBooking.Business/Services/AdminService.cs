@@ -21,7 +21,7 @@ namespace FPTBooking.Business.Services
             var result = await NotiHelper.Notify(entity.Id, new Notification
             {
                 Body = model.Body,
-                ImageUrl = model.ImageUrl,
+                ImageUrl = string.IsNullOrWhiteSpace(model.ImageUrl) ? null : model.ImageUrl,
                 Title = model.Title,
             }, model.Data);
             return result;
