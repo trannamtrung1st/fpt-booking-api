@@ -1,0 +1,297 @@
+﻿@page
+@model FPTBooking.WebAdmin.Pages.Admin.IndexModel
+@{
+    var apiUrl = WebAdmin.Settings.Instance.ApiUrl;
+}
+
+@section head {
+
+    <!-- icheck bootstrap -->
+    <link rel="stylesheet" href="/plugins/icheck-bootstrap/icheck-bootstrap.min.css">
+    <!-- Select2 -->
+    <link rel="stylesheet" href="/plugins/select2/css/select2.min.css">
+    <link rel="stylesheet" href="/plugins/select2-bootstrap4-theme/select2-bootstrap4.min.css">
+    <!-- DataTables -->
+    <link rel="stylesheet" href="/plugins/datatables-bs4/css/dataTables.bootstrap4.min.css">
+    <link rel="stylesheet" href="/plugins/datatables-responsive/css/responsive.bootstrap4.min.css">
+    <style>
+        [class*=icheck-] > label {
+            padding-left: 0 !important;
+            line-height: unset !important;
+        }
+    </style>
+}
+
+<!-- Content Header (Page header) -->
+<section class="content-header">
+    <div class="container-fluid">
+        <div class="row mb-2">
+            <div class="col-sm-6">
+                <h1>@Model.Info.Title</h1>
+            </div>
+            <div class="col-sm-6">
+                <ol class="breadcrumb float-sm-right">
+                    <li class="breadcrumb-item"><a href="@Routing.DASHBOARD">Dashboard</a></li>
+                    <li class="breadcrumb-item active">@Model.Info.Title</li>
+                </ol>
+            </div>
+        </div>
+    </div><!-- /.container-fluid -->
+</section>
+
+<!-- Main content -->
+<section class="content">
+    <div class="row">
+        <div class="col-12">
+            <form id="form-config-api">
+                <div class="card card-default collapsed collapsed-card">
+                    <div class="card-header clickable" data-card-widget="collapse">
+                        <h3 class="card-title">
+                            <i class="fa fa-cog text-black-50 mr-1"></i>
+                            Configure Web Api
+                        </h3>
+                        <div class="card-tools">
+                            <button type="button" class="btn btn-tool" data-card-widget="collapse"><i class="fas fa-plus"></i></button>
+                        </div>
+                    </div>
+                    <!-- /.card-header -->
+                    <div class="card-body">
+                        <div class="form-group w-50">
+                            <span class="icheck-primary">
+                                <label for="student-allowed" class="pr-2" style="font-weight: normal">Allow student login</label>
+                                <input type="checkbox" id="student-allowed" name="student_allowed" value="true">
+                            </span>
+                        </div>
+                    </div>
+                    <div class="card-footer">
+                        <button class="btn btn-primary float-right">
+                            <i class="fa fa-edit mr-2"></i>UPDATE
+                        </button>
+                    </div>
+                </div>
+            </form>
+            <!-- /.card -->
+        </div>
+        <!-- /.col -->
+    </div>
+    <!-- /.row -->
+
+    <div class="row">
+        <div class="col-12">
+            <form id="form-push-noti">
+                <div class="card card-default collapsed collapsed-card">
+                    <div class="card-header clickable" data-card-widget="collapse">
+                        <h3 class="card-title">
+                            <i class="fas fa-envelope text-black-50 mr-1"></i>
+                            Push Notification
+                        </h3>
+                        <div class="card-tools">
+                            <button type="button" class="btn btn-tool" data-card-widget="collapse"><i class="fas fa-plus"></i></button>
+                        </div>
+                    </div>
+                    <!-- /.card-header -->
+                    <div class="card-body">
+                        <div class="form-group w-50">
+                            <label>Email</label>
+                            <input type="text" name="email"
+                                   class="form-control" placeholder="Enter destination user's email">
+                        </div>
+                        <div class="form-group w-50">
+                            <label>Title</label>
+                            <input type="text" name="title"
+                                   class="form-control" placeholder="Enter message title">
+                        </div>
+                        <div class="form-group w-50">
+                            <label>Body</label>
+                            <textarea name="body" class="form-control" placeholder="Enter message body"></textarea>
+                        </div>
+                        <div class="form-group w-50">
+                            <label>Image url</label>
+                            <input type="text" name="image_url" class="form-control"
+                                   placeholder="Image url (optional)">
+                        </div>
+                    </div>
+                    <div class="card-footer">
+                        <button class="btn btn-primary float-right">
+                            <i class="fa fa-envelope mr-2"></i>SUBMIT
+                        </button>
+                    </div>
+                </div>
+            </form>
+            <!-- /.card -->
+        </div>
+        <!-- /.col -->
+    </div>
+    <!-- /.row -->
+
+</section>
+<!-- /.content -->
+
+@section scripts {
+
+    <!-- iCheck -->
+    <script src="~/plugins/icheck/icheck.min.js"></script>
+    <!-- jquery-validation -->
+    <script src="/plugins/jquery-validation/jquery.validate.min.js"></script>
+    <script src="/plugins/jquery-validation/additional-methods.min.js"></script>
+    <!-- DataTables -->
+    <script src="/plugins/datatables/jquery.dataTables.min.js"></script>
+    <script src="/plugins/datatables-bs4/js/dataTables.bootstrap4.min.js"></script>
+    <script src="/plugins/datatables-responsive/js/dataTables.responsive.min.js"></script>
+    <script src="/plugins/datatables-responsive/js/responsive.bootstrap4.min.js"></script>
+    <!-- Select2 -->
+    <script src="/plugins/select2/js/select2.full.min.js"></script>
+
+    <!-- page script -->
+    <script>
+        $(function () {
+            $('#form-config-api').validate({
+                submitHandler: confirmSubmitConfigApi,
+                rules: {
+                },
+                messages: {
+                },
+                errorElement: 'span',
+                errorPlacement: function (error, element) {
+                    error.addClass('invalid-feedback');
+                    element.closest('.form-group').append(error);
+                },
+                highlight: function (element, errorClass, validClass) {
+                    $(element).addClass('is-invalid');
+                },
+                unhighlight: function (element, errorClass, validClass) {
+                    $(element).removeClass('is-invalid');
+                }
+            });
+
+            $('#form-push-noti').validate({
+                submitHandler: confirmPushNoti,
+                rules: {
+                    title: {
+                        required: true,
+                    },
+                    body: {
+                        required: true,
+                    },
+                    email: {
+                        required: true,
+                    },
+                },
+                messages: {
+                    title: {
+                        required: "Please enter message title",
+                    },
+                    body: {
+                        required: "Please enter message body",
+                    },
+                    email: {
+                        required: "Please enter user's email",
+                    },
+                },
+                errorElement: 'span',
+                errorPlacement: function (error, element) {
+                    error.addClass('invalid-feedback');
+                    element.closest('.form-group').append(error);
+                },
+                highlight: function (element, errorClass, validClass) {
+                    $(element).addClass('is-invalid');
+                },
+                unhighlight: function (element, errorClass, validClass) {
+                    $(element).removeClass('is-invalid');
+                }
+            });
+
+            getWebApiConfig();
+            $('.select2').select2();
+        });
+
+        function getWebApiConfig() {
+            changeLoading(true);
+            const data = {};
+            $.ajax({
+                url: '@apiUrl/@ApiEndpoint.ADMIN_API/config',
+                type: 'get',
+                data: data,
+                success: (respData) => {
+                    console.log(respData);
+                    let data = respData.data;
+                    processWebApiConfig(data);
+                },
+                error: (data) => {
+                    handleGeneralError(data);
+                },
+                complete: () => {
+                    changeLoading(false);
+                }
+            });
+        }
+
+        function processWebApiConfig(data) {
+            var form = $('#form-config-api');
+            form.find('input[name=student_allowed]').iCheck(data.student_allowed ? 'check' : 'uncheck');
+        }
+
+        function confirmSubmitConfigApi() {
+            confirmAlert().then((result) => {
+                if (result.value)
+                    submitConfigApi();
+            });
+        }
+
+        function submitConfigApi() {
+            changeLoading(true);
+            var form = $('#form-config-api');
+            var model = {};
+            model.student_allowed = form.find('input[name=student_allowed]:checked').val();
+            $.ajax({
+                url: '@apiUrl/@ApiEndpoint.ADMIN_API/config',
+                type: 'put',
+                contentType: 'application/json',
+                data: JSON.stringify(model),
+                success: (data) => {
+                    successAlert("Update successfully");
+                },
+                error: (data) => {
+                    handleGeneralError(data);
+                },
+                complete: () => {
+                    changeLoading(false);
+                }
+            });
+        }
+
+        function confirmPushNoti() {
+            confirmAlert().then((result) => {
+                if (result.value)
+                    submitPushNoti();
+            });
+        }
+
+        function submitPushNoti() {
+            var model = {};
+            var form = $('#form-push-noti');
+            model.title = form.find('[name=title]').val();
+            model.email = form.find('[name=email]').val();
+            model.body = form.find('[name=body]').val();
+            model.image_url = form.find('[name=image_url]').val();
+            changeLoading(true);
+            $.ajax({
+                url: '/@ApiEndpoint.ADMIN_API/noti',
+                type: 'post',
+                contentType: 'application/json',
+                data: JSON.stringify(model),
+                success: (data) => {
+                    successAlert("Push notification successfully");
+                },
+                error: (data) => {
+                    handleGeneralError(data);
+                },
+                complete: () => {
+                    changeLoading(false);
+                }
+            });
+        }
+
+    </script>
+}
+

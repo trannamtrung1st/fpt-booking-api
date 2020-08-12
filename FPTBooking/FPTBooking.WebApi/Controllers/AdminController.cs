@@ -46,7 +46,20 @@ namespace FPTBooking.WebApi.Controllers
                 System.IO.File.ReadAllText("appsettings.json"));
             config["BusinessSettings"] = Business.Settings.Instance;
             System.IO.File.WriteAllText("appsettings.json", JsonConvert.SerializeObject(config, Formatting.Indented));
-            return Ok();
+            return NoContent();
+        }
+
+#if !DEBUG
+        [Authorize(Roles = RoleName.ADMIN)]
+#endif
+        [HttpGet("config")]
+        public IActionResult GetConfig()
+        {
+            var config = Business.Settings.Instance;
+            return Ok(AppResult.Success(data: new
+            {
+                student_allowed = config.StudentAllowed
+            }));
         }
     }
 }
