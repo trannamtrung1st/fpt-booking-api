@@ -1,4 +1,5 @@
 ﻿using FirebaseAdmin.Messaging;
+using FPTBooking.Business.Helpers;
 using FPTBooking.Business.Models;
 using FPTBooking.Data.Models;
 using System;
@@ -17,18 +18,12 @@ namespace FPTBooking.Business.Services
 
         public async Task<string> PushNotiToUser(AppUser entity, PushNotiModel model)
         {
-            var mess = new Message
+            var result = await NotiHelper.Notify(entity.Id, new Notification
             {
-                Data = model.Data,
-                Notification = new Notification
-                {
-                    Body = model.Body,
-                    ImageUrl = model.ImageUrl,
-                    Title = model.Title,
-                },
-                Topic = entity.Id
-            };
-            var result = await FirebaseMessaging.DefaultInstance.SendAsync(mess);
+                Body = model.Body,
+                ImageUrl = model.ImageUrl,
+                Title = model.Title,
+            }, model.Data);
             return result;
         }
     }

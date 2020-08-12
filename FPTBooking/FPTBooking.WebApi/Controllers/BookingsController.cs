@@ -110,26 +110,31 @@ namespace FPTBooking.WebApi.Controllers
                 return BadRequest(AppResult.FailValidation(data: validationData));
             var usingMemberIds = validationData.GetTempData<List<string>>("using_member_ids");
             var bookedRoom = validationData.GetTempData<Room>("booked_room");
-            Booking entity;
+            AppEvent ev; Booking entity;
             using (var trans = context.Database.BeginTransaction())
             {
                 entity = _service.CreateBooking(member, bookedRoom, model, usingMemberIds);
                 var history = _service.CreateHistoryForCreateBooking(entity, member);
                 _roomService.ChangeRoomHangingStatus(bookedRoom, false, UserId);
                 //log event
-                var ev = _sysService.GetEventForBookingProcessing(history);
+                ev = _sysService.GetEventForBookingProcessing(history);
                 _sysService.CreateAppEvent(ev);
                 //end log event
                 context.SaveChanges();
                 trans.Commit();
             }
             //notify using members, managers (if any)
+            var notiData = new Dictionary<string, string>
+            {
+                { "event", ev.Type },
+                { "id", entity.Id.ToString() }
+            };
             var notiMemberIds = usingMemberIds.Where(o => o != UserId).ToList();
             var notiMembers = notiMemberIds.Any() ? NotiHelper.Notify(notiMemberIds, new Notification
             {
                 Title = $"You have a new booking",
                 Body = $"{UserEmail} has just created a booking of room {entity.RoomCode} for you. Press for more detail"
-            }) : Task.CompletedTask;
+            }, data: notiData) : Task.CompletedTask;
             var managerNoti = new Notification
             {
                 Title = $"There's a new booking request",
@@ -140,14 +145,14 @@ namespace FPTBooking.WebApi.Controllers
                 var managerIds = _memberService.QueryManagersOfMember(member.UserId)
                     .Select(o => o.UserId).ToList();
                 if (managerIds.Count > 0)
-                    await NotiHelper.Notify(managerIds, managerNoti);
+                    await NotiHelper.Notify(managerIds, managerNoti, data: notiData);
             }
             else if (entity.Status == BookingStatusValues.VALID)
             {
                 var managerIds = _memberService.QueryManagersOfArea(bookedRoom.BuildingAreaCode)
                     .Select(o => o.UserId).ToList();
                 if (managerIds.Count > 0)
-                    await NotiHelper.Notify(managerIds, managerNoti);
+                    await NotiHelper.Notify(managerIds, managerNoti, data: notiData);
             }
             await notiMembers;
             return Created($"/{ApiEndpoint.BOOKING_API}/{entity.Id}",
@@ -164,25 +169,31 @@ namespace FPTBooking.WebApi.Controllers
             if (!validationData.IsValid)
                 return BadRequest(AppResult.FailValidation(data: validationData));
             var fromStatus = entity.Status;
+            AppEvent ev;
             using (var trans = context.Database.BeginTransaction())
             {
                 _service.CancelBooking(model, entity);
                 var history = _service.CreateHistoryForCancelBooking(entity, fromStatus, entity.BookMember);
                 //log event
-                var ev = _sysService.GetEventForBookingProcessing(history);
+                ev = _sysService.GetEventForBookingProcessing(history);
                 _sysService.CreateAppEvent(ev);
                 //end log event
                 context.SaveChanges();
                 trans.Commit();
             }
             //notify using members, managers (if any)
+            var notiData = new Dictionary<string, string>
+            {
+                { "event", ev.Type },
+                { "id", entity.Id.ToString() }
+            };
             var notiMemberIds = entity.UsingMemberIds.Split('\n')
                 .Where(o => o != UserId).ToList();
             var notiMembers = notiMemberIds.Any() ? NotiHelper.Notify(notiMemberIds, new Notification
             {
                 Title = $"Your booking {entity.Code} has been aborted",
                 Body = $"{UserEmail} has just aborted booking {entity.Code}. Press for more detail"
-            }) : Task.CompletedTask;
+            }, data: notiData) : Task.CompletedTask;
             var managerNoti = new Notification
             {
                 Title = $"A booking managed by you has been aborted",
@@ -193,14 +204,14 @@ namespace FPTBooking.WebApi.Controllers
                 var managerIds = _memberService.QueryManagersOfMember(entity.BookMemberId)
                     .Select(o => o.UserId).ToList();
                 if (managerIds.Count > 0)
-                    await NotiHelper.Notify(managerIds, managerNoti);
+                    await NotiHelper.Notify(managerIds, managerNoti, data: notiData);
             }
             else if (entity.Status == BookingStatusValues.APPROVED)
             {
                 var managerIds = _memberService.QueryManagersOfArea(entity.Room.BuildingAreaCode)
                     .Select(o => o.UserId).ToList();
                 if (managerIds.Count > 0)
-                    await NotiHelper.Notify(managerIds, managerNoti);
+                    await NotiHelper.Notify(managerIds, managerNoti, data: notiData);
             }
             await notiMembers;
             return NoContent();
@@ -246,19 +257,25 @@ namespace FPTBooking.WebApi.Controllers
             if (!validationData.IsValid)
                 return BadRequest(AppResult.FailValidation(data: validationData));
             var fromStatus = entity.Status;
+            AppEvent ev;
             using (var trans = context.Database.BeginTransaction())
             {
                 _service.ChangeApprovalStatusOfBooking(model, entity);
                 var history = _service.CreateHistoryForChangeApprovalStatusOfBooking(
                     entity, fromStatus, model.IsApproved, member);
                 //log event
-                var ev = _sysService.GetEventForBookingProcessing(history);
+                ev = _sysService.GetEventForBookingProcessing(history);
                 _sysService.CreateAppEvent(ev);
                 //end log event
                 context.SaveChanges();
                 trans.Commit();
             }
             //notify using members, managers (if any)
+            var notiData = new Dictionary<string, string>
+            {
+                { "event", ev.Type },
+                { "id", entity.Id.ToString() }
+            };
             var approvePerson = fromStatus == BookingStatusValues.PROCESSING ? "department manager" :
                 "location manager";
             var action = model.IsApproved ? "approved" : "denied";
@@ -268,7 +285,7 @@ namespace FPTBooking.WebApi.Controllers
             {
                 Title = $"Booking {entity.Code} has been {action} by your {approvePerson}",
                 Body = $"{UserEmail} has just {action} your booking. Press for more detail"
-            });
+            }, data: notiData);
             if (entity.Status == BookingStatusValues.VALID && model.IsApproved)
             {
                 var managerIds = _memberService.QueryManagersOfArea(entity.Room.BuildingAreaCode)
@@ -278,7 +295,7 @@ namespace FPTBooking.WebApi.Controllers
                     {
                         Title = $"There's a new booking request",
                         Body = $"{UserEmail} has just {action} a booking of room {entity.RoomCode}. Press for more detail"
-                    });
+                    }, data: notiData);
             }
             await notiMembers;
             return NoContent();
@@ -295,18 +312,24 @@ namespace FPTBooking.WebApi.Controllers
             if (!validationData.IsValid)
                 return BadRequest(AppResult.FailValidation(data: validationData));
             var fromStatus = entity.Status;
+            AppEvent ev;
             using (var trans = context.Database.BeginTransaction())
             {
                 _service.UpdateBooking(model, entity);
                 var history = _service.CreateHistoryForUpdateBooking(entity, member);
                 //log event
-                var ev = _sysService.GetEventForBookingProcessing(history);
+                ev = _sysService.GetEventForBookingProcessing(history);
                 _sysService.CreateAppEvent(ev);
                 //end log event
                 context.SaveChanges();
                 trans.Commit();
             }
             //notify using members
+            var notiData = new Dictionary<string, string>
+            {
+                { "event", ev.Type },
+                { "id", entity.Id.ToString() }
+            };
             var updatePerson = fromStatus == BookingStatusValues.PROCESSING ? "department manager" :
                 "location manager";
             var usingMemberIds = entity.UsingMemberIds.Split('\n');
@@ -315,7 +338,7 @@ namespace FPTBooking.WebApi.Controllers
             {
                 Title = $"Booking {entity.Code} has been updated by your {updatePerson}",
                 Body = $"{UserEmail} has just updated your booking of room {entity.RoomCode}. Press for more detail"
-            });
+            }, data: notiData);
             return NoContent();
         }
 

@@ -105,15 +105,16 @@ namespace FPTBooking.WebApi.Controllers
             var validationData = _service.ValidateCheckRoomStatus(User, entity, model);
             if (!validationData.IsValid)
                 return BadRequest(AppResult.FailValidation(data: validationData));
+            AppEvent ev;
             using (var trans = context.Database.BeginTransaction())
             {
                 var oldNote = entity.Note;
                 var oldStatus = entity.IsAvailable;
                 _service.CheckRoomStatus(model, entity);
                 //log event
-                var ev = _sysService.GetEventForRoomProcessing(
+                ev = _sysService.GetEventForRoomProcessing(
                     $"{UserEmail} has changed the status of room {entity.Code}",
-                    "CheckRoomStatus", UserId, new
+                    "Room_CheckStatus", UserId, new
                     {
                         old_note = oldNote,
                         old_status = oldStatus,
@@ -126,6 +127,11 @@ namespace FPTBooking.WebApi.Controllers
                 context.SaveChanges();
             }
             //notify managers
+            var notiData = new Dictionary<string, string>
+            {
+                { "event", ev.Type },
+                { "id", entity.Code.ToString() }
+            };
             var managerIds = _memberService.QueryManagersOfDepartment(entity.DepartmentCode)
                 .Union(_memberService.QueryManagersOfArea(entity.BuildingAreaCode))
                 .Select(o => o.UserId).ToList();
@@ -134,7 +140,7 @@ namespace FPTBooking.WebApi.Controllers
                 {
                     Title = $"Status of room {entity.Code} has been changed",
                     Body = $"{UserEmail} has changed the status of room {entity.Code}. Pressed for more detail"
-                });
+                }, data: notiData);
             return NoContent();
         }
 

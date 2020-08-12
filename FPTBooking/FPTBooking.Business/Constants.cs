@@ -114,12 +114,12 @@ namespace FPTBooking.Business
 
     public static class BookingHistoryTypes
     {
-        public const string CREATE = "Create";
-        public const string APPROVE = "Approve";
-        public const string FEEDBACK = "Feedback";
-        public const string DENY = "Deny";
-        public const string ABORT = "Abort";
-        public const string UPDATE = "Update";
+        public const string CREATE = "Booking_Create";
+        public const string APPROVE = "Booking_Approve";
+        public const string FEEDBACK = "Booking_Feedback";
+        public const string DENY = "Booking_Deny";
+        public const string ABORT = "Booking_Abort";
+        public const string UPDATE = "Booking_Update";
     }
 
     public enum BookingPrincipalRelationship
