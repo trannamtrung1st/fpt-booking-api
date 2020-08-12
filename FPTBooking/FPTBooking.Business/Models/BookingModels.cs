@@ -192,6 +192,7 @@ namespace FPTBooking.Business.Models
         public DateTime? from_date { get; set; }
         [DefaultDateTimeModelBinder(ToUtc = false)]
         public DateTime? to_date { get; set; }
+        public string date_type { get; set; }
         public string status { get; set; }
         public string search { get; set; }
         public string room_code { get; set; }

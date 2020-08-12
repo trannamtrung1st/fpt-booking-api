@@ -133,4 +133,10 @@ namespace FPTBooking.Business
         T = 1, F = 2, B = 3
     }
 
+    public class BookingQueryFilterDateType
+    {
+        public const string BOOKED_DATE = "booked";
+        public const string SENT_DATE = "sent";
+    }
+
 }

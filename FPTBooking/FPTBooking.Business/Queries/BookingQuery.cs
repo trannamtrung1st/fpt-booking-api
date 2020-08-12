@@ -55,6 +55,11 @@ namespace FPTBooking.Business.Queries
             return query.Where(o => o.BookedDate.Date == date.Date);
         }
 
+        public static IQueryable<Booking> SentDate(this IQueryable<Booking> query, DateTime date)
+        {
+            return query.Where(o => o.SentDate.Date == date.Date);
+        }
+
         public static IQueryable<Booking> ActiveStatus(this IQueryable<Booking> query)
         {
             return query.NotStatus(BookingStatusValues.ABORTED)
@@ -172,15 +177,31 @@ namespace FPTBooking.Business.Queries
             var archived = model.archived ?? BoolOptions.F;
             if (archived != BoolOptions.B)
                 query = query.Archived(!(archived == BoolOptions.F));
-            if (model.from_date != null)
-                query = query.SentDateFromDate(model.from_date.Value);
-            if (model.to_date != null)
+            switch (model.date_type)
             {
-                var toDateUtc = model.to_date.Value.ToEndOfDay().ToUtc();
-                query = query.SentDateToDate(toDateUtc);
+                case BookingQueryFilterDateType.BOOKED_DATE:
+                    if (model.from_date != null)
+                        query = query.SentDateFromDate(model.from_date.Value);
+                    if (model.to_date != null)
+                    {
+                        var toDateUtc = model.to_date.Value.ToEndOfDay().ToUtc();
+                        query = query.SentDateToDate(toDateUtc);
+                    }
+                    if (model.date != null)
+                        query = query.SentDate(model.date.Value);
+                    break;
+                case BookingQueryFilterDateType.SENT_DATE:
+                    if (model.from_date != null)
+                        query = query.BookedDateFromDate(model.from_date.Value);
+                    if (model.to_date != null)
+                    {
+                        var toDateUtc = model.to_date.Value.ToEndOfDay().ToUtc();
+                        query = query.BookedDateToDate(toDateUtc);
+                    }
+                    if (model.date != null)
+                        query = query.BookedDate(model.date.Value);
+                    break;
             }
-            if (model.date != null)
-                query = query.BookedDate(model.date.Value);
             if (model.status != null)
                 query = query.Status(model.status);
             if (model.search != null)
