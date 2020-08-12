@@ -8,10 +8,13 @@ namespace FPTBooking.Business.Helpers
 {
     public static class NotiHelper
     {
+        public const string CLICK_ACTION = "FLUTTER_NOTIFICATION_CLICK";
+
         public static async Task<string> Notify(string topic,
             Notification noti,
-            IReadOnlyDictionary<string, string> data = null)
+            Dictionary<string, string> data = null)
         {
+            if (data != null) data["click_action"] = CLICK_ACTION;
             var result = await FirebaseMessaging.DefaultInstance.SendAsync(new Message
             {
                 Topic = topic,
@@ -23,8 +26,9 @@ namespace FPTBooking.Business.Helpers
 
         public static async Task<BatchResponse> Notify(IEnumerable<string> topics,
             Notification noti,
-            IReadOnlyDictionary<string, string> data = null)
+            Dictionary<string, string> data = null)
         {
+            if (data != null) data["click_action"] = CLICK_ACTION;
             var messages = topics.Select(t => new Message
             {
                 Data = data,
@@ -35,8 +39,9 @@ namespace FPTBooking.Business.Helpers
             return result;
         }
 
-        public static async Task<string> SendData(string topic, IReadOnlyDictionary<string, string> data)
+        public static async Task<string> SendData(string topic, Dictionary<string, string> data)
         {
+            if (data != null) data["click_action"] = CLICK_ACTION;
             var result = await FirebaseMessaging.DefaultInstance.SendAsync(new Message
             {
                 Topic = topic,
