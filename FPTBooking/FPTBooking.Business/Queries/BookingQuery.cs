@@ -179,7 +179,7 @@ namespace FPTBooking.Business.Queries
                 query = query.Archived(!(archived == BoolOptions.F));
             switch (model.date_type)
             {
-                case BookingQueryFilterDateType.BOOKED_DATE:
+                case BookingQueryFilterDateType.SENT_DATE:
                     if (model.from_date != null)
                         query = query.SentDateFromDate(model.from_date.Value);
                     if (model.to_date != null)
@@ -190,7 +190,7 @@ namespace FPTBooking.Business.Queries
                     if (model.date != null)
                         query = query.SentDate(model.date.Value);
                     break;
-                case BookingQueryFilterDateType.SENT_DATE:
+                case BookingQueryFilterDateType.BOOKED_DATE:
                     if (model.from_date != null)
                         query = query.BookedDateFromDate(model.from_date.Value);
                     if (model.to_date != null)
