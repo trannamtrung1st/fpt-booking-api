@@ -32,10 +32,10 @@ namespace FPTBooking.Business.Services
         #region Create Booking
         protected string GetBookingCode(Booking entity)
         {
-            return "B-" + Global.Random.RandomStringFrom(RandomExtension.Uppers_Digits, 4) +
+            return "B-" + Global.Random.RandomStringFrom(RandomExtension.Uppers_Digits, 4) + "-" +
                 entity.RoomCode + "-" +
                 entity.BookedDate.ToDefaultTimeZone().ToString("ddMMyyyy") + "-" +
-                entity.FromTime.ToString("hhmm") + entity.ToTime.ToString("hhmm") + "-";
+                entity.FromTime.ToString("hhmm") + entity.ToTime.ToString("hhmm");
         }
         protected void PrepareCreate(Booking entity, Member bookMember, Room bookedRoom)
         {
