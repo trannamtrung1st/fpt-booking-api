@@ -44,9 +44,11 @@ namespace FPTBooking.Business.Services
             entity.SentDate = DateTime.UtcNow;
             foreach (var e in entity.AttachedService)
                 e.Booking = entity;
-            var managerDeps = _memberService.DepartmentMembers.OfMember(bookMember.UserId)
-                .IsManager().Select(o => o.DepartmentCode).ToList();
-            var isDepManager = managerDeps.Contains(bookedRoom.DepartmentCode);
+            //var managerDeps = _memberService.DepartmentMembers.OfMember(bookMember.UserId)
+            //    .IsManager().Select(o => o.DepartmentCode).ToList();
+            //var isDepManager = managerDeps.Contains(bookedRoom.DepartmentCode);
+            var isDepManager = _memberService.DepartmentMembers.OfMember(bookMember.UserId)
+                .IsManager().Any();
             var isAreaManager = _memberService.AreaMembers.OfMember(bookMember.UserId)
                 .IsManager().Select(o => o.AreaCode)
                 .Contains(bookedRoom.BuildingAreaCode);
